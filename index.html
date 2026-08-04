@@ -186,7 +186,16 @@ main{padding:36px 0 80px}
 .spec-name.valideyn{background:#e07b1e}
 .act-title{font-weight:700; font-size:14.5px; margin-bottom:3px}
 .act-meta{font-size:12.5px; color:var(--muted); margin-bottom:6px}
-.act-why{font-size:13px; background:#fbfdff; border-left:3px solid var(--blue2); padding:8px 12px; border-radius:0 8px 8px 0; margin-top:6px}
+.act-obj{font-size:13.5px; background:#eef6ff; border-left:3px solid var(--blue); padding:8px 12px; border-radius:0 8px 8px 0; margin-top:8px}
+.act-obj b{color:var(--navy)}
+.act-steps{margin:10px 0 0; padding:0; list-style:none; counter-reset:stepnum}
+.act-steps li{counter-increment:stepnum; position:relative; padding:6px 0 6px 30px; font-size:13.5px; border-bottom:1px dashed var(--line)}
+.act-steps li:last-child{border-bottom:none}
+.act-steps li::before{content:counter(stepnum); position:absolute; left:0; top:5px; width:20px;height:20px;border-radius:6px; background:var(--blue2); color:#fff; font-size:11px; font-weight:800; display:flex;align-items:center;justify-content:center}
+.act-steps-label{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-top:12px}
+.act-why{font-size:13px; background:#fbfdff; border-left:3px solid var(--mint); padding:8px 12px; border-radius:0 8px 8px 0; margin-top:10px}
+.act-eval{font-size:13px; background:#f2fbf7; border-left:3px solid var(--ok); padding:8px 12px; border-radius:0 8px 8px 0; margin-top:8px}
+.act-adapt{font-size:13px; background:#fff8ee; border-left:3px solid #e07b1e; padding:8px 12px; border-radius:0 8px 8px 0; margin-top:8px}
 
 .notes-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
 @media(max-width:700px){.notes-grid{grid-template-columns:1fr}}
@@ -544,149 +553,381 @@ function detectAgeGroup(ageText, birthDateStr){
 const BANK = {
 psixoloq:{
   umumi:[
-    {t:"Göz kontaktı və birgə diqqət məşqi (güzgü qarşısında)", m:"güzgü, sevimli oyuncaq", r:"Göz kontaktı sosial ünsiyyətin təməl blokudur; erkən mərhələdə güzgü vasitəsilə şəxsi diqqəti artırmaq mümkündür."},
-    {t:"Növbə gözləmə oyunu (top ötürmə)", m:"yumşaq top", r:"Növbə gözləmə özünütənzimləmə və sosial qarşılıqlılığın inkişafına xidmət edir."},
-    {t:"Emosiya kartları ilə tanınma məşqi", m:"emosiya kartları", r:"Emosiyaları tanımaq özünüifadə və empatiyanın inkişafı üçün zəruridir."},
-    {t:"Struktura salınmış sərbəst oyun sessiyası", m:"seçilmiş 2-3 oyuncaq", r:"Struktura salınmış oyun diqqətin idarə olunmasını və davranış nəzarətini gücləndirir."},
-    {t:"Təqlid məşqi (hərəkətləri təkrarlama)", m:"yoxdur", r:"Təqlid bacarığı yeni bacarıqların mənimsənilməsi üçün əsas mexanizmdir."},
-    {t:"Motivasiyaedici mükafat sistemi ilə tapşırıq icrası", m:"jeton/ulduz cədvəli", r:"Müsbət pekləndirmə arzuolunan davranışların tezliyini artırır (ABA prinsipi)."},
-    {t:"Sakitləşmə küncündə özünütənzimləmə məşqi", m:"yumşaq yastıq, sensor oyuncaq", r:"Özünütənzimləmə strategiyaları emosional partlayışların qarşısını almağa kömək edir."},
-    {t:"Sosial hekayə ilə davranış nümunəsi", m:"şəkilli sosial hekayə", r:"Sosial hekayələr mürəkkəb sosial vəziyyətləri sadə, başa düşülən formada izah edir."},
-    {t:"Problemin həlli tapşırığı (puzzle/labirint)", m:"sadə puzzle", r:"Problem həll etmə bacarığı koqnitiv çevikliyi inkişaf etdirir."},
-    {t:"Birgə fəaliyyət — komanda tapşırığı", m:"böyük karton, iki uşaq/valideyn", r:"Əməkdaşlıq tapşırıqları sosial qarşılıqlılığı təbii mühitdə formalaşdırır."}
+    {t:"Göz kontaktı və birgə diqqət məşqi", obj:"Uşaq adı çağırıldıqda 3 saniyəyə qədər göz kontaktı saxlaya bilsin.",
+     steps:["Uşağı güzgü qarşısında rahat mövqedə əyləşdirin, sevimli oyuncağı üzünüzün yanında tutun.","Adını deyərək 1-2 saniyə pauza edin, göz təması yarandığı an dərhal jeton/tərif ilə pekləndirin.","Tədricən gözləmə müddətini artırın; təması 5-6 dəfə təkrarlayın, hər dəfə fərqli sevimli əşya istifadə edin."],
+     m:"güzgü, 2-3 sevimli oyuncaq", r:"Göz kontaktı sosial ünsiyyətin təməl blokudur; erkən mərhələdə güzgü vasitəsilə şəxsi diqqəti artırmaq mümkündür.",
+     eval:"Sessiya ərzində minimum 5 spontan/stimullaşdırılmış göz təması qeydə alınmalıdır.", adapt:"Çətinlik yaranarsa məsafəni azaldın və vaxtı 1 saniyəyə endirin; asan gələrsə fon səs-küyünü artıraraq diqqəti çətinləşdirin."},
+    {t:"Növbə gözləmə oyunu (top ötürmə)", obj:"Uşaq 3 dövrə ərzində növbəsini gözləyib topu vaxtında ötürsün.",
+     steps:["Uşaqla üz-üzə əyləşin, aydın \"Mənim növbəm — Sənin növbən\" ifadələrini vizual kartla dəstəkləyin.","Topu ötürün, uşağın öz növbəsini gözləməsini 3-5 saniyə gözləyin, tələsdirməyin.","Uğurlu növbə dəyişikliyindən sonra dərhal müsbət rəy verin və dövrü təkrarlayın."],
+     m:"yumşaq top, növbə kartı", r:"Növbə gözləmə özünütənzimləmə və sosial qarşılıqlılığın inkişafına xidmət edir.",
+     eval:"5 dövrədən minimum 3-də müstəqil növbə gözləməsi uğur sayılır.", adapt:"Impulsivlik yüksəkdirsə vizual таймer əlavə edin; irəliləyiş varsa iştirakçı sayını artırın."},
+    {t:"Emosiya kartları ilə tanınma məşqi", obj:"Uşaq 4 əsas emosiyadan (sevinc, kədər, qorxu, qəzəb) ən azı 2-sini düzgün adlandırsın.",
+     steps:["Kartları bir-bir göstərin, hər üzü öz mimikanızla canlandırın.","Uşaqdan kartı adlandırmasını və ya eyni emosiyanı üzündə göstərməsini xahiş edin.","Gündəlik həyatdan konkret nümunə ilə (\"bax, bu uşaq da belə kədərlidir\") anlayışı möhkəmləndirin."],
+     m:"4-6 emosiya kartı", r:"Emosiyaları tanımaq özünüifadə və empatiyanın inkişafı üçün zəruridir.",
+     eval:"Sessiya sonunda ən azı 2 emosiyanın sabit tanınması.", adapt:"Zəifdirsə yalnız 2 kontrast emosiya (sevinc/kədər) ilə başlayın."},
+    {t:"Struktura salınmış sərbəst oyun sessiyası", obj:"Uşaq 8-10 dəqiqə ərzində 1 oyun fəaliyyətinə diqqətini saxlasın.",
+     steps:["2-3 oyuncağı əvvəlcədən seçib masaya düzün, artıq stimulları uzaqlaşdırın.","Uşağın öz təşəbbüsünü izləyin, paralel oynayaraq nəzarətçi deyil, tərəfdaş rolunda olun.","Fəaliyyət yorucu olmadan əvvəl planlı şəkildə \"bitir\" siqnalı verərək keçidi hazırlayın."],
+     m:"2-3 seçilmiş oyuncaq", r:"Struktura salınmış oyun diqqətin idarə olunmasını və davranış nəzarətini gücləndirir.",
+     eval:"Diqqətin kəsilmə sayı əvvəlki sessiyaya nisbətən azalmalıdır.", adapt:"Diqqət tez yayınırsa oyuncaq sayını 1-ə endirin."},
+    {t:"Təqlid məşqi (hərəkətləri təkrarlama)", obj:"Uşaq 5 sadə hərəkətdən minimum 3-nü təqlid etsin.",
+     steps:["Sadə, aydın hərəkət nümayiş etdirin (əl çırpma, qol qaldırma).","\"Bax, belə et\" deyərək uşağı təqlidə təşviq edin, lazım gələrsə əlindən tutub kömək edin (fiziki komanda).","Hər uğurlu təqlidi dərhal pekləndirin, tədricən köməyi azaldın (fading)."],
+     m:"yoxdur", r:"Təqlid bacarığı yeni bacarıqların mənimsənilməsi üçün əsas mexanizmdir.",
+     eval:"Fiziki köməksiz təqlid faizinin artması.", adapt:"Uğur olmursa əvvəlcə cismani köməklə başlayıb tədricən azaldın (prompt fading)."},
+    {t:"Motivasiyaedici mükafat sistemi ilə tapşırıq icrası", obj:"Uşaq 3 ardıcıl tapşırığı jeton sistemi ilə tamamlasın.",
+     steps:["Uşaqla birlikdə 3 sadə tapşırıq və mükafat (jeton cədvəli) barədə razılaşın.","Hər tapşırıq bitdikdə dərhal jeton verin, vizual irəliləyişi göstərin.","5 jeton toplandıqda əvvəlcədən razılaşılmış mükafatı təqdim edin."],
+     m:"jeton/ulduz cədvəli, kiçik mükafat", r:"Müsbət pekləndirmə arzuolunan davranışların tezliyini artırır (ABA əsaslı token economy prinsipi).",
+     eval:"3 tapşırığın tam icrası və mükafat gözləmə müddətinin dözümlülüyü.", adapt:"Motivasiya zəifdirsə jeton sayını azaldın (məs. 3-ə), mükafatı daha tez-tez verin."},
+    {t:"Sakitləşmə küncündə özünütənzimləmə məşqi", obj:"Uşaq gərginlik zamanı köməklə sakitləşmə küncündən istifadə etsin.",
+     steps:["Sakitləşmə küncünü əvvəlcədən sakit vaxtda tanıdın (yumşaq yastıq, sensor oyuncaq).","Gərginlik əlamətləri müşahidə olunanda sakit səslə küncə yönləndirin.","Nəfəs məşqi (3 dərin nəfəs) ilə birgə sakitləşməyə kömək edin, sonra tədricən tapşırığa qayıdın."],
+     m:"yumşaq yastıq, sensor oyuncaq, nəfəs kartı", r:"Özünütənzimləmə strategiyaları emosional partlayışların qarşısını almağa kömək edir.",
+     eval:"Küncdən istifadədən sonra sakitləşmə vaxtının qısalması.", adapt:"Müqavimət olarsa əvvəlcə mütəxəssis özü nümunə göstərsin (modelling)."},
+    {t:"Sosial hekayə ilə davranış nümunəsi", obj:"Uşaq hekayədəki sosial qaydanı 1 konkret vəziyyətdə tətbiq etsin.",
+     steps:["Uşağın konkret çətinlik yaşadığı vəziyyətə uyğun qısa, şəkilli sosial hekayə hazırlayın.","Hekayəni sakit mühitdə, yavaş templə oxuyun, hər şəkildə dayanıb sual verin.","Hekayədəki davranışı rollu oyun şəklində birgə canlandırın."],
+     m:"şəkilli sosial hekayə", r:"Sosial hekayələr mürəkkəb sosial vəziyyətləri sadə, başa düşülən formada izah edir.",
+     eval:"Uşağın hekayə sualına düzgün cavab verməsi və davranışı təqlid etməsi.", adapt:"Anlama zəifdirsə şəkil sayını artırın, mətni sadələşdirin."}
   ],
   autizm:[
-    {t:"DIR/Floortime prinsipi ilə uşağın təşəbbüsünü izləmə", m:"uşağın seçdiyi oyuncaq", r:"Uşağın öz təşəbbüsünü izləmək emosional əlaqəni və ünsiyyət istəyini gücləndirir."},
-    {t:"Vizual cədvəl ilə keçid məşqi", m:"vizual keçid kartları", r:"Vizual dəstək gözlənilməzliyi azaldaraq keçid çətinliklərini yumşaldır."},
-    {t:"PECS əsaslı istək bildirmə məşqi", m:"PECS kartları", r:"Alternativ kommunikasiya funksional ünsiyyəti erkən formada təmin edir."},
-    {t:"Stereotip davranışın funksional əvəzlənməsi", m:"sensor alternativ oyuncaq", r:"Funksional əvəzetmə davranış analizinin əsas prinsiplərindən biridir (ABC modeli)."},
-    {t:"Sıra ilə oyuncaq düzmə və struktur oyunu", m:"kublar, sıralı oyuncaqlar", r:"Struktura meyl güclü tərəf kimi istifadə olunaraq öyrənməyə körpü yaradır."}
+    {t:"DIR/Floortime prinsipi ilə uşağın təşəbbüsünü izləmə", obj:"Uşağın öz seçdiyi fəaliyyətdə 5 dəqiqə qarşılıqlı ünsiyyət dövrəsi yaradılsın.",
+     steps:["Uşağın öz seçdiyi oyuna qoşulun, idarə etməyə çalışmadan onun ardınca gedin.","Onun hərəkətini şərh edin və təqlid edərək \"dairəni açın\" (open a circle of communication).","Kiçik təəccüblü elementlə (gözlənilməz hərəkət) qarşılıqlı reaksiyanı təhrik edin."],
+     m:"uşağın seçdiyi oyuncaq", r:"Uşağın öz təşəbbüsünü izləmək emosional əlaqəni və ünsiyyət istəyini gücləndirir (Floortime metodologiyası).",
+     eval:"Qarşılıqlı \"ünsiyyət dairələrinin\" sayının artması.", adapt:"Uşaq təkrarlayıcı oyunda israrlıdırsa, həmin oyuna kiçik dəyişiklik əlavə edərək çevikliyi təşviq edin."},
+    {t:"Vizual cədvəl ilə keçid məşqi", obj:"Uşaq 1 fəaliyyətdən digərinə davranış partlayışı olmadan keçsin.",
+     steps:["Növbəti fəaliyyəti göstərən vizual kartı əvvəlcədən (2 dəqiqə qabaq) nümayiş etdirin.","\"Bitdi — indi bu\" formulunu istifadə edərək keçidi vizual şəkildə izah edin.","Keçid uğurla olduqda dərhal pekləndirin, çətinlik olarsa sakit gözləyin, təzyiq etməyin."],
+     m:"vizual keçid kartları, таймer", r:"Vizual dəstək gözlənilməzliyi azaldaraq keçid çətinliklərini yumşaldır.",
+     eval:"Keçid zamanı davranış partlayışının tezliyi/müddəti azalmalıdır.", adapt:"Çətinlik davam edərsə xəbərdarlıq vaxtını 5 dəqiqəyə qədər artırın."},
+    {t:"PECS əsaslı istək bildirmə məşqi", obj:"Uşaq 1 mərhələli PECS mübadiləsi ilə istəyini bildirsin.",
+     steps:["Sevdiyi əşyanı görünən, lakin əlçatmaz məsafədə yerləşdirin.","Uşaq əşyaya əl uzatdıqda kartı ona verib mütəxəssisə uzatmasına kömək edin (fiziki komanda ilə).","Kart mütəxəssisə çatan kimi dərhal əşyanı verin və sözlə də adlandırın."],
+     m:"PECS kartları", r:"Funksional kommunikasiya problemli davranışların yerini tuta bilər və spontan ünsiyyəti başladır.",
+     eval:"Fiziki köməksiz kart mübadiləsinin baş verməsi.", adapt:"Mərhələ 1 möhkəmlənməyibsə fiziki köməyi azaltmayın, əvvəlcə tam köməklə təkrarlayın."},
+    {t:"Stereotip davranışın funksional əvəzlənməsi", obj:"Stereotip hərəkət epizodunun 1 sessiya ərzində tezliyi azaldılsın.",
+     steps:["Stereotip davranışın hansı funksiyaya (sensor, qaçış, diqqət) xidmət etdiyini müşahidə edin.","Eyni funksiyanı ödəyən uyğun alternativ (məs. sensor oyuncaq) təklif edin.","Alternativ istifadə olunduqda dərhal pekləndirin, davranışı tənbeh etmədən yönləndirin."],
+     m:"sensor alternativ oyuncaq", r:"Funksional əvəzetmə davranış analizinin əsas prinsiplərindən biridir (ABC modeli və funksional davranış qiymətləndirməsi).",
+     eval:"Stereotip epizodların tezliyində/uzunluğunda azalma.", adapt:"Funksiya aydın deyilsə, əvvəlcə 2-3 sessiya yalnız müşahidə aparın (ABC qeydi)."},
+    {t:"Sıra ilə oyuncaq düzmə və struktur oyunu", obj:"Güclü tərəf olan struktur meyli istifadə edərək 5 addımlı tapşırıq tamamlansın.",
+     steps:["Uşağın sevdiyi sıralama fəaliyyətini (kublar, maşınlar) başladın.","Sıralama zamanı yeni elementlər (rəng, ölçü) tədricən daxil edərək öyrənməyə körpü yaradın.","Tapşırıq bitdikdə uşağın öz nəticəsini göstərməsinə imkan verin."],
+     m:"kublar, sıralı oyuncaqlar", r:"Struktura meyl güclü tərəf kimi istifadə olunaraq öyrənməyə körpü yaradır.",
+     eval:"Yeni element daxil edildikdə davam etmə (elastiklik) qabiliyyəti.", adapt:"Müqavimət olarsa yeni elementi sonuncu addıma köçürün."}
   ],
   daun:[
-    {t:"Təkrarlayıcı ritmik mahnı ilə diqqət cəlbetmə", m:"sadə ritmik mahnı", r:"Down sindromlu uşaqlarda auditor-ritmik stimullar diqqəti effektiv cəlb edir."},
-    {t:"Vizual dəstəkli sadə göstəriş icrası", m:"şəkilli göstəriş kartları", r:"Vizual dəstək reseptiv dilin gücləndirilməsinə kömək edir."},
-    {t:"Yavaş templi təqlid oyunu", m:"yoxdur", r:"Prosesləmə sürətinə uyğunlaşdırılmış tempo öyrənmə effektivliyini artırır."}
+    {t:"Təkrarlayıcı ritmik mahnı ilə diqqət cəlbetmə", obj:"Uşaq mahnı zamanı 3 dəqiqə fəal iştirak etsin (əl çalma/hərəkət).",
+     steps:["Sadə, təkrarlayıcı ritmik mahnını yavaş templə oxuyun.","Hərəkətli jestlərlə (əl çalma, yellənmə) mahnını canlandırın, uşağı qoşulmağa təşviq edin.","Mahnını 2-3 dəfə təkrarlayaraq gözlənilən hərəkəti gücləndirin."],
+     m:"sadə ritmik mahnı mətni", r:"Down sindromlu uşaqlarda auditor-ritmik stimullar diqqəti effektiv cəlb edir.",
+     eval:"Fəal iştirakın (hərəkət/səs) müddətinin artması.", adapt:"Diqqət zəifdirsə mahnını qısaldın, tempi ləngidin."},
+    {t:"Vizual dəstəkli sadə göstəriş icrası", obj:"Uşaq 1 addımlı vizual göstərişi 4/5 halda icra etsin.",
+     steps:["Göstərişi həm sözlə, həm şəkilli kartla eyni anda təqdim edin.","İcra üçün lazım gələrsə əl ilə yüngül yönləndirmə edin.","Uğurlu icradan sonra həm sözlü, həm vizual pekləndirmə verin."],
+     m:"şəkilli göstəriş kartları", r:"Vizual dəstək reseptiv dilin gücləndirilməsinə kömək edir.",
+     eval:"Köməksiz düzgün icra faizinin artması.", adapt:"Çətinlikdə göstəriş sayını 1-ə endirin, addımı sadələşdirin."},
+    {t:"Yavaş templi təqlid oyunu", obj:"Uşaq yavaş templə göstərilən 3 hərəkətdən 2-ni təqlid etsin.",
+     steps:["Hərəkəti adi templdən 2 dəfə yavaş nümayiş etdirin.","Uşağa hərəkəti təkrarlamaq üçün əlavə vaxt (5-7 saniyə) verin.","Uğurlu təqlidi bol tərif və jestlə pekləndirin."],
+     m:"yoxdur", r:"Prosesləmə sürətinə uyğunlaşdırılmış tempo öyrənmə effektivliyini artırır.",
+     eval:"Əlavə vaxt verildikdə təqlid dəqiqliyinin artması.", adapt:"Yenə çətindirsə hərəkəti fiziki köməklə icra etdirin."}
   ],
   serebral:[
-    {t:"Uyğunlaşdırılmış oturma vəziyyətində diqqət tapşırığı", m:"dəstəkləyici oturacaq", r:"Düzgün postural dəstək koqnitiv tapşırıqlara diqqəti artırır."},
-    {t:"Alternativ kommunikasiya ilə seçim etmə", m:"AAC lövhəsi/kart", r:"Motor məhdudiyyəti olan uşaqlarda seçim imkanı özünüifadəni təmin edir."}
+    {t:"Uyğunlaşdırılmış oturma vəziyyətində diqqət tapşırığı", obj:"Uşaq düzgün postural dəstəklə 5 dəqiqə tapşırığa diqqətini saxlasın.",
+     steps:["Dəstəkləyici oturacaqda bədən düzülüşünü (baş, gövdə, ayaqlar) tənzimləyin.","Əlləri sərbəst istifadə oluna bilən mövqedə sadə tapşırıq təqdim edin.","Yorğunluq əlamətləri görünən kimi qısa fasilə verin, postural dəstəyi yenidən nəzərdən keçirin."],
+     m:"dəstəkləyici oturacaq/yastıqlar", r:"Düzgün postural dəstək koqnitiv tapşırıqlara diqqəti artırır.",
+     eval:"Diqqətin saxlanma müddətinin artması.", adapt:"Yorğunluq tez yaranırsa sessiya müddətini qısaldıb tezliyini artırın."},
+    {t:"Alternativ kommunikasiya ilə seçim etmə", obj:"Uşaq AAC vasitəsilə 2 variantdan 1-ni müstəqil seçsin.",
+     steps:["AAC lövhəsində 2 aydın fərqli şəkil/simvol təqdim edin.","Uşağa baxış, işarə və ya toxunma ilə seçim etmək üçün vaxt verin.","Seçim edildikdə dərhal onu reallaşdırın (\"sən bunu seçdin\") ki, səbəb-nəticə əlaqəsi güclənsin."],
+     m:"AAC lövhəsi/kart", r:"Motor məhdudiyyəti olan uşaqlarda seçim imkanı özünüifadəni və nəzarət hissini təmin edir.",
+     eval:"Müstəqil (köməksiz) seçim faizinin artması.", adapt:"Fiziki çətinlik varsa simvol ölçüsünü böyüdün, aralarındakı məsafəni artırın."}
   ],
   gerilik:[
-    {t:"Addım-addım (task analysis) sadə tapşırıq icrası", m:"3 addımlı vizual sxem", r:"Tapşırığın kiçik addımlara bölünməsi mənimsəməni asanlaşdırır."},
-    {t:"Təkrar və möhkəmləndirmə məşqi", m:"əvvəlki tapşırıqdan material", r:"Çoxsaylı təkrar yeni bacarığın uzunmüddətli yaddaşda saxlanmasına kömək edir."}
+    {t:"Addım-addım (task analysis) sadə tapşırıq icrası", obj:"Uşaq 3 addımlı tapşırığı vizual sxemlə müstəqil tamamlasın.",
+     steps:["Tapşırığı 3 kiçik, aydın addıma bölün və hər addımı ayrıca kartla göstərin.","Hər addımı ayrılıqda modelləşdirin, sonra uşağa icra etmək imkanı verin.","Addım tamamlandıqda dərhal pekləndirin və növbəti addıma keçin."],
+     m:"3 addımlı vizual sxem", r:"Tapşırığın kiçik addımlara bölünməsi (task analysis) mənimsəməni əhəmiyyətli dərəcədə asanlaşdırır.",
+     eval:"Müstəqil tamamlanan addım sayının artması.", adapt:"Çətinlikdə addım sayını artırıb hər addımı daha da xırdalayın."},
+    {t:"Təkrar və möhkəmləndirmə məşqi", obj:"Əvvəlki sessiyada öyrənilmiş bacarıq 80% dəqiqliklə təkrarlansın.",
+     steps:["Əvvəlki sessiyanın materialını eynilə təkrar təqdim edin.","Uşağın müstəqil icrasını izləyin, yalnız zəruri olduqda köməklə dəstəkləyin.","Möhkəmlənmə üçün eyni bacarığı fərqli materialla da sınayın (generalization)."],
+     m:"əvvəlki tapşırıqdan material + yeni oxşar material", r:"Çoxsaylı təkrar yeni bacarığın uzunmüddətli yaddaşda saxlanmasına (konsolidasiya) kömək edir.",
+     eval:"Fərqli materialla da bacarığın göstərilməsi (ümumiləşdirmə).", adapt:"Ümumiləşdirmə olmursa yalnız tanış material üzərində davam edin."}
   ],
   nitq:[
-    {t:"Ünsiyyət istəyini artırmaq üçün motivasiya oyunu", m:"maraqlı oyuncaq əlçatmaz yerdə", r:"Tələbat yaratmaq spontan ünsiyyət cəhdlərini artırır."}
+    {t:"Ünsiyyət istəyini artırmaq üçün motivasiya oyunu", obj:"Uşaq istəyini spontan şəkildə səs/söz/jestlə bildirsin.",
+     steps:["Maraqlı əşyanı görünən, əlçatmaz yerə qoyun.","Uşağın reaksiyasını gözləyin (baxış, səs, əl uzatma), dərhal kömək etməyin.","Ən kiçik ünsiyyət cəhdini belə dərhal cavablandırıb pekləndirin."],
+     m:"maraqlı oyuncaq əlçatmaz yerdə", r:"Tələbat yaratmaq (communicative temptation) spontan ünsiyyət cəhdlərini artırır.",
+     eval:"Spontan ünsiyyət cəhdlərinin sayının artması.", adapt:"Reaksiya yoxdursa gözləmə vaxtını qısaldın, model göstərin."}
   ],
   dehb:[
-    {t:"Qısa interval — hərəkət fasiləli diqqət tapşırığı", m:"taймer, hərəkət kartı", r:"Hərəkət fasilələri diqqətin bərpasına və hiperaktivliyin idarə olunmasına kömək edir."},
-    {t:"Aydın qayda və nəticəli oyun", m:"qayda kartı", r:"Aydın strukturlaşdırılmış qaydalar impulsivliyi azaldır."}
+    {t:"Qısa interval — hərəkət fasiləli diqqət tapşırığı", obj:"Uşaq 3x3 dəqiqəlik interval blokunda tapşırığa qayıtsın.",
+     steps:["3 dəqiqəlik tapşırıq + 1 dəqiqəlik idarə olunan hərəkət fasiləsi planlaşdırın.","Vizual таймerdən istifadə edərək vaxt sərhədlərini aydın göstərin.","Fasilədən sonra tapşırığa qayıdışı dərhal pekləndirin."],
+     m:"таймer, hərəkət kartı", r:"Hərəkət fasilələri diqqətin bərpasına və hiperaktivliyin idarə olunmasına kömək edir.",
+     eval:"Fasilədən sonra tapşırığa qayıdış sürəti və davamlılığı.", adapt:"Hələ də çətindirsə interval müddətini 2 dəqiqəyə endirin."},
+    {t:"Aydın qayda və nəticəli oyun", obj:"Uşaq 2 sadə qaydaya 3 dövrə ərzində riayət etsin.",
+     steps:["Oyun başlamazdan əvvəl qaydaları vizual kartla qısa və konkret izah edin.","Oyun zamanı qaydaya riayət anını dərhal müsbət qeyd edin (\"gördün, qaydaya əməl etdin\").","Qayda pozulduqda sakit tonda xatırladın, cəza tətbiq etmədən yenidən başladın."],
+     m:"qayda kartı", r:"Aydın strukturlaşdırılmış qaydalar impulsivliyi azaldır və özünüidarəetmə bacarığını inkişaf etdirir.",
+     eval:"Qaydaya riayət nisbətinin sessiyalar üzrə artması.", adapt:"Riayət aşağıdırsa qayda sayını 1-ə endirin."}
   ]
 },
 loqoped:{
   umumi:[
-    {t:"Nitq nəfəsi məşqi (üfləmə oyunları)", m:"saplı fırfıra, sabun köpüyü", r:"Düzgün nəfəs nitq səslərinin formalaşması üçün fiziki əsasdır."},
-    {t:"Səs təqlidi məşqi", m:"heyvan şəkilləri, səslər", r:"Səs təqlidi artikulyasiya orqanlarının hərəkət diapazonunu genişləndirir."},
-    {t:"Reseptiv nitq — sadə göstərişi yerinə yetirmə", m:"gündəlik əşyalar", r:"Reseptiv dil ekspressiv nitqin əsasını təşkil edir."},
-    {t:"Söz ehtiyatını genişləndirmə (şəkilli kartlar)", m:"tematik lüğət kartları", r:"Söz ehtiyatının artırılması cümlə qurma bacarığına zəmin yaradır."},
-    {t:"Cümlə qurma məşqi (2-3 sözlü)", m:"şəkilli cümlə kartları", r:"Tədrici cümlə uzunluğu artımı qrammatik inkişafı dəstəkləyir."},
-    {t:"Artikulyasiya gimnastikası", m:"güzgü", r:"Artikulyasiya orqanlarının çevikliyi düzgün səs tələffüzü üçün vacibdir."},
-    {t:"Fonematik eşitmə fərqləndirmə oyunu", m:"eyni/fərqli səs cütləri", r:"Fonematik eşitmə oxu-yazı bacarığının əsasını qoyur."}
+    {t:"Nitq nəfəsi məşqi (üfləmə oyunları)", obj:"Uşaq 5 saniyə davam edən sabit hava axını yarada bilsin.",
+     steps:["Uşağa düz oturma vəziyyətində dərin nəfəs almağı göstərin.","Fırfıra və ya sabun köpüyü ilə üfləmə məşqini nümayiş etdirin, sonra təkrarlatdırın.","Hava axınının müddətini tədricən artıraraq 5 təkrarla məşqi bitirin."],
+     m:"saplı fırfıra, sabun köpüyü", r:"Düzgün nəfəs nitq səslərinin formalaşması üçün fiziki əsasdır.",
+     eval:"Hava axınının davamlılığında (saniyə) artım.", adapt:"Tez yorulursa təkrar sayını azaldıb tezliyi artırın."},
+    {t:"Səs təqlidi məşqi", obj:"Uşaq 3 heyvan səsindən 2-sini təqlid etsin.",
+     steps:["Heyvan şəklini göstərib müvafiq səsi aydın tələffüz edin.","Uşaqdan səsi təqlid etməsini xahiş edin, ağız hərəkətini göstərməklə dəstəkləyin.","Uğurlu təqlidi dərhal tərif və jestlə pekləndirin."],
+     m:"heyvan şəkilləri", r:"Səs təqlidi artikulyasiya orqanlarının hərəkət diapazonunu genişləndirir.",
+     eval:"Müstəqil təqlid edilən səs sayının artması.", adapt:"Çətindirsə əvvəlcə sadə saitlərlə (a, o, u) başlayın."},
+    {t:"Reseptiv nitq — sadə göstərişi yerinə yetirmə", obj:"Uşaq 1 addımlı göstərişi 4/5 halda düzgün icra etsin.",
+     steps:["Gündəlik əşya ilə bağlı sadə göstəriş verin (\"topu ver\").","Lazım gələrsə jest və ya işarə ilə əlavə vizual ipucu verin.","Düzgün icranı dərhal sözlə pekləndirin (\"əla, topu verdin\")."],
+     m:"gündəlik əşyalar", r:"Reseptiv dil ekspressiv nitqin əsasını təşkil edir.",
+     eval:"Köməksiz düzgün icra nisbətinin artması.", adapt:"Anlama zəifdirsə jest dəstəyini artırın, cümləni qısaldın."},
+    {t:"Söz ehtiyatını genişləndirmə (şəkilli kartlar)", obj:"Uşaq sessiyada 3 yeni söz mənimsəsin.",
+     steps:["Tematik kartları (heyvanlar, meyvələr) bir-bir göstərib adlandırın.","Uşaqdan sözü təkrarlamasını və ya işarə etməsini xahiş edin.","Sessiya sonunda öyrənilən sözləri qısaca təkrar gözdən keçirin."],
+     m:"tematik lüğət kartları", r:"Söz ehtiyatının artırılması cümlə qurma bacarığına zəmin yaradır.",
+     eval:"Sessiya sonu yadda qalan söz sayı (təkrar/işarə ilə göstərilən).", adapt:"Yadda saxlama zəifdirsə kart sayını 2-yə endirin, daha çox təkrar edin."},
+    {t:"Cümlə qurma məşqi (2-3 sözlü)", obj:"Uşaq şəkil əsasında 2 sözlü cümlə qursun.",
+     steps:["Sadə hərəkət şəklini göstərin (\"uşaq qaçır\").","Model cümləni deyib uşaqdan təkrarlamasını istəyin.","Fərqli şəkillərlə 3-4 dəfə təkrarlayaraq quruluşu möhkəmləndirin."],
+     m:"şəkilli cümlə kartları", r:"Tədrici cümlə uzunluğu artımı qrammatik inkişafı dəstəkləyir.",
+     eval:"Müstəqil qurulan cümlə sayının artması.", adapt:"Çətindirsə tək sözlə (\"qaçır\") başlayıb tədricən genişləndirin."},
+    {t:"Artikulyasiya gimnastikası", obj:"Uşaq 5 artikulyasiya hərəkətini düzgün icra etsin.",
+     steps:["Güzgü qarşısında dil, dodaq hərəkətlərini yavaş nümayiş etdirin.","Hər hərəkəti uşaqla birgə 3 dəfə təkrarlayın.","Hərəkətləri kiçik oyun formasında (\"dilini pəncərəyə çıxar\") təqdim edin."],
+     m:"güzgü", r:"Artikulyasiya orqanlarının çevikliyi düzgün səs tələffüzü üçün vacibdir.",
+     eval:"Hərəkətlərin dəqiqliyində (güzgüdə özünəbaxma ilə) yaxşılaşma.", adapt:"Yorulma sürətlidirsə hərəkət sayını azaldıb qısa fasilələr verin."},
+    {t:"Fonematik eşitmə fərqləndirmə oyunu", obj:"Uşaq 5 səs cütündən 4-də eyni/fərqli olduğunu düzgün göstərsin.",
+     steps:["İki səsi ayrı-ayrı, aydın tələffüz edin (məs. \"pa-ba\").","Uşaqdan eyni olub-olmadığını əl qaldıraraq və ya sözlə bildirməsini istəyin.","Nəticəni dərhal təsdiqləyin və izah edin."],
+     m:"eyni/fərqli səs cütləri siyahısı", r:"Fonematik eşitmə oxu-yazı bacarığının əsasını qoyur.",
+     eval:"Düzgün fərqləndirmə nisbətinin artması.", adapt:"Çətindirsə kontrastı daha böyük səslərlə (a-i) başlayın."}
   ],
   autizm:[
-    {t:"Funksional istək bildirmə (PECS mərhələsi)", m:"PECS kartları", r:"Funksional kommunikasiya problemli davranışların yerini tuta bilər."},
-    {t:"Ekolaliyanın funksional istifadəyə yönləndirilməsi", m:"model cümlələr", r:"Ekolaliya düzgün istiqamətləndirildikdə kommunikativ məqsədə xidmət edə bilər."}
+    {t:"Funksional istək bildirmə (PECS mərhələsi)", obj:"Uşaq 1 kartla istəyini müstəqil bildirsin.",
+     steps:["Motivasiyaedici əşyanı görünən yerdə saxlayın.","Kartı əşya ilə əlaqələndirərək uşağa mübadilə prosesini göstərin.","Uğurlu mübadilədən sonra dərhal əşyanı verin və sözlə də adlandırın."],
+     m:"PECS kartları", r:"Funksional kommunikasiya problemli davranışların yerini tuta bilər.",
+     eval:"Müstəqil kart mübadiləsi tezliyinin artması.", adapt:"Çətindirsə əvvəlcə tam fiziki köməklə başlayın."},
+    {t:"Ekolaliyanın funksional istifadəyə yönləndirilməsi", obj:"Ekolaliyalı ifadə funksional cavaba çevrilsin (1 nümunə).",
+     steps:["Uşağın təkrarladığı ifadəni müşahidə edin və kontekstini müəyyən edin.","Eyni struktur üzərində funksional model cümlə təklif edin.","Düzgün funksional istifadəni bol tərif ilə pekləndirin."],
+     m:"model cümlələr siyahısı", r:"Ekolaliya düzgün istiqamətləndirildikdə kommunikativ məqsədə xidmət edə bilər.",
+     eval:"Funksional kontekstdə istifadənin artması.", adapt:"Çətindirsə daha sadə, qısa model cümlədən başlayın."}
   ],
   nitq:[
-    {t:"İntensiv artikulyasiya korreksiyası", m:"artikulyasiya güzgüsü, şpatel", r:"Sistemli korreksiya düzgün səs modelinin avtomatlaşmasını təmin edir."},
-    {t:"Dizartrik xüsusiyyətlər üçün oro-motor məşq", m:"oro-motor alətlər", r:"Əzələ tonusunun tənzimlənməsi aydın nitq üçün vacibdir."}
+    {t:"İntensiv artikulyasiya korreksiyası", obj:"Hədəf səsin təcrid olunmuş vəziyyətdə düzgün tələffüzü 70% əldə edilsin.",
+     steps:["Hədəf səsin düzgün artikulyasiya nöqtəsini güzgüdə göstərin.","Şpateldən istifadə edərək dil/dodaq mövqeyini fiziki dəstəkləyin.","Səsi tək halda, sonra heca daxilində təkrarladın."],
+     m:"artikulyasiya güzgüsü, şpatel", r:"Sistemli korreksiya düzgün səs modelinin avtomatlaşmasını təmin edir.",
+     eval:"Təcrid olunmuş səsin düzgün tələffüz faizi.", adapt:"Çətindirsə yaxın, daha asan artikulyasiya nöqtəli səsdən başlayın."},
+    {t:"Dizartrik xüsusiyyətlər üçün oro-motor məşq", obj:"Əzələ tonusu tənzimlənərək 5 oro-motor hərəkət icra edilsin.",
+     steps:["Üz və ağız ətrafı əzələlərə yüngül masaj tətbiq edin.","Dodaq/dil güc məşqlərini (üfləmə, basma) nümayiş etdirin.","Hər hərəkəti 3-5 dəfə təkrarlayın, yorğunluğa nəzarət edin."],
+     m:"oro-motor alətlər", r:"Əzələ tonusunun tənzimlənməsi aydın nitq üçün vacibdir.",
+     eval:"Hərəkət dəqiqliyi və dözümlülük müddətində artım.", adapt:"Həssaslıq varsa təzyiqi azaldın, tempi ləngidin."}
   ],
   daun:[
-    {t:"Yavaş templi, vizual dəstəkli artikulyasiya məşqi", m:"şəkilli səs kartları", r:"Vizual-auditor ikili dəstək öyrənməni gücləndirir."}
+    {t:"Yavaş templi, vizual dəstəkli artikulyasiya məşqi", obj:"Uşaq 3 səsi yavaş templə düzgün tələffüz etsin.",
+     steps:["Səsi normaldan yavaş templə, şəkilli kartla birgə göstərin.","Uşağa təqlid üçün əlavə vaxt verin, lazım gələrsə güzgüdən istifadə edin.","Düzgün cəhdi bol, konkret tərif ilə pekləndirin."],
+     m:"şəkilli səs kartları", r:"Vizual-auditor ikili dəstək öyrənməni gücləndirir.",
+     eval:"Yavaş templə düzgün tələffüz faizinin artması.", adapt:"Çətindirsə tempi daha da azaldın, tək səs üzərində işləyin."}
   ],
   serebral:[
-    {t:"Oro-motor funksiyaların (udma, çeynəmə) inkişafı", m:"təhlükəsiz qida nümunələri", r:"Oro-motor funksiya həm qidalanma, həm nitq üçün əsasdır."}
+    {t:"Oro-motor funksiyaların (udma, çeynəmə) inkişafı", obj:"Uşaq təhlükəsiz konsistensiyalı qidanı nəzarətlə udsun.",
+     steps:["Təhlükəsiz, uyğun konsistensiyalı qida nümunəsini seçin (loqoped/dietoloq rəyi ilə).","Düzgün baş/gövdə mövqeyində qidalanma prosesini yavaş templə aparın.","Udma prosesini diqqətlə müşahidə edin, ehtiyac olarsa dərhal dayandırın."],
+     m:"təhlükəsiz qida nümunələri", r:"Oro-motor funksiya həm qidalanma, həm nitq üçün əsasdır.",
+     eval:"Təhlükəsiz udma epizodlarının sabitliyi.", adapt:"Risk əlaməti olarsa dərhal mütəxəssis pediatr/loqopedlə əlaqə saxlayın."}
   ],
   gerilik:[
-    {t:"Sadə, konkret sözlərlə lüğət artırma", m:"real əşyalar", r:"Konkret, gündəlik həyatla bağlı sözlər mənimsəməni asanlaşdırır."}
+    {t:"Sadə, konkret sözlərlə lüğət artırma", obj:"Uşaq 3 real əşyanın adını mənimsəsin.",
+     steps:["Real, əldə olan əşyanı göstərib adını aydın tələffüz edin.","Uşağa əşyanı əlinə almasına və adı təkrarlamasına imkan verin.","Eyni əşyanı fərqli kontekstdə (\"topu at\", \"topu gətir\") təkrar istifadə edin."],
+     m:"real əşyalar", r:"Konkret, gündəlik həyatla bağlı sözlər mənimsəməni asanlaşdırır.",
+     eval:"Müstəqil adlandırma sayının artması.", adapt:"Çətindirsə əşya sayını 1-ə endirin, çox təkrar edin."}
   ],
   dehb:[
-    {t:"Qısa, dinamik nitq oyunları (diqqət itməsin deyə)", m:"kart oyunu", r:"Qısa fəaliyyət blokları diqqət itkisinin qarşısını alır."}
+    {t:"Qısa, dinamik nitq oyunları (diqqət itməsin deyə)", obj:"Uşaq 2 dəqiqəlik nitq oyununda tam iştirak etsin.",
+     steps:["Oyunu yüksək templi, rəngli kartlarla təqdim edin.","Hər cavabdan sonra dərhal yeni kart göstərərək dinamikanı saxlayın.","2 dəqiqədən sonra qısa fasilə verib təkrar başlayın."],
+     m:"kart oyunu", r:"Qısa fəaliyyət blokları diqqət itkisinin qarşısını alır.",
+     eval:"2 dəqiqə ərzində davamlı iştirakın qorunması.", adapt:"Diqqət tez yayınırsa blokları 1 dəqiqəyə endirin."}
   ]
 },
 ergoterapevt:{
   umumi:[
-    {t:"Xırda motorika məşqi (muncuq düzmə)", m:"böyük muncuqlar, ip", r:"İncə motorika akademik bacarıqların (yazı) əsasını təşkil edir."},
-    {t:"Sensor inteqrasiya — toxunma qutusu", m:"müxtəlif toxunuşlu materiallar", r:"Sensor təcrübə beyin-bədən əlaqəsini gücləndirir."},
-    {t:"Tarazlıq və koordinasiya məşqi", m:"balans lövhəsi/yastıq", r:"Vestibulyar sistem inkişafı ümumi motor planlamanı yaxşılaşdırır."},
-    {t:"Gündəlik həyat bacarığı — geyinmə simulyasiyası", m:"düymələr, fermuar taxtası", r:"Funksional bacarıqlar müstəqilliyi artırır."},
-    {t:"Əl-göz koordinasiyası — top atma/tutma", m:"yumşaq top", r:"Əl-göz koordinasiyası yazı və gündəlik fəaliyyətlər üçün əsasdır."},
-    {t:"Qələm tutma düzgünləşdirmə məşqi", m:"üçbucaqlı qələm", r:"Düzgün qrip yazı bacarığının inkişafına zəmin hazırlayır."}
+    {t:"Xırda motorika məşqi (muncuq düzmə)", obj:"Uşaq 5 muncuğu ipə düzsün.",
+     steps:["Böyük ölçülü muncuq və qalın ipi hazırlayın.","Əvvəlcə mütəxəssis nümunə göstərsin, sonra uşağa növbə versin.","Çətinlik yaşandıqda əl-üstə əl texnikası ilə köməklik edin."],
+     m:"böyük muncuqlar, ip", r:"İncə motorika akademik bacarıqların (yazı) əsasını təşkil edir.",
+     eval:"Müstəqil düzülən muncuq sayının artması.", adapt:"Çətindirsə muncuq ölçüsünü böyüdün, ip qalınlığını artırın."},
+    {t:"Sensor inteqrasiya — toxunma qutusu", obj:"Uşaq 4 fərqli toxunuş materialını 5 saniyə tolerasiya etsin.",
+     steps:["Qutuda müxtəlif toxunuşlu materialları (düyü, kum, yun) hazırlayın.","Uşağın əlini yavaş-yavaş materiala yönləndirin, məcbur etmədən.","Müsbət reaksiyanı dərhal tərif edin, mənfi reaksiyada geri çəkilib başqa material təklif edin."],
+     m:"müxtəlif toxunuşlu materiallar", r:"Sensor təcrübə beyin-bədən əlaqəsini gücləndirir.",
+     eval:"Tolerasiya müddətinin (saniyə) artması.", adapt:"Həssaslıq yüksəkdirsə əvvəlcə əl əvəzinə alət (qaşıq) ilə toxunmağı təklif edin."},
+    {t:"Tarazlıq və koordinasiya məşqi", obj:"Uşaq balans lövhəsində 10 saniyə dayana bilsin.",
+     steps:["Uşağı balans lövhəsinə yavaş, dəstəklə çıxarın.","Əllərindən tutaraq tarazlığı qorumasına kömək edin.","Tədricən köməyi azaldaraq müstəqil dayanma müddətini artırın."],
+     m:"balans lövhəsi/yastıq", r:"Vestibulyar sistem inkişafı ümumi motor planlamanı yaxşılaşdırır.",
+     eval:"Müstəqil tarazlıq saxlama müddətinin artması.", adapt:"Qorxu/narahatlıq varsa əvvəlcə iki əllə divardan tutmasına icazə verin."},
+    {t:"Gündəlik həyat bacarığı — geyinmə simulyasiyası", obj:"Uşaq 1 düymə/fermuar əməliyyatını müstəqil icra etsin.",
+     steps:["Böyük ölçülü düymə/fermuar taxtasında hərəkəti yavaş nümayiş etdirin.","Uşağın əlini istiqamətləndirərək addım-addım təkrarlatdırın.","Uğur qazanıldıqda köməyi tədricən azaldın."],
+     m:"düymələr, fermuar taxtası", r:"Funksional bacarıqlar müstəqilliyi artırır və gündəlik həyata birbaşa tətbiq olunur.",
+     eval:"Köməksiz icra faizinin artması.", adapt:"Çətindirsə daha böyük, asan düymə/fermuar ilə başlayın."},
+    {t:"Əl-göz koordinasiyası — top atma/tutma", obj:"Uşaq 5 atışdan 3-nü tutsun.",
+     steps:["Yaxın məsafədən (1 metr) yumşaq topu yavaş atın.","Uşağa əllərini hazırlamağı vizual göstərin.","Uğurlu tutmadan sonra məsafəni tədricən artırın."],
+     m:"yumşaq top", r:"Əl-göz koordinasiyası yazı və gündəlik fəaliyyətlər üçün əsasdır.",
+     eval:"Tutma nisbətinin (5-dən neçəsi) artması.", adapt:"Çətindirsə daha böyük, yumşaq top istifadə edin, məsafəni azaldın."},
+    {t:"Qələm tutma düzgünləşdirmə məşqi", obj:"Uşaq üçbucaqlı qələmi düzgün üçbarmaq qavrayışı ilə tutsun.",
+     steps:["Üçbucaqlı qələmi göstərərək düzgün barmaq mövqeyini nümayiş etdirin.","Əl-üstə əl texnikası ilə düzgün tutuşu köməklə hiss etdirin.","Sadə xətt çəkmə tapşırığı ilə tutuşu möhkəmləndirin."],
+     m:"üçbucaqlı qələm, kağız", r:"Düzgün qrip yazı bacarığının inkişafına zəmin hazırlayır.",
+     eval:"Köməksiz düzgün tutuş müddətinin artması.", adapt:"Əzələ gücü zəifdirsə əvvəlcə plastilin sıxma məşqləri ilə gücü artırın."}
   ],
   autizm:[
-    {t:"Proprioseptiv təzyiq terapiyası (ağır yorğan/massaj)", m:"ağır yorğan, top masaj", r:"Proprioseptiv giriş özünütənzimləməni sakitləşdirici şəkildə dəstəkləyir."},
-    {t:"Sensor axtarışını təmin edən hərəkət stansiyası", m:"trampolin/fırlanan oturacaq", r:"Nəzarətli sensor axtarışı davranış partlayışlarını azalda bilər."}
+    {t:"Proprioseptiv təzyiq terapiyası (ağır yorğan/massaj)", obj:"Uşaq 3 dəqiqə proprioseptiv təzyiqi qəbul edib sakitləşsin.",
+     steps:["Uşağın icazəsi/adaptasiyası ilə ağır yorğanı yüngül tətbiq edin.","Dərin təzyiqli, yavaş massaj hərəkətləri ilə davam edin.","Reaksiyanı izləyərək təzyiq gücünü uşağın rahatlıq səviyyəsinə uyğunlaşdırın."],
+     m:"ağır yorğan, top masaj", r:"Proprioseptiv giriş özünütənzimləməni sakitləşdirici şəkildə dəstəkləyir.",
+     eval:"Tətbiqdən sonra sakitləşmə vaxtının qısalması.", adapt:"Həssaslıq varsa yüngül təzyiqdən başlayıb tədricən artırın."},
+    {t:"Sensor axtarışını təmin edən hərəkət stansiyası", obj:"Uşaq nəzarətli hərəkət fəaliyyətindən sonra tapşırığa daha sakit qayıtsın.",
+     steps:["Trampolin/fırlanan oturacaqda 2-3 dəqiqəlik nəzarətli hərəkət təklif edin.","Hərəkəti sözlə saya-saya strukturlaşdırın (\"5 sıçrayış\").","Fəaliyyət bitdikdə sakit keçidlə növbəti tapşırığa yönləndirin."],
+     m:"trampolin/fırlanan oturacaq", r:"Nəzarətli sensor axtarışı davranış partlayışlarını azalda bilər.",
+     eval:"Sonrakı tapşırığa diqqətin keyfiyyətində yaxşılaşma.", adapt:"Aşırı stimullaşdırırsa müddəti qısaldın."}
   ],
   serebral:[
-    {t:"Postural nəzarət və oturma məşqi", m:"terapevtik top", r:"Postural sabitlik funksional hərəkətlərin əsasıdır."},
-    {t:"Adaptiv alətlərlə gündəlik fəaliyyət", m:"adaptiv qaşıq/qələm", r:"Adaptiv alətlər motor məhdudiyyətini kompensasiya edir."}
+    {t:"Postural nəzarət və oturma məşqi", obj:"Uşaq terapevtik topda 5 dəqiqə dəstəklə sabit otursun.",
+     steps:["Terapevtik topda uşağı təhlükəsiz dəstəklə əyləşdirin.","Gövdə əzələlərini fəallaşdıran yüngül yellənmə hərəkətləri edin.","Tarazlığı özü saxlamağa çalışdıqda köməyi tədricən azaldın."],
+     m:"terapevtik top", r:"Postural sabitlik funksional hərəkətlərin əsasıdır.",
+     eval:"Müstəqil sabit oturma müddətinin artması.", adapt:"Qorxu/narahatlıq varsa topu divara söykənmiş vəziyyətdə istifadə edin."},
+    {t:"Adaptiv alətlərlə gündəlik fəaliyyət", obj:"Uşaq adaptiv qaşıqla 3 qaşıq qidanı müstəqil ağzına aparsın.",
+     steps:["Uşağın əl ölçüsünə uyğun adaptiv qaşığı seçin.","Əl-üstə əl köməyi ilə hərəkəti bir neçə dəfə göstərin.","Köməyi tədricən azaldaraq müstəqilliyi təşviq edin."],
+     m:"adaptiv qaşıq/qələm", r:"Adaptiv alətlər motor məhdudiyyətini kompensasiya edərək funksional müstəqilliyi artırır.",
+     eval:"Müstəqil tamamlanan hərəkət sayının artması.", adapt:"Çətindirsə əvvəlcə daha yüngül, qısa saplı alət seçin."}
   ],
   daun:[
-    {t:"Əzələ tonusunu gücləndirici oyun (aşağı tonus üçün)", m:"terapevtik top, üzük halqaları", r:"Down sindromunda hipotoniya üçün gücləndirici məşqlər vacibdir."}
+    {t:"Əzələ tonusunu gücləndirici oyun (aşağı tonus üçün)", obj:"Uşaq 5 təkrarlı gücləndirici hərəkəti tamamlasın.",
+     steps:["Terapevtik topda yüngül gücləndirici hərəkətlər (itələmə, çəkmə) göstərin.","Oyun formasında (\"kim daha güclü itələyəcək\") motivasiyanı artırın.","Hərəkəti 5 dəfə təkrarladıb yorğunluğa nəzarət edin."],
+     m:"terapevtik top, üzük halqaları", r:"Down sindromunda hipotoniya (aşağı əzələ tonusu) üçün gücləndirici məşqlər vacibdir.",
+     eval:"Tamamlanan təkrar sayı və hərəkət keyfiyyəti.", adapt:"Tez yorulursa təkrar sayını azaldıb tezliyi artırın."}
   ],
   gerilik:[
-    {t:"Sadələşdirilmiş addım-addım motor tapşırıq", m:"vizual addım kartları", r:"Motor bacarıqların kiçik addımlara bölünməsi öyrənməni asanlaşdırır."}
+    {t:"Sadələşdirilmiş addım-addım motor tapşırıq", obj:"Uşaq 3 addımlı motor tapşırığı vizual dəstəklə tamamlasın.",
+     steps:["Tapşırığı 3 sadə addıma bölüb hər birini ayrıca vizual kartla göstərin.","Hər addımı ayrılıqda modelləşdirib icra etdirin.","Bütün addımlar bitdikdə ümumi nəticəni birgə nəzərdən keçirin."],
+     m:"vizual addım kartları", r:"Motor bacarıqların kiçik addımlara bölünməsi öyrənməni asanlaşdırır.",
+     eval:"Müstəqil tamamlanan addım sayının artması.", adapt:"Çətindirsə addımları daha da xırdalayın."}
   ],
   dehb:[
-    {t:"Enerji boşaltma stansiyası (hərəkətli fasilə)", m:"trampolin, sıçrayış halqaları", r:"Nəzarətli hərəkət fasilələri sonrakı diqqət tapşırığına hazırlıq yaradır."}
+    {t:"Enerji boşaltma stansiyası (hərəkətli fasilə)", obj:"Uşaq 2 dəqiqəlik strukturlaşdırılmış hərəkətdən sonra sakit tapşırığa keçsin.",
+     steps:["Trampolin/sıçrayış halqalarında sayılan (5-10) hərəkət tapşırığı verin.","Hərəkəti bitirdikdən sonra 1 dəqiqəlik sakitləşmə nəfəsi ilə keçid edin.","Sakit tapşırığa dərhal, aydın təlimatla yönləndirin."],
+     m:"trampolin, sıçrayış halqaları", r:"Nəzarətli hərəkət fasilələri sonrakı diqqət tapşırığına hazırlıq yaradır.",
+     eval:"Hərəkətdən sonra tapşırığa başlama sürəti.", adapt:"Sakitləşmə çətindirsə keçid vaxtını uzadın."}
   ],
   nitq:[
-    {t:"Oro-motor əzələ gücləndirmə məşqi", m:"üfləmə alətləri", r:"Ağız ətrafı əzələ gücü aydın artikulyasiyaya kömək edir."}
+    {t:"Oro-motor əzələ gücləndirmə məşqi", obj:"Uşaq 5 üfləmə hərəkətini davamlı icra etsin.",
+     steps:["Üfləmə alətini (fit, saplı fırfıra) təqdim edin.","Düzgün nəfəs texnikasını nümayiş etdirib təkrarlatdırın.","Hər uğurlu üfləməni pekləndirərək 5 təkrara çatdırın."],
+     m:"üfləmə alətləri", r:"Ağız ətrafı əzələ gücü aydın artikulyasiyaya kömək edir.",
+     eval:"Davamlı üfləmə müddətinin artması.", adapt:"Tez yorulursa təkrar arasında fasilə əlavə edin."}
   ]
 },
 pedaqoq:{
   umumi:[
-    {t:"Diqqət saxlama məşqi (uyğunlaşdırma oyunu)", m:"eyni cütləri tapma kartları", r:"Qısa, uğur təmin edən tapşırıqlar diqqət müddətini tədricən artırır."},
-    {t:"Rəng və forma təsnifatı", m:"rəngli formalar", r:"Təsnifat bacarığı məntiqi təfəkkürün ilkin formasıdır."},
-    {t:"Say-hesab anlayışı (əşya sayma)", m:"kiçik əşyalar", r:"Konkret sayma mücərrəd riyazi anlayışların əsasını qoyur."},
-    {t:"Vizual qavrama — puzzle tapşırığı", m:"4-6 hissəli puzzle", r:"Puzzle həlli vizual-məkan qavrayışını inkişaf etdirir."},
-    {t:"Yaddaş məşqi (əşya gizlətmə oyunu)", m:"3 əşya, örtük", r:"Qısamüddətli yaddaş akademik öyrənmənin əsas mexanizmidir."},
-    {t:"Oxuya hazırlıq — hərf tanıma oyunu", m:"böyük hərf kartları", r:"Erkən hərf tanıma sonrakı oxuma bacarığına zəmin yaradır."}
+    {t:"Diqqət saxlama məşqi (uyğunlaşdırma oyunu)", obj:"Uşaq 3 cütdən 2-sini müstəqil tapsın.",
+     steps:["Eyni kartların cütlərini qarışdırıb masaya düzün.","Uşağa 1 kart göstərib eynisini tapmasını xahiş edin.","Uğurlu uyğunlaşdırmanı dərhal pekləndirin, çətinlikdə kart sayını azaldın."],
+     m:"eyni cütləri tapma kartları", r:"Qısa, uğur təmin edən tapşırıqlar diqqət müddətini tədricən artırır.",
+     eval:"Müstəqil tapılan cüt sayının artması.", adapt:"Çətindirsə 2 kartla başlayın, tədricən artırın."},
+    {t:"Rəng və forma təsnifatı", obj:"Uşaq 3 rəng/formadan 2-sini düzgün təsnif etsin.",
+     steps:["Rəngli formaları qarışıq şəkildə masaya düzün.","Bir kateqoriya (rəng) üzrə nümunə göstərib təsnifatı başladın.","Uşağın müstəqil təsnifatını izləyib səhvləri incə şəkildə düzəldin."],
+     m:"rəngli formalar", r:"Təsnifat bacarığı məntiqi təfəkkürün ilkin formasıdır.",
+     eval:"Düzgün təsnif edilən əşya sayının artması.", adapt:"Çətindirsə 2 kontrast rənglə (qırmızı/mavi) başlayın."},
+    {t:"Say-hesab anlayışı (əşya sayma)", obj:"Uşaq 5-ə qədər əşyanı düzgün sayısın.",
+     steps:["Əşyaları bir sıra ilə düzüb bir-bir toxunaraq sayın.","Uşaqdan sizinlə birgə səsli saymasını xahiş edin.","Sonra müstəqil saymasına imkan verin, lazım gələrsə köməklik edin."],
+     m:"kiçik əşyalar", r:"Konkret sayma mücərrəd riyazi anlayışların əsasını qoyur.",
+     eval:"Müstəqil düzgün sayılan ədədin artması.", adapt:"Çətindirsə 3-ə qədər saymaqla başlayın."},
+    {t:"Vizual qavrama — puzzle tapşırığı", obj:"Uşaq 4-6 hissəli puzzle-ı tamamlasın.",
+     steps:["Puzzle hissələrini masaya düzüb tam şəkli göstərin.","İlk 1-2 hissəni birgə yerləşdirərək strategiyanı nümayiş etdirin.","Qalan hissələri müstəqil tamamlamasına imkan verin."],
+     m:"4-6 hissəli puzzle", r:"Puzzle həlli vizual-məkan qavrayışını inkişaf etdirir.",
+     eval:"Müstəqil yerləşdirilən hissə sayının artması.", adapt:"Çətindirsə 2-3 hissəli puzzle ilə başlayın."},
+    {t:"Yaddaş məşqi (əşya gizlətmə oyunu)", obj:"Uşaq 3 əşyadan 2-sinin yerini xatırlasın.",
+     steps:["3 əşyanı uşağın gözü qarşısında ayrı-ayrı örtüklərin altına gizlədin.","Bir əşyanın adını deyib harada olduğunu tapmasını xahiş edin.","Düzgün tapıntını dərhal tərif edin."],
+     m:"3 əşya, örtük", r:"Qısamüddətli yaddaş akademik öyrənmənin əsas mexanizmidir.",
+     eval:"Düzgün tapılan əşya sayının artması.", adapt:"Çətindirsə 1-2 əşya ilə başlayın."},
+    {t:"Oxuya hazırlıq — hərf tanıma oyunu", obj:"Uşaq 3 böyük hərfdən 2-sini tanısın.",
+     steps:["Böyük hərf kartlarını göstərib adını aydın tələffüz edin.","Uşaqdan hərfi barmaqla izləməsini və adlandırmasını xahiş edin.","Hərfi gündəlik əşyalarda (ad, işarə) tapmağı təklif edin."],
+     m:"böyük hərf kartları", r:"Erkən hərf tanıma sonrakı oxuma bacarığına zəmin yaradır.",
+     eval:"Müstəqil tanınan hərf sayının artması.", adapt:"Çətindirsə 1 hərflə başlayıb möhkəmlənəndən sonra əlavə edin."}
   ],
   autizm:[
-    {t:"Struktura salınmış TEACCH tipli iş stansiyası", m:"iş qutuları, vizual ardıcıllıq", r:"Struktur və vizual ardıcıllıq müstəqil işləmə bacarığını artırır."}
+    {t:"Struktura salınmış TEACCH tipli iş stansiyası", obj:"Uşaq \"soldan-sağa\" iş sistemi ilə 3 qutunu müstəqil tamamlasın.",
+     steps:["3 iş qutusunu soldan sağa vizual ardıcıllıqla düzün, hər qutuda konkret tapşırıq.","\"Bitdi\" qutusunu göstərərək tapşırığın harada bitdiyini aydın edin.","Hər qutu tamamlandıqda \"bitdi\" qutusuna köçürməsinə imkan verin."],
+     m:"iş qutuları, vizual ardıcıllıq lövhəsi", r:"Struktur və vizual ardıcıllıq müstəqil işləmə bacarığını artırır (TEACCH metodologiyası).",
+     eval:"Müstəqil tamamlanan qutu sayının artması.", adapt:"Çətindirsə 1 qutu ilə başlayın."}
   ],
   gerilik:[
-    {t:"Çoxlu təkrarla konkret anlayış öyrətmə", m:"real əşyalar/şəkillər", r:"Konkret, çoxsaylı təkrar mücərrəd anlayışların mənimsənilməsinə kömək edir."}
+    {t:"Çoxlu təkrarla konkret anlayış öyrətmə", obj:"Uşaq 1 konkret anlayışı 5 təkrardan sonra tanısın.",
+     steps:["Real əşya/şəkil ilə anlayışı sadə cümləylə təqdim edin.","Anlayışı fərqli kontekstdə (\"böyük top\", \"böyük ev\") 5 dəfə təkrarlayın.","Sonda uşaqdan anlayışı müstəqil göstərməsini/tanımasını istəyin."],
+     m:"real əşyalar/şəkillər", r:"Konkret, çoxsaylı təkrar mücərrəd anlayışların mənimsənilməsinə kömək edir.",
+     eval:"Müstəqil tanıma faizinin artması.", adapt:"Çətindirsə təkrar sayını 8-10-a qədər artırın."}
   ],
   dehb:[
-    {t:"Qısa müddətli, yüksək stimullaşdırıcı tapşırıq bloku", m:"rəngli, maraqlı material", r:"Yüksək stimul səviyyəsi diqqəti daha uzun saxlaya bilər."}
+    {t:"Qısa müddətli, yüksək stimullaşdırıcı tapşırıq bloku", obj:"Uşaq 2 dəqiqəlik yüksək-stimullu blokda tam iştirak etsin.",
+     steps:["Rəngli, maraqlı materialla tapşırığı yüksək templə təqdim edin.","Hər 20-30 saniyədə yeni element/sual əlavə edərək dinamikanı saxlayın.","Blok bitdikdə dərhal növbəti blok üçün qısa fasilə verin."],
+     m:"rəngli, maraqlı material", r:"Yüksək stimul səviyyəsi diqqəti daha uzun saxlaya bilər.",
+     eval:"Tam iştirak müddətinin (2 dəqiqə) qorunması.", adapt:"Diqqət yayınırsa blok müddətini 1 dəqiqəyə endirin."}
   ],
   daun:[
-    {t:"Vizual-təkrarlayıcı akademik tapşırıq", m:"şəkilli iş vərəqi", r:"Vizual təkrar Down sindromunda öyrənməni gücləndirir."}
+    {t:"Vizual-təkrarlayıcı akademik tapşırıq", obj:"Uşaq iş vərəqindəki 3 tapşırıqdan 2-sini tamamlasın.",
+     steps:["İş vərəqini sadə, az elementli formada hazırlayın.","İlk tapşırığı birgə, yavaş templə tamamlayın.","Qalanları müstəqil etməsinə imkan verib lazım gəldikcə köməklik edin."],
+     m:"şəkilli iş vərəqi", r:"Vizual təkrar Down sindromunda öyrənməni gücləndirir.",
+     eval:"Müstəqil tamamlanan tapşırıq sayının artması.", adapt:"Çətindirsə vərəqdə 1 tapşırıqla başlayın."}
   ],
   serebral:[
-    {t:"Adaptiv formatda (böyük düymələr/keys) koqnitiv oyun", m:"adaptiv planşet/keys", r:"Fiziki maneələrin aradan qaldırılması koqnitiv iştiraka imkan verir."}
+    {t:"Adaptiv formatda (böyük düymələr/keys) koqnitiv oyun", obj:"Uşaq adaptiv vasitə ilə 3 koqnitiv sualdan 2-sinə cavab versin.",
+     steps:["Adaptiv planşet/keys-i uşağın motor imkanına uyğunlaşdırın.","Sadə koqnitiv sualı (rəng, forma seçimi) təqdim edin.","Cavabı gözləyib dərhal müsbət rəy verin."],
+     m:"adaptiv planşet/keys", r:"Fiziki maneələrin aradan qaldırılması koqnitiv iştiraka bərabər imkan verir.",
+     eval:"Müstəqil cavablanan sual sayının artması.", adapt:"Çətindirsə seçim sayını 2-yə endirin."}
   ],
   nitq:[
-    {t:"Şəkil-söz uyğunlaşdırma tapşırığı", m:"şəkil-söz kartları", r:"Vizual-verbal əlaqə söz ehtiyatının möhkəmlənməsinə kömək edir."}
+    {t:"Şəkil-söz uyğunlaşdırma tapşırığı", obj:"Uşaq 3 şəkil-söz cütündən 2-sini uyğunlaşdırsın.",
+     steps:["Şəkil kartlarını söz kartları ilə qarışıq düzün.","Bir şəkli göstərib uyğun sözü tapmasını xahiş edin.","Düzgün uyğunlaşdırmanı dərhal pekləndirin."],
+     m:"şəkil-söz kartları", r:"Vizual-verbal əlaqə söz ehtiyatının möhkəmlənməsinə kömək edir.",
+     eval:"Müstəqil uyğunlaşdırılan cüt sayının artması.", adapt:"Çətindirsə 1 cütlə başlayın."}
   ]
 },
 valideyn:[
-  {t:"Gündəlik rutinin vizual cədvəllə təqdimi", m:"vizual gündəlik cədvəl", r:"Rutinin əvvəlcədən görünməsi keçid çətinliyini azaldır."},
-  {t:"Birgə kitab oxuma (10-15 dəqiqə)", m:"yaşa uyğun şəkilli kitab", r:"Birgə oxuma söz ehtiyatını və valideyn-uşaq əlaqəsini gücləndirir."},
-  {t:"Sadə, aydın cümlələrlə danışma", m:"—", r:"Sadələşdirilmiş dil reseptiv anlamanı asanlaşdırır."},
-  {t:"Müsbət davranışı dərhal mükafatlandırma", m:"tərif, jeton sistemi", r:"Dərhal müsbət pekləndirmə davranışın təkrarlanma ehtimalını artırır."},
-  {t:"Davranış partlayışı zamanı sakit, sabit reaksiya", m:"—", r:"Sakit reaksiya davranışın gücləndirilməsinin qarşısını alır və uşağa təhlükəsizlik hissi verir."},
-  {t:"Ekran vaxtının məhdudlaşdırılması və strukturlaşdırılması", m:"vaxt taймeri", r:"Həddindən artıq ekran vaxtı diqqət və nitq inkişafına mənfi təsir göstərə bilər."},
-  {t:"Sabit yuxu rejiminin qorunması", m:"yuxu rutini cədvəli", r:"Sabit yuxu rejimi emosional tənzimləməyə birbaşa təsir edir."},
-  {t:"Birgə məişət tapşırığı (masa yığma və s.)", m:"gündəlik əşyalar", r:"Məişət bacarıqları funksional müstəqilliyi artırır."},
-  {t:"Gəzinti zamanı adlandırma oyunu", m:"—", r:"Təbii mühitdə söz ehtiyatının genişləndirilməsi daha effektivdir."},
-  {t:"Sadə seçim təklif etmə (iki variant arasından)", m:"iki əşya/şəkil", r:"Seçim imkanı özünüifadəni və qərar qəbuletmə bacarığını inkişaf etdirir."},
-  {t:"Növbəli sadə oyun (top, kublar)", m:"top/kublar", r:"Ailə daxilində növbə gözləmə sosial bacarıqları möhkəmləndirir."},
-  {t:"Emosiyaların adlandırılmasına kömək", m:"emosiya kartları", r:"Emosiyanı adlandırmaq özünütənzimləmənin ilk addımıdır."},
-  {t:"Musiqi ilə birgə hərəkət fəaliyyəti", m:"sadə musiqi", r:"Ritmik hərəkət həm motor, həm emosional tənzimləməyə kömək edir."},
-  {t:"Mütəxəssis tövsiyələrinin evdə təkrarlanması", m:"sessiya qeydləri", r:"Ev-mərkəz ardıcıllığı proqresi əhəmiyyətli dərəcədə sürətləndirir."}
+  {t:"Gündəlik rutinin vizual cədvəllə təqdimi", obj:"Uşaq gün ərzində 3 keçidi vizual cədvəllə narahatlıq olmadan icra etsin.",
+   steps:["Səhər gündəlik fəaliyyətləri şəkilli kartlarla ardıcıl düzün.","Hər fəaliyyətdən əvvəl kartı birlikdə göstərib adlandırın.","Fəaliyyət bitdikdə kartı \"bitdi\" bölməsinə birgə köçürün."],
+   m:"vizual gündəlik cədvəl", r:"Rutinin əvvəlcədən görünməsi keçid çətinliyini azaldır.",
+   eval:"Narahatlıqsız keçid sayının artması.", adapt:"Çətindirsə cədvəldə yalnız növbəti 1 addımı göstərin."},
+  {t:"Birgə kitab oxuma (10-15 dəqiqə)", obj:"Uşaq kitab oxuma zamanı 5 dəqiqə diqqətini saxlasın.",
+   steps:["Sakit, rahat guşədə yaşa uyğun kitabı seçin.","Hər səhifədə şəkli göstərib sadə sualla (\"bu nədir?\") iştirakı təşviq edin.","Uşağın marağına uyğun tempə uyğunlaşın, tələsdirməyin."],
+   m:"yaşa uyğun şəkilli kitab", r:"Birgə oxuma söz ehtiyatını və valideyn-uşaq əlaqəsini gücləndirir.",
+   eval:"Diqqətin saxlanma müddətinin artması.", adapt:"Diqqət tez yayınırsa daha az mətnli, daha çox şəkilli kitab seçin."},
+  {t:"Sadə, aydın cümlələrlə danışma", obj:"Uşaqla ünsiyyətdə orta cümlə uzunluğu azaldılsın.",
+   steps:["Uzun izahlar əvəzinə 2-4 sözlü, konkret cümlələr işlədin.","Vacib sözü vurğulayaraq yavaş templə deyin.","Anlaşılmadıqda cümləni təkrarlamaq əvəzinə sadələşdirin."],
+   m:"—", r:"Sadələşdirilmiş dil reseptiv anlamanı asanlaşdırır.",
+   eval:"Uşağın göstərişlərə düzgün reaksiya nisbətinin artması.", adapt:"Hələ də çətindirsə tək sözlə (\"gəl\", \"otur\") ünsiyyətə keçin."},
+  {t:"Müsbət davranışı dərhal mükafatlandırma", obj:"Gün ərzində minimum 5 müsbət davranış anı qeyd olunub pekləndirilsin.",
+   steps:["Gün ərzində uşağın yaxşı davranış nümunələrini diqqətlə izləyin.","Davranışdan dərhal (5 saniyə ərzində) konkret tərif verin (\"əlini yudun, çox yaxşı\").","Vaxtaşırı jeton/kiçik mükafatla möhkəmləndirin."],
+   m:"tərif, jeton sistemi", r:"Dərhal müsbət pekləndirmə davranışın təkrarlanma ehtimalını artırır.",
+   eval:"Gün ərzində qeydə alınan müsbət davranış sayı.", adapt:"Unutma riski varsa telefon xatırlatması qoyun."},
+  {t:"Davranış partlayışı zamanı sakit, sabit reaksiya", obj:"Partlayış zamanı valideyn sakit tonu 90% halda qorusun.",
+   steps:["Partlayış başlayanda səsinizi qaldırmadan, sakit mövqe tutun.","Uşağın təhlükəsizliyini təmin edin, lakin diqqəti həddindən artıq artırmayın.","Sakitləşdikdən sonra qısa, sadə sözlərlə vəziyyəti izah edin."],
+   m:"—", r:"Sakit reaksiya davranışın gücləndirilməsinin qarşısını alır və uşağa təhlükəsizlik hissi verir.",
+   eval:"Partlayışın müddətinin qısalması.", adapt:"Çətinlikdə əvvəlcədən özünüz üçün \"sakitləşmə cümləsi\" hazırlayın (\"bu keçəcək\")."},
+  {t:"Ekran vaxtının məhdudlaşdırılması və strukturlaşdırılması", obj:"Ekran vaxtı gündəlik razılaşdırılmış limitə (məs. 30-45 dəq) endirilsin.",
+   steps:["Gündəlik ekran vaxtını əvvəlcədən vizual таймerlə göstərin.","Ekran vaxtı bitməzdən 2 dəqiqə əvvəl xəbərdarlıq edin.","Ekrandan sonra dərhal alternativ fəaliyyət təklif edin ki, keçid asanlaşsın."],
+   m:"vaxt таймeri", r:"Həddindən artıq ekran vaxtı diqqət və nitq inkişafına mənfi təsir göstərə bilər.",
+   eval:"Razılaşdırılmış limitə uyğunluq faizinin artması.", adapt:"Ekranı tam kəsmək yerinə tədricən (5-10 dəq) azaldın."},
+  {t:"Sabit yuxu rejiminin qorunması", obj:"Yatma vaxtı ±15 dəqiqə sabitliklə qorunsun.",
+   steps:["Hər axşam eyni ardıcıllıqla sakit rutini (hamam-kitab-yataq) tətbiq edin.","Yatmazdan 1 saat əvvəl ekran və hərəkətli oyunları dayandırın.","Otaqda sakit, qaranlıq, sabit temperatur mühiti təmin edin."],
+   m:"yuxu rutini cədvəli", r:"Sabit yuxu rejimi emosional tənzimləməyə birbaşa təsir edir.",
+   eval:"Yatma vaxtının sabitliyi və gecə oyanma sayının azalması.", adapt:"Keçid çətindirsə rutini 15 dəqiqə əvvəldən başladın."},
+  {t:"Birgə məişət tapşırığı (masa yığma və s.)", obj:"Uşaq 1 məişət tapşırığını köməklə tamamlasın.",
+   steps:["Sadə, təhlükəsiz tapşırığı (qaşıq-çəngəl yerləşdirmə) seçin.","Tapşırığı birgə, addım-addım göstərərək icra edin.","Tamamlandıqda konkret tərif verin (\"masanı birlikdə yığdıq\")."],
+   m:"gündəlik əşyalar", r:"Məişət bacarıqları funksional müstəqilliyi artırır.",
+   eval:"Köməksiz icra edilən addım sayının artması.", adapt:"Çətindirsə tapşırığı 1 addıma endirin."},
+  {t:"Gəzinti zamanı adlandırma oyunu", obj:"Gəzinti zamanı 5 yeni obyekt adlandırılsın.",
+   steps:["Gəzinti marşrutunda diqqət çəkən 5 obyekt (ağac, maşın, quş) seçin.","Hər obyektə baxıb sakit, aydın səslə adlandırın.","Uşaqdan təkrarlamasını və ya işarə etməsini xahiş edin."],
+   m:"—", r:"Təbii mühitdə söz ehtiyatının genişləndirilməsi daha effektiv və davamlıdır.",
+   eval:"Uşağın təkrarladığı/tanıdığı obyekt sayı.", adapt:"Çətindirsə 2-3 obyektlə məhdudlaşdırın."},
+  {t:"Sadə seçim təklif etmə (iki variant arasından)", obj:"Uşaq gün ərzində 3 dəfə müstəqil seçim etsin.",
+   steps:["İki əşya/şəkli eyni məsafədə, aydın göstərin.","\"Bunu, yoxsa bunu?\" sualı ilə seçim üçün vaxt verin.","Seçimi dərhal reallaşdırıb (\"sən bunu istədin\") təsdiqləyin."],
+   m:"iki əşya/şəkil", r:"Seçim imkanı özünüifadəni və qərar qəbuletmə bacarığını inkişaf etdirir.",
+   eval:"Müstəqil seçim sayının artması.", adapt:"Çətindirsə vizual fərqi (rəng, ölçü) artırın."},
+  {t:"Növbəli sadə oyun (top, kublar)", obj:"Ailə daxilində 3 dövrə növbəli oyun aparılsın.",
+   steps:["Sadə növbəli oyunu (top ötürmə, qüllə tikmə) seçin.","\"İndi sənin növbən\" ifadəsini hər dəfə aydın bildirin.","Növbə dəyişikliyini vizual jestlə (əl işarəsi) də dəstəkləyin."],
+   m:"top/kublar", r:"Ailə daxilində növbə gözləmə sosial bacarıqları təbii mühitdə möhkəmləndirir.",
+   eval:"Uğurlu növbə dövrələrinin sayı.", adapt:"Çətindirsə növbə müddətini qısaldın."},
+  {t:"Emosiyaların adlandırılmasına kömək", obj:"Gün ərzində uşağın 1 emosiyası birgə adlandırılsın.",
+   steps:["Uşağın emosional vəziyyətini müşahidə edin (kədər, sevinc).","Sakit tonda adlandırın (\"görürəm ki, üzgünsən\").","Səbəbi sadə sözlərlə birgə müzakirə edin."],
+   m:"emosiya kartları", r:"Emosiyanı adlandırmaq özünütənzimləmənin ilk addımıdır.",
+   eval:"Uşağın emosiyanı özü adlandırma cəhdlərinin artması.", adapt:"Çətindirsə yalnız kart göstərərək seçim etməsini təklif edin."},
+  {t:"Musiqi ilə birgə hərəkət fəaliyyəti", obj:"Uşaq musiqi zamanı 3 dəqiqə hərəkətə qoşulsun.",
+   steps:["Sadə, ritmik musiqi seçib birgə hərəkət edin (əl çalma, rəqs).","Uşağın öz hərəkətini təqlid edərək iştirakını artırın.","Musiqini tədricən dəyişərək fərqli tempoları sınayın."],
+   m:"sadə musiqi", r:"Ritmik hərəkət həm motor, həm emosional tənzimləməyə kömək edir.",
+   eval:"Fəal iştirak müddətinin artması.", adapt:"Səs həssaslığı varsa səs səviyyəsini azaldın."},
+  {t:"Mütəxəssis tövsiyələrinin evdə təkrarlanması", obj:"Gündəlik sessiya materialı evdə 1 dəfə təkrarlansın.",
+   steps:["Mərkəzdən gələn sessiya qeydini diqqətlə oxuyun.","Eyni materialı/oyuncağı evdə bənzər şəkildə təkrar tətbiq edin.","Nəticəni qeyd edib növbəti sessiyada mütəxəssislə bölüşün."],
+   m:"sessiya qeydləri", r:"Ev-mərkəz ardıcıllığı proqresi əhəmiyyətli dərəcədə sürətləndirir (generalization prinsipi).",
+   eval:"Ev tapşırıqlarının icra faizi.", adapt:"Vaxt azdırsa tapşırığı 5 dəqiqəyə qədər sadələşdirin."}
 ]
 };
 
@@ -763,11 +1004,16 @@ function buildGoals(data, diagCat){
 }
 
 function specHtml(cls, name, item, day, lvl){
+  const stepsHtml = (item.steps||[]).map(s=>`<li>${s}</li>`).join('');
   return `<div class="spec-block">
     <span class="spec-name ${cls}">${name}</span>
     <div class="act-title">${item.t}</div>
     <div class="act-meta">⏱ ${durationForDay(day)} dəq · Səviyyə: ${LEVEL_TXT[lvl]} · Material: ${item.m}</div>
-    <div class="act-why"><b>Niyə bu fəaliyyət aparılır?</b><br>${item.r}</div>
+    ${item.obj?`<div class="act-obj"><b>🎯 Konkret məqsəd:</b> ${item.obj}</div>`:''}
+    ${stepsHtml?`<div class="act-steps-label">İcra qaydası (addım-addım)</div><ol class="act-steps">${stepsHtml}</ol>`:''}
+    <div class="act-why"><b>🔬 Niyə bu fəaliyyət aparılır?</b><br>${item.r}</div>
+    ${item.eval?`<div class="act-eval"><b>✅ Qiymətləndirmə / uğur meyarı:</b> ${item.eval}</div>`:''}
+    ${item.adapt?`<div class="act-adapt"><b>⚙️ Uyğunlaşdırma tövsiyəsi:</b> ${item.adapt}</div>`:''}
   </div>`;
 }
 
@@ -849,15 +1095,8 @@ function renderPlan(plan){
         ${specHtml('loq','Loqoped', day.loqoped, day.day, day.lvl)}
         ${specHtml('ergo','Erqoterapevt', day.ergoterapevt, day.day, day.lvl)}
         ${specHtml('pedaqoq','Psixopedaqoq', day.pedaqoq, day.day, day.lvl)}
-        <div class="spec-block">
-          <span class="spec-name valideyn">Valideyn Planı</span>
-          <div class="act-title">1) ${day.valideyn1.t}</div>
-          <div class="act-meta">Material: ${day.valideyn1.m}</div>
-          <div class="act-why"><b>Niyə?</b> ${day.valideyn1.r}</div>
-          <div class="act-title" style="margin-top:10px">2) ${day.valideyn2.t}</div>
-          <div class="act-meta">Material: ${day.valideyn2.m}</div>
-          <div class="act-why"><b>Niyə?</b> ${day.valideyn2.r}</div>
-        </div>
+        ${specHtml('valideyn','Valideyn Planı (1)', day.valideyn1, day.day, day.lvl)}
+        ${specHtml('valideyn','Valideyn Planı (2)', day.valideyn2, day.day, day.lvl)}
       </div>
     </div>
   `).join('');
