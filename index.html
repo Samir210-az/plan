@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fərdi Reabilitasiya Planı Generatoru | AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</title>
+<style>
+:root{
+  --navy:#0b2545; --blue:#1e5aa8; --blue2:#2f7fe0; --sky:#eaf3ff;
+  --mint:#12b3a8; --ink:#1b2733; --muted:#5c7089; --line:#dbe6f3;
+  --bg:#f5f9fd; --card:#ffffff; --warn:#c0392b; --ok:#1c8a5a;
+  --shadow:0 10px 30px rgba(20,50,90,.08); --shadow2:0 4px 14px rgba(20,50,90,.10);
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.55;
+}
+a{color:var(--blue2)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+
+/* HERO */
+.hero{
+  position:relative; overflow:hidden; color:#fff; padding:64px 0 84px;
+  background:linear-gradient(120deg,#0b2545,#1e5aa8 45%,#12b3a8 120%);
+  background-size:220% 220%;
+  animation:gradientShift 14s ease infinite;
+}
+@keyframes gradientShift{
+  0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
+}
+.hero::before,.hero::after{
+  content:""; position:absolute; border-radius:50%; filter:blur(2px);
+  background:radial-gradient(circle,rgba(255,255,255,.16),transparent 65%);
+  animation:floaty 16s ease-in-out infinite;
+}
+.hero::before{width:420px;height:420px; top:-160px; right:-120px;}
+.hero::after{width:300px;height:300px; bottom:-140px; left:-80px; animation-delay:3s}
+@keyframes floaty{0%,100%{transform:translateY(0px)} 50%{transform:translateY(26px)}}
+.hero-inner{position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:28px; flex-wrap:wrap}
+.brand{display:flex; gap:16px; align-items:center}
+.brand-badge{
+  width:58px;height:58px;border-radius:16px;background:rgba(255,255,255,.14);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;
+  border:1px solid rgba(255,255,255,.35); backdrop-filter:blur(4px);
+}
+.brand h1{margin:0; font-size:15px; letter-spacing:.5px; font-weight:600; opacity:.85; text-transform:uppercase}
+.brand p{margin:2px 0 0; font-size:13px; opacity:.7}
+.hero-title{font-size:clamp(28px,4vw,42px); font-weight:800; margin:26px 0 6px; letter-spacing:-.5px}
+.hero-sub{font-size:16px; opacity:.9; max-width:620px}
+.hero-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap}
+.pill-select{
+  background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.4); color:#fff;
+  padding:11px 16px; border-radius:12px; font-size:14px; cursor:pointer;
+}
+.pill-select option{color:#111}
+
+/* BUTTONS */
+.btn{
+  border:none; cursor:pointer; padding:13px 22px; border-radius:12px; font-size:14.5px;
+  font-weight:700; transition:.18s transform ease, .18s box-shadow ease, .18s background ease;
+  display:inline-flex; align-items:center; gap:8px;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:linear-gradient(120deg,#2f7fe0,#12b3a8); color:#fff; box-shadow:var(--shadow2)}
+.btn-primary:hover{box-shadow:0 10px 22px rgba(30,90,168,.28); transform:translateY(-1px)}
+.btn-ghost{background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.5)}
+.btn-ghost:hover{background:rgba(255,255,255,.2)}
+.btn-outline{background:#fff; color:var(--blue); border:1.5px solid var(--line)}
+.btn-outline:hover{border-color:var(--blue2); background:var(--sky)}
+.btn-sm{padding:9px 14px; font-size:13px; border-radius:10px}
+.btn-danger{background:#fff; color:var(--warn); border:1.5px solid #f1c6c0}
+
+/* LAYOUT */
+main{padding:36px 0 80px}
+.card{
+  background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+  border:1px solid var(--line); padding:26px 26px 8px; margin-bottom:22px;
+  animation:fadeUp .5s ease both;
+}
+@keyframes fadeUp{from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:translateY(0)}}
+.card h2{
+  font-size:18px; margin:0 0 4px; color:var(--navy); display:flex; align-items:center; gap:10px;
+}
+.card h2 .num{
+  width:28px;height:28px;border-radius:8px; background:var(--sky); color:var(--blue);
+  display:flex;align-items:center;justify-content:center; font-size:13px; font-weight:800;
+}
+.card .hint{color:var(--muted); font-size:13px; margin-bottom:16px}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px 18px; margin-bottom:18px}
+.grid.g2{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.field{display:flex; flex-direction:column; gap:6px}
+.field label{font-size:12.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.3px}
+.field input, .field select, .field textarea{
+  border:1.5px solid var(--line); border-radius:10px; padding:10px 12px; font-size:14px;
+  background:#fbfdff; color:var(--ink); font-family:inherit; transition:.15s border-color;
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none; border-color:var(--blue2); background:#fff}
+.field textarea{resize:vertical; min-height:64px}
+.field.full{grid-column:1/-1}
+
+.chiplist{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px}
+.chip{
+  border:1.5px solid var(--line); background:#fbfdff; padding:8px 13px; border-radius:999px;
+  font-size:13px; cursor:pointer; user-select:none; transition:.15s all;
+}
+.chip input{display:none}
+.chip.on{background:linear-gradient(120deg,#2f7fe0,#12b3a8); border-color:transparent; color:#fff; font-weight:700}
+
+.section-toggle{
+  display:flex; align-items:center; justify-content:space-between; cursor:pointer; padding:16px 0;
+}
+.section-toggle .arrow{transition:.2s transform; color:var(--blue)}
+.section-body{max-height:0; overflow:hidden; transition:max-height .35s ease}
+.section-body.open{max-height:4000px}
+.section-toggle.open .arrow{transform:rotate(90deg)}
+
+.duration-row{display:flex; gap:14px; margin:6px 0 20px}
+.dur-card{
+  flex:1; border:2px solid var(--line); border-radius:14px; padding:18px; cursor:pointer; text-align:center;
+  transition:.18s all; background:#fbfdff;
+}
+.dur-card:hover{border-color:var(--blue2)}
+.dur-card.sel{border-color:var(--blue2); background:var(--sky); box-shadow:0 6px 18px rgba(47,127,224,.15)}
+.dur-card b{display:block; font-size:22px; color:var(--navy)}
+.dur-card span{font-size:12.5px; color:var(--muted)}
+
+.submit-bar{
+  position:sticky; bottom:16px; display:flex; justify-content:center; margin-top:10px; z-index:20;
+}
+.submit-bar .btn{padding:16px 40px; font-size:16px; box-shadow:0 14px 30px rgba(18,179,168,.35)}
+
+/* PLAN VIEW */
+#planSection{display:none}
+.plan-head{
+  background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--line);
+  padding:26px; margin-bottom:20px; position:relative; overflow:hidden;
+}
+.plan-head .ribbon{
+  position:absolute; inset:0 0 auto 0; height:6px; background:linear-gradient(90deg,#2f7fe0,#12b3a8,#2f7fe0);
+  background-size:200% 100%; animation:gradientShift 6s linear infinite;
+}
+.plan-head-top{display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px}
+.plan-title{font-size:22px; font-weight:800; color:var(--navy); margin:0}
+.plan-sub{color:var(--muted); font-size:13.5px; margin-top:4px}
+.badge{
+  display:inline-block; background:var(--sky); color:var(--blue); padding:5px 12px; border-radius:999px;
+  font-size:12px; font-weight:700; margin-right:6px; margin-top:6px;
+}
+.export-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+
+.goals-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin:18px 0}
+.goal-card{border:1.5px solid var(--line); border-radius:14px; padding:18px; background:#fbfdff}
+.goal-card h4{margin:0 0 8px; color:var(--blue); font-size:13px; text-transform:uppercase; letter-spacing:.4px}
+.goal-card ul{margin:0; padding-left:18px; font-size:14px}
+.goal-card li{margin-bottom:6px}
+
+.week-nav{display:flex; gap:8px; flex-wrap:wrap; margin:20px 0 8px}
+.week-btn{
+  border:1.5px solid var(--line); background:#fff; padding:8px 14px; border-radius:10px; cursor:pointer;
+  font-size:13px; font-weight:700; color:var(--muted);
+}
+.week-btn.active{background:var(--navy); color:#fff; border-color:var(--navy)}
+
+.day-card{
+  border:1px solid var(--line); border-radius:14px; margin-bottom:14px; overflow:hidden; background:#fff;
+}
+.day-head{
+  display:flex; justify-content:space-between; align-items:center; padding:14px 18px; cursor:pointer;
+  background:linear-gradient(120deg,#f7fafd,#eef6ff);
+}
+.day-head b{color:var(--navy); font-size:14.5px}
+.day-head .lvl{font-size:11.5px; color:var(--muted)}
+.day-body{display:none; padding:6px 18px 18px}
+.day-body.open{display:block}
+.spec-block{border-top:1px dashed var(--line); padding:14px 0}
+.spec-block:first-child{border-top:none}
+.spec-name{
+  font-size:12.5px; font-weight:800; color:#fff; background:var(--blue); display:inline-block;
+  padding:3px 10px; border-radius:7px; margin-bottom:8px;
+}
+.spec-name.ergo{background:var(--mint)}
+.spec-name.pedaqoq{background:#7c5cff}
+.spec-name.valideyn{background:#e07b1e}
+.act-title{font-weight:700; font-size:14.5px; margin-bottom:3px}
+.act-meta{font-size:12.5px; color:var(--muted); margin-bottom:6px}
+.act-why{font-size:13px; background:#fbfdff; border-left:3px solid var(--blue2); padding:8px 12px; border-radius:0 8px 8px 0; margin-top:6px}
+
+.notes-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+@media(max-width:700px){.notes-grid{grid-template-columns:1fr}}
+
+.footer{
+  background:var(--navy); color:#cfe0f5; padding:34px 0; margin-top:40px; text-align:center; font-size:13.5px;
+}
+.footer a{color:#7fd6ff; text-decoration:none; font-weight:700}
+.footer .ig{display:inline-flex; align-items:center; gap:6px; margin-top:8px}
+
+.toast{
+  position:fixed; bottom:22px; right:22px; background:var(--navy); color:#fff; padding:13px 20px;
+  border-radius:12px; box-shadow:var(--shadow); font-size:14px; z-index:99; opacity:0; transform:translateY(10px);
+  transition:.25s all; pointer-events:none;
+}
+.toast.show{opacity:1; transform:translateY(0)}
+
+@media print{
+  .hero,.no-print,.footer,.submit-bar,.week-nav{display:none !important}
+  body{background:#fff}
+  .card,.day-card,.plan-head{box-shadow:none; border:1px solid #ccc; break-inside:avoid}
+  .day-body{display:block !important}
+  main{padding:0}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <div class="brand">
+      <div class="brand-badge">AN</div>
+      <div>
+        <h1>AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</h1>
+        <p>Elmi Rəhbər: Nahidə Axundova</p>
+      </div>
+    </div>
+    <div class="no-print" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <select id="savedSelect" class="pill-select">
+        <option value="">📁 Yaddaşdan uşaq seç…</option>
+      </select>
+      <button class="btn btn-ghost" onclick="newAssessment()">+ Yeni Qiymətləndirmə</button>
+    </div>
+  </div>
+  <div class="wrap" style="position:relative;z-index:2">
+    <div class="hero-title">Fərdi Reabilitasiya Planı Generatoru</div>
+    <div class="hero-sub">Individual Rehabilitation Program — hər uşağın yaşına, diaqnozuna, inkişaf səviyyəsinə və ailə məqsədlərinə uyğun, sıfırdan formalaşan, tam fərdi klinik reabilitasiya planı.</div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <form id="intakeForm">
+
+    <!-- 1. Şəxsi məlumatlar -->
+    <div class="card">
+      <h2><span class="num">1</span> Şəxsi Məlumatlar</h2>
+      <div class="hint">Uşaq və planla bağlı əsas identifikasiya məlumatları</div>
+      <div class="grid">
+        <div class="field"><label>Ad</label><input required id="f_ad" placeholder="Ad"></div>
+        <div class="field"><label>Soyad</label><input id="f_soyad" placeholder="Soyad"></div>
+        <div class="field"><label>Ata adı</label><input id="f_ataadi"></div>
+        <div class="field"><label>Doğum tarixi</label><input type="date" id="f_dogum" onchange="calcAge()"></div>
+        <div class="field"><label>Yaş</label><input id="f_yas" readonly placeholder="avtomatik"></div>
+        <div class="field"><label>Cins</label>
+          <select id="f_cins"><option value="qız">Qız</option><option value="oğlan">Oğlan</option></select>
+        </div>
+        <div class="field"><label>Boy (sm)</label><input type="number" id="f_boy"></div>
+        <div class="field"><label>Çəki (kq)</label><input type="number" id="f_cheki"></div>
+        <div class="field"><label>Qiymətləndirmə tarixi</label><input type="date" id="f_qtarix"></div>
+        <div class="field"><label>Planın başlanma tarixi</label><input type="date" id="f_baslama"></div>
+        <div class="field"><label>Kurator mütəxəssis</label><input id="f_kurator" placeholder="Ad Soyad"></div>
+      </div>
+    </div>
+
+    <!-- 2. Klinik məlumatlar -->
+    <div class="card">
+      <h2><span class="num">2</span> Klinik Məlumatlar</h2>
+      <div class="grid g2">
+        <div class="field"><label>Əsas diaqnoz</label><input required id="f_diaqnoz" placeholder="məs. Autizm spektri pozuntusu"></div>
+        <div class="field"><label>Əlavə diaqnozlar</label><input id="f_diaqnoz2"></div>
+        <div class="field"><label>ICD kodu (istəyə bağlı)</label><input id="f_icd"></div>
+        <div class="field"><label>Diaqnozun qoyulma tarixi</label><input type="date" id="f_diaqtarix"></div>
+        <div class="field"><label>Əvvəlki terapiyalar</label><input id="f_evvelki"></div>
+        <div class="field"><label>Qəbul etdiyi dərmanlar</label><input id="f_derman"></div>
+        <div class="field"><label>Allergiyalar</label><input id="f_allergiya"></div>
+      </div>
+      <div class="grid">
+        <div class="field full"><label>Nevroloji / Psixiatrik / Pediatrik rəy, EEQ, MRT, genetik nəticələr (əlavə qeydlər)</label>
+          <textarea id="f_tibbiqeyd" placeholder="Sərbəst qeyd..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- 3. İnkişaf anamnezi -->
+    <div class="card">
+      <div class="section-toggle" onclick="toggleSec(this)"><h2 style="margin:0"><span class="num">3</span> İnkişaf Anamnezi</h2><span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="grid g2" style="padding-top:6px">
+          <div class="field"><label>Hamiləlik / Doğuş</label><input id="f_hamile" placeholder="qısa qeyd"></div>
+          <div class="field"><label>Yeriməyə başlama (yaş)</label><input id="f_yerime"></div>
+          <div class="field"><label>İlk söz (yaş)</label><input id="f_ilksoz"></div>
+          <div class="field"><label>İlk cümlə (yaş)</label><input id="f_ilkcumle"></div>
+          <div class="field"><label>Tualet bacarıqları</label>
+            <select id="f_tualet"><option>Formalaşmayıb</option><option>Qismən formalaşıb</option><option>Formalaşıb</option></select></div>
+          <div class="field"><label>Özünə xidmət / Yemək / Geyinmə / Gigiyena</label><input id="f_ozunexidmet" placeholder="qısa qiymətləndirmə"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Nitq və Dil -->
+    <div class="card">
+      <div class="section-toggle" onclick="toggleSec(this)"><h2 style="margin:0"><span class="num">4</span> Nitq və Dil</h2><span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="grid g2" style="padding-top:6px">
+          <div class="field"><label>Nitqin səviyyəsi</label>
+            <select id="f_nitqsev"><option>Nitq yoxdur</option><option>Tək sözlər</option><option>Qısa cümlələr</option><option>Sərbəst nitq, artikulyasiya problemi</option><option>Yaşa uyğun</option></select></div>
+          <div class="field"><label>Reseptiv / Ekspressiv nitq</label><input id="f_reseptiv" placeholder="qısa qeyd"></div>
+          <div class="field"><label>Alternativ kommunikasiya (PECS/AAC/jest)</label>
+            <select id="f_aac"><option>Yoxdur</option><option>PECS istifadə olunur</option><option>AAC cihazı</option><option>Jestlərlə</option></select></div>
+          <div class="field"><label>Ekolaliya / Səs təqlidi</label><input id="f_ekolaliya"></div>
+          <div class="field"><label>Adına reaksiya</label>
+            <select id="f_adreaksiya"><option>Yox</option><option>Qismən</option><option>Bəli, sabit</option></select></div>
+          <div class="field"><label>Sadə göstərişləri yerinə yetirmə</label>
+            <select id="f_gosterish"><option>Yox</option><option>1 addımlı</option><option>2-3 addımlı</option><option>Mürəkkəb</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Sosial inkişaf -->
+    <div class="card">
+      <div class="section-toggle" onclick="toggleSec(this)"><h2 style="margin:0"><span class="num">5</span> Sosial İnkişaf</h2><span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="grid g2" style="padding-top:6px">
+          <div class="field"><label>Göz kontaktı</label><select id="f_gozkontakt"><option>Yox</option><option>Qısa müddətli</option><option>Sabit</option></select></div>
+          <div class="field"><label>Birgə diqqət</label><select id="f_birgediqqet"><option>Formalaşmayıb</option><option>Qismən</option><option>Formalaşıb</option></select></div>
+          <div class="field"><label>Digər uşaqlarla / Böyüklərlə münasibət</label><input id="f_munasibet"></div>
+          <div class="field"><label>Oyun bacarıqları</label><select id="f_oyun"><option>Tək oyun</option><option>Paralel oyun</option><option>Qarşılıqlı oyun</option></select></div>
+          <div class="field"><label>Növbə gözləmə / Empati</label><input id="f_novbe"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Davranış -->
+    <div class="card">
+      <div class="section-toggle" onclick="toggleSec(this)"><h2 style="margin:0"><span class="num">6</span> Davranış</h2><span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="hint" style="padding-top:6px">Müşahidə olunan davranışları seçin</div>
+        <div class="chiplist" id="behaviorChips"></div>
+        <div class="field full"><label>Digər davranışlar</label><input id="f_davranisdiger"></div>
+      </div>
+    </div>
+
+    <!-- 7. Sensor profil -->
+    <div class="card">
+      <div class="section-toggle" onclick="toggleSec(this)"><h2 style="margin:0"><span class="num">7</span> Sensor Profil</h2><span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="chiplist" id="sensoryChips" style="padding-top:6px"></div>
+      </div>
+    </div>
+
+    <!-- 8. Motor bacarıqlar -->
+    <div class="card">
+      <div class="section-toggle" onclick="toggleSec(this)"><h2 style="margin:0"><span class="num">8</span> Motor Bacarıqlar</h2><span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="grid g2" style="padding-top:6px">
+          <div class="field"><label>İri motorika</label><select id="f_irimotor"><option>Zəif</option><option>Orta</option><option>Yaxşı</option></select></div>
+          <div class="field"><label>Xırda motorika</label><select id="f_xirdamotor"><option>Zəif</option><option>Orta</option><option>Yaxşı</option></select></div>
+          <div class="field"><label>Tarazlıq / Koordinasiya</label><select id="f_tarazliq"><option>Zəif</option><option>Orta</option><option>Yaxşı</option></select></div>
+          <div class="field"><label>Qələm tutma / Qayçı istifadəsi</label><select id="f_qelem"><option>Formalaşmayıb</option><option>Qismən</option><option>Formalaşıb</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Koqnitiv bacarıqlar -->
+    <div class="card">
+      <div class="section-toggle" onclick="toggleSec(this)"><h2 style="margin:0"><span class="num">9</span> Koqnitiv Bacarıqlar</h2><span class="arrow">▶</span></div>
+      <div class="section-body">
+        <div class="grid g2" style="padding-top:6px">
+          <div class="field"><label>Diqqət</label><select id="f_diqqet"><option>Çox qısa (1-2 dəq)</option><option>Qısa (3-5 dəq)</option><option>Orta (5-10 dəq)</option><option>Yaxşı (10+ dəq)</option></select></div>
+          <div class="field"><label>Yaddaş / Təqlid</label><select id="f_yaddas"><option>Zəif</option><option>Orta</option><option>Yaxşı</option></select></div>
+          <div class="field"><label>Rənglər / Formalar / Say anlayışı</label><select id="f_akademik"><option>Formalaşmayıb</option><option>Qismən</option><option>Formalaşıb</option></select></div>
+          <div class="field"><label>Oxuya / Yazıya hazırlıq</label><select id="f_oxuyazi"><option>Uyğun deyil (kiçik yaş)</option><option>Başlanğıc mərhələ</option><option>İnkişaf edir</option><option>Hazırdır</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. Ailə -->
+    <div class="card">
+      <h2><span class="num">10</span> Ailə Haqqında</h2>
+      <div class="grid g2">
+        <div class="field full"><label>Valideynlərin əsas narahatlığı</label><textarea id="f_narahatliq"></textarea></div>
+        <div class="field full"><label>Əsas məqsədlər (ailənin gözləntisi)</label><textarea id="f_meqsed"></textarea></div>
+        <div class="field"><label>Evdə məşğələ vaxtı (gündəlik, dəq)</label><input type="number" id="f_evdevaxt" value="45"></div>
+        <div class="field"><label>Bacı-qardaş</label><input id="f_bacigardas"></div>
+        <div class="field"><label>Bağça / Məktəb</label><input id="f_mekteb"></div>
+      </div>
+    </div>
+
+    <!-- 11. Plan müddəti -->
+    <div class="card">
+      <h2><span class="num">11</span> Plan Müddəti</h2>
+      <div class="duration-row" id="durationRow">
+        <div class="dur-card sel" data-days="30" onclick="selectDuration(this,30)"><b>1 Aylıq</b><span>30 günlük fərdi plan</span></div>
+        <div class="dur-card" data-days="90" onclick="selectDuration(this,90)"><b>3 Aylıq</b><span>90 günlük fərdi plan</span></div>
+      </div>
+      <input type="hidden" id="f_muddet" value="30">
+    </div>
+
+    <div class="submit-bar">
+      <button type="submit" class="btn btn-primary">✨ PLANI HAZIRLA</button>
+    </div>
+  </form>
+
+  <!-- PLAN NƏTİCƏSİ -->
+  <section id="planSection">
+    <div class="plan-head">
+      <div class="ribbon"></div>
+      <div class="plan-head-top">
+        <div>
+          <p class="plan-title" id="planTitleName">Fərdi Reabilitasiya Planı</p>
+          <p class="plan-sub" id="planTitleSub"></p>
+          <div id="planBadges"></div>
+        </div>
+        <div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ Çap / PDF</button>
+          <button class="btn btn-outline btn-sm" onclick="exportJSON()">⬇ JSON</button>
+          <button class="btn btn-outline btn-sm" onclick="exportWord()">📄 Word</button>
+          <button class="btn btn-outline btn-sm" onclick="exportExcel()">📊 Excel</button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('importFile').click()">⬆ JSON Yüklə</button>
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+          <button class="btn btn-primary btn-sm" onclick="renewPlan()">🔄 Planı Yenilə</button>
+        </div>
+      </div>
+      <div class="export-row no-print">
+        <button class="btn btn-ghost" style="background:var(--sky);color:var(--blue)" onclick="scrollToId('goalsBlock')">🎯 SMART Məqsədlər</button>
+        <button class="btn btn-ghost" style="background:var(--sky);color:var(--blue)" onclick="scrollToId('daysBlock')">📅 Gündəlik Plan</button>
+        <button class="btn btn-ghost" style="background:var(--sky);color:var(--blue)" onclick="scrollToId('notesBlock')">📝 Qeydlər</button>
+        <button class="btn btn-ghost" style="background:var(--sky);color:var(--blue)" onclick="scrollToId('reportBlock')">📈 Hesabat</button>
+      </div>
+    </div>
+
+    <div class="card" id="goalsBlock">
+      <h2><span class="num">🎯</span> SMART Məqsədlər</h2>
+      <div class="goals-grid" id="goalsGrid"></div>
+    </div>
+
+    <div class="card" id="daysBlock">
+      <h2><span class="num">📅</span> Gündəlik Fərdi Plan</h2>
+      <div class="hint">Hər gün üçün Klinik Psixoloq, Loqoped, Erqoterapevt, Psixopedaqoq və Valideyn bölmələri</div>
+      <div class="week-nav no-print" id="weekNav"></div>
+      <div id="daysContainer"></div>
+    </div>
+
+    <div class="card" id="notesBlock">
+      <h2><span class="num">📝</span> Gündəlik Qeydlər (cari həftə)</h2>
+      <div class="hint">Bu qeydlər "Planı Yenilə" funksiyası üçün əsas kimi istifadə olunur və yaddaşda saxlanılır</div>
+      <div class="notes-grid">
+        <div class="field"><label>Mütəxəssis qeydi</label><textarea id="note_spec"></textarea></div>
+        <div class="field"><label>Valideyn qeydi</label><textarea id="note_parent"></textarea></div>
+        <div class="field"><label>Çətinliklər</label><textarea id="note_diff"></textarea></div>
+        <div class="field"><label>Uğurlar</label><textarea id="note_win"></textarea></div>
+      </div>
+      <div class="no-print" style="margin:16px 0"><button class="btn btn-outline btn-sm" onclick="saveNote()">💾 Qeydi Saxla</button></div>
+      <div id="notesLog"></div>
+    </div>
+
+    <div class="card" id="reportBlock">
+      <h2><span class="num">📈</span> İrəliləyiş Hesabatı</h2>
+      <div id="reportBody"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div>AN Psixoloji Dəstək və Reabilitasiya Mərkəzi &copy; <span id="yr"></span></div>
+  <div style="margin-top:6px">Hazırladı: <strong>By s_akhundoff</strong> — SECURITY GROUP</div>
+  <div class="ig"><a href="https://instagram.com/securtiy_group" target="_blank">📷 instagram.com/securtiy_group</a></div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ---------- KÖMƏKÇİ FUNKSİYALAR ---------- */
+function toggleSec(el){ el.classList.toggle('open'); el.nextElementSibling.classList.toggle('open'); }
+function scrollToId(id){ document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'}); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+function calcAge(){
+  const v = document.getElementById('f_dogum').value;
+  if(!v) return;
+  const b = new Date(v), n = new Date();
+  let years = n.getFullYear()-b.getFullYear(), months = n.getMonth()-b.getMonth();
+  if(months<0){years--; months+=12;}
+  document.getElementById('f_yas').value = years + ' yaş ' + months + ' ay';
+}
+function selectDuration(el, days){
+  document.querySelectorAll('.dur-card').forEach(d=>d.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('f_muddet').value = days;
+}
+
+/* ---------- ÇOXSEÇİMLİ SİYAHILAR ---------- */
+const BEHAVIOR_LIST = ["Aqressiya","Özünə zərər","Əl çırpma","Fırlanma","Qaçma","Əşya atma","Dişləmə","Qışqırma","Ağlama",
+"Hiperaktivlik","Diqqət çatışmazlığı","Rutinə bağlılıq","Keçid çətinliyi","Sensor həssaslıq","Yemək seçiciliyi","Yuxu problemi","Obsessiv davranışlar","Qorxular","Tiklər"];
+const SENSORY_LIST = ["Taktil həssaslıq","Vestibulyar həssaslıq","Proprioseptiv axtarış","Vizual həssaslıq","Auditor həssaslıq","Dad seçiciliyi","Qoxu həssaslığı","Sensor axtarışı","Sensor qaçınması"];
+
+function buildChips(containerId, list){
+  const c = document.getElementById(containerId);
+  c.innerHTML = list.map((x,i)=>`<label class="chip" id="${containerId}_${i}" onclick="this.classList.toggle('on')">${x}</label>`).join('');
+}
+buildChips('behaviorChips', BEHAVIOR_LIST);
+buildChips('sensoryChips', SENSORY_LIST);
+
+function getCheckedChips(containerId){
+  return [...document.querySelectorAll('#'+containerId+' .chip.on')].map(c=>c.textContent);
+}
+
+/* ---------- SEEDED RANDOM ---------- */
+function hashStr(s){ let h=1779033703; for(let i=0;i<s.length;i++){ h=Math.imul(h^s.charCodeAt(i),3432918353); h=h<<13|h>>>19; } return function(){ h=Math.imul(h^h>>>16,2246822519); h=Math.imul(h^h>>>13,3266489917); h^=h>>>16; return h>>>0; }; }
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function seededShuffle(arr, seed){
+  const rand = mulberry32(seed); const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(rand()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function seedFromString(s){ const f = hashStr(s); return f(); }
+
+/* ---------- DİAQNOZ VƏ YAŞ TƏSNİFATI ---------- */
+function detectDiagCategory(text){
+  const t = (text||'').toLowerCase();
+  const map = {
+    autizm:['autizm','asd','spektr'],
+    daun:['daun','down'],
+    serebral:['serebral','iflic','dcp',' cp'],
+    gerilik:['gerilik','əqli','intellekt'],
+    nitq:['nitq','dizartriya','alaliya','gecikm'],
+    dehb:['dehb','hiperaktiv','diqqət çatışmaz','adhd']
+  };
+  for(const k in map){ if(map[k].some(w=>t.includes(w))) return k; }
+  return 'umumi';
+}
+function detectAgeGroup(ageText, birthDateStr){
+  let years = 5;
+  if(birthDateStr){ const b=new Date(birthDateStr), n=new Date(); years = n.getFullYear()-b.getFullYear() - ((n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate()))?1:0); }
+  if(years<3) return 'erken';
+  if(years<6) return 'mekteboqeder';
+  if(years<12) return 'mekteb';
+  return 'yeniyetme';
+}
+
+/* ---------- FƏALİYYƏT BANKLARI ---------- */
+/* format: {t: başlıq, m: material, r: elmi əsaslandırma (niyə)} */
+const BANK = {
+psixoloq:{
+  umumi:[
+    {t:"Göz kontaktı və birgə diqqət məşqi (güzgü qarşısında)", m:"güzgü, sevimli oyuncaq", r:"Göz kontaktı sosial ünsiyyətin təməl blokudur; erkən mərhələdə güzgü vasitəsilə şəxsi diqqəti artırmaq mümkündür."},
+    {t:"Növbə gözləmə oyunu (top ötürmə)", m:"yumşaq top", r:"Növbə gözləmə özünütənzimləmə və sosial qarşılıqlılığın inkişafına xidmət edir."},
+    {t:"Emosiya kartları ilə tanınma məşqi", m:"emosiya kartları", r:"Emosiyaları tanımaq özünüifadə və empatiyanın inkişafı üçün zəruridir."},
+    {t:"Struktura salınmış sərbəst oyun sessiyası", m:"seçilmiş 2-3 oyuncaq", r:"Struktura salınmış oyun diqqətin idarə olunmasını və davranış nəzarətini gücləndirir."},
+    {t:"Təqlid məşqi (hərəkətləri təkrarlama)", m:"yoxdur", r:"Təqlid bacarığı yeni bacarıqların mənimsənilməsi üçün əsas mexanizmdir."},
+    {t:"Motivasiyaedici mükafat sistemi ilə tapşırıq icrası", m:"jeton/ulduz cədvəli", r:"Müsbət pekləndirmə arzuolunan davranışların tezliyini artırır (ABA prinsipi)."},
+    {t:"Sakitləşmə küncündə özünütənzimləmə məşqi", m:"yumşaq yastıq, sensor oyuncaq", r:"Özünütənzimləmə strategiyaları emosional partlayışların qarşısını almağa kömək edir."},
+    {t:"Sosial hekayə ilə davranış nümunəsi", m:"şəkilli sosial hekayə", r:"Sosial hekayələr mürəkkəb sosial vəziyyətləri sadə, başa düşülən formada izah edir."},
+    {t:"Problemin həlli tapşırığı (puzzle/labirint)", m:"sadə puzzle", r:"Problem həll etmə bacarığı koqnitiv çevikliyi inkişaf etdirir."},
+    {t:"Birgə fəaliyyət — komanda tapşırığı", m:"böyük karton, iki uşaq/valideyn", r:"Əməkdaşlıq tapşırıqları sosial qarşılıqlılığı təbii mühitdə formalaşdırır."}
+  ],
+  autizm:[
+    {t:"DIR/Floortime prinsipi ilə uşağın təşəbbüsünü izləmə", m:"uşağın seçdiyi oyuncaq", r:"Uşağın öz təşəbbüsünü izləmək emosional əlaqəni və ünsiyyət istəyini gücləndirir."},
+    {t:"Vizual cədvəl ilə keçid məşqi", m:"vizual keçid kartları", r:"Vizual dəstək gözlənilməzliyi azaldaraq keçid çətinliklərini yumşaldır."},
+    {t:"PECS əsaslı istək bildirmə məşqi", m:"PECS kartları", r:"Alternativ kommunikasiya funksional ünsiyyəti erkən formada təmin edir."},
+    {t:"Stereotip davranışın funksional əvəzlənməsi", m:"sensor alternativ oyuncaq", r:"Funksional əvəzetmə davranış analizinin əsas prinsiplərindən biridir (ABC modeli)."},
+    {t:"Sıra ilə oyuncaq düzmə və struktur oyunu", m:"kublar, sıralı oyuncaqlar", r:"Struktura meyl güclü tərəf kimi istifadə olunaraq öyrənməyə körpü yaradır."}
+  ],
+  daun:[
+    {t:"Təkrarlayıcı ritmik mahnı ilə diqqət cəlbetmə", m:"sadə ritmik mahnı", r:"Down sindromlu uşaqlarda auditor-ritmik stimullar diqqəti effektiv cəlb edir."},
+    {t:"Vizual dəstəkli sadə göstəriş icrası", m:"şəkilli göstəriş kartları", r:"Vizual dəstək reseptiv dilin gücləndirilməsinə kömək edir."},
+    {t:"Yavaş templi təqlid oyunu", m:"yoxdur", r:"Prosesləmə sürətinə uyğunlaşdırılmış tempo öyrənmə effektivliyini artırır."}
+  ],
+  serebral:[
+    {t:"Uyğunlaşdırılmış oturma vəziyyətində diqqət tapşırığı", m:"dəstəkləyici oturacaq", r:"Düzgün postural dəstək koqnitiv tapşırıqlara diqqəti artırır."},
+    {t:"Alternativ kommunikasiya ilə seçim etmə", m:"AAC lövhəsi/kart", r:"Motor məhdudiyyəti olan uşaqlarda seçim imkanı özünüifadəni təmin edir."}
+  ],
+  gerilik:[
+    {t:"Addım-addım (task analysis) sadə tapşırıq icrası", m:"3 addımlı vizual sxem", r:"Tapşırığın kiçik addımlara bölünməsi mənimsəməni asanlaşdırır."},
+    {t:"Təkrar və möhkəmləndirmə məşqi", m:"əvvəlki tapşırıqdan material", r:"Çoxsaylı təkrar yeni bacarığın uzunmüddətli yaddaşda saxlanmasına kömək edir."}
+  ],
+  nitq:[
+    {t:"Ünsiyyət istəyini artırmaq üçün motivasiya oyunu", m:"maraqlı oyuncaq əlçatmaz yerdə", r:"Tələbat yaratmaq spontan ünsiyyət cəhdlərini artırır."}
+  ],
+  dehb:[
+    {t:"Qısa interval — hərəkət fasiləli diqqət tapşırığı", m:"taймer, hərəkət kartı", r:"Hərəkət fasilələri diqqətin bərpasına və hiperaktivliyin idarə olunmasına kömək edir."},
+    {t:"Aydın qayda və nəticəli oyun", m:"qayda kartı", r:"Aydın strukturlaşdırılmış qaydalar impulsivliyi azaldır."}
+  ]
+},
+loqoped:{
+  umumi:[
+    {t:"Nitq nəfəsi məşqi (üfləmə oyunları)", m:"saplı fırfıra, sabun köpüyü", r:"Düzgün nəfəs nitq səslərinin formalaşması üçün fiziki əsasdır."},
+    {t:"Səs təqlidi məşqi", m:"heyvan şəkilləri, səslər", r:"Səs təqlidi artikulyasiya orqanlarının hərəkət diapazonunu genişləndirir."},
+    {t:"Reseptiv nitq — sadə göstərişi yerinə yetirmə", m:"gündəlik əşyalar", r:"Reseptiv dil ekspressiv nitqin əsasını təşkil edir."},
+    {t:"Söz ehtiyatını genişləndirmə (şəkilli kartlar)", m:"tematik lüğət kartları", r:"Söz ehtiyatının artırılması cümlə qurma bacarığına zəmin yaradır."},
+    {t:"Cümlə qurma məşqi (2-3 sözlü)", m:"şəkilli cümlə kartları", r:"Tədrici cümlə uzunluğu artımı qrammatik inkişafı dəstəkləyir."},
+    {t:"Artikulyasiya gimnastikası", m:"güzgü", r:"Artikulyasiya orqanlarının çevikliyi düzgün səs tələffüzü üçün vacibdir."},
+    {t:"Fonematik eşitmə fərqləndirmə oyunu", m:"eyni/fərqli səs cütləri", r:"Fonematik eşitmə oxu-yazı bacarığının əsasını qoyur."}
+  ],
+  autizm:[
+    {t:"Funksional istək bildirmə (PECS mərhələsi)", m:"PECS kartları", r:"Funksional kommunikasiya problemli davranışların yerini tuta bilər."},
+    {t:"Ekolaliyanın funksional istifadəyə yönləndirilməsi", m:"model cümlələr", r:"Ekolaliya düzgün istiqamətləndirildikdə kommunikativ məqsədə xidmət edə bilər."}
+  ],
+  nitq:[
+    {t:"İntensiv artikulyasiya korreksiyası", m:"artikulyasiya güzgüsü, şpatel", r:"Sistemli korreksiya düzgün səs modelinin avtomatlaşmasını təmin edir."},
+    {t:"Dizartrik xüsusiyyətlər üçün oro-motor məşq", m:"oro-motor alətlər", r:"Əzələ tonusunun tənzimlənməsi aydın nitq üçün vacibdir."}
+  ],
+  daun:[
+    {t:"Yavaş templi, vizual dəstəkli artikulyasiya məşqi", m:"şəkilli səs kartları", r:"Vizual-auditor ikili dəstək öyrənməni gücləndirir."}
+  ],
+  serebral:[
+    {t:"Oro-motor funksiyaların (udma, çeynəmə) inkişafı", m:"təhlükəsiz qida nümunələri", r:"Oro-motor funksiya həm qidalanma, həm nitq üçün əsasdır."}
+  ],
+  gerilik:[
+    {t:"Sadə, konkret sözlərlə lüğət artırma", m:"real əşyalar", r:"Konkret, gündəlik həyatla bağlı sözlər mənimsəməni asanlaşdırır."}
+  ],
+  dehb:[
+    {t:"Qısa, dinamik nitq oyunları (diqqət itməsin deyə)", m:"kart oyunu", r:"Qısa fəaliyyət blokları diqqət itkisinin qarşısını alır."}
+  ]
+},
+ergoterapevt:{
+  umumi:[
+    {t:"Xırda motorika məşqi (muncuq düzmə)", m:"böyük muncuqlar, ip", r:"İncə motorika akademik bacarıqların (yazı) əsasını təşkil edir."},
+    {t:"Sensor inteqrasiya — toxunma qutusu", m:"müxtəlif toxunuşlu materiallar", r:"Sensor təcrübə beyin-bədən əlaqəsini gücləndirir."},
+    {t:"Tarazlıq və koordinasiya məşqi", m:"balans lövhəsi/yastıq", r:"Vestibulyar sistem inkişafı ümumi motor planlamanı yaxşılaşdırır."},
+    {t:"Gündəlik həyat bacarığı — geyinmə simulyasiyası", m:"düymələr, fermuar taxtası", r:"Funksional bacarıqlar müstəqilliyi artırır."},
+    {t:"Əl-göz koordinasiyası — top atma/tutma", m:"yumşaq top", r:"Əl-göz koordinasiyası yazı və gündəlik fəaliyyətlər üçün əsasdır."},
+    {t:"Qələm tutma düzgünləşdirmə məşqi", m:"üçbucaqlı qələm", r:"Düzgün qrip yazı bacarığının inkişafına zəmin hazırlayır."}
+  ],
+  autizm:[
+    {t:"Proprioseptiv təzyiq terapiyası (ağır yorğan/massaj)", m:"ağır yorğan, top masaj", r:"Proprioseptiv giriş özünütənzimləməni sakitləşdirici şəkildə dəstəkləyir."},
+    {t:"Sensor axtarışını təmin edən hərəkət stansiyası", m:"trampolin/fırlanan oturacaq", r:"Nəzarətli sensor axtarışı davranış partlayışlarını azalda bilər."}
+  ],
+  serebral:[
+    {t:"Postural nəzarət və oturma məşqi", m:"terapevtik top", r:"Postural sabitlik funksional hərəkətlərin əsasıdır."},
+    {t:"Adaptiv alətlərlə gündəlik fəaliyyət", m:"adaptiv qaşıq/qələm", r:"Adaptiv alətlər motor məhdudiyyətini kompensasiya edir."}
+  ],
+  daun:[
+    {t:"Əzələ tonusunu gücləndirici oyun (aşağı tonus üçün)", m:"terapevtik top, üzük halqaları", r:"Down sindromunda hipotoniya üçün gücləndirici məşqlər vacibdir."}
+  ],
+  gerilik:[
+    {t:"Sadələşdirilmiş addım-addım motor tapşırıq", m:"vizual addım kartları", r:"Motor bacarıqların kiçik addımlara bölünməsi öyrənməni asanlaşdırır."}
+  ],
+  dehb:[
+    {t:"Enerji boşaltma stansiyası (hərəkətli fasilə)", m:"trampolin, sıçrayış halqaları", r:"Nəzarətli hərəkət fasilələri sonrakı diqqət tapşırığına hazırlıq yaradır."}
+  ],
+  nitq:[
+    {t:"Oro-motor əzələ gücləndirmə məşqi", m:"üfləmə alətləri", r:"Ağız ətrafı əzələ gücü aydın artikulyasiyaya kömək edir."}
+  ]
+},
+pedaqoq:{
+  umumi:[
+    {t:"Diqqət saxlama məşqi (uyğunlaşdırma oyunu)", m:"eyni cütləri tapma kartları", r:"Qısa, uğur təmin edən tapşırıqlar diqqət müddətini tədricən artırır."},
+    {t:"Rəng və forma təsnifatı", m:"rəngli formalar", r:"Təsnifat bacarığı məntiqi təfəkkürün ilkin formasıdır."},
+    {t:"Say-hesab anlayışı (əşya sayma)", m:"kiçik əşyalar", r:"Konkret sayma mücərrəd riyazi anlayışların əsasını qoyur."},
+    {t:"Vizual qavrama — puzzle tapşırığı", m:"4-6 hissəli puzzle", r:"Puzzle həlli vizual-məkan qavrayışını inkişaf etdirir."},
+    {t:"Yaddaş məşqi (əşya gizlətmə oyunu)", m:"3 əşya, örtük", r:"Qısamüddətli yaddaş akademik öyrənmənin əsas mexanizmidir."},
+    {t:"Oxuya hazırlıq — hərf tanıma oyunu", m:"böyük hərf kartları", r:"Erkən hərf tanıma sonrakı oxuma bacarığına zəmin yaradır."}
+  ],
+  autizm:[
+    {t:"Struktura salınmış TEACCH tipli iş stansiyası", m:"iş qutuları, vizual ardıcıllıq", r:"Struktur və vizual ardıcıllıq müstəqil işləmə bacarığını artırır."}
+  ],
+  gerilik:[
+    {t:"Çoxlu təkrarla konkret anlayış öyrətmə", m:"real əşyalar/şəkillər", r:"Konkret, çoxsaylı təkrar mücərrəd anlayışların mənimsənilməsinə kömək edir."}
+  ],
+  dehb:[
+    {t:"Qısa müddətli, yüksək stimullaşdırıcı tapşırıq bloku", m:"rəngli, maraqlı material", r:"Yüksək stimul səviyyəsi diqqəti daha uzun saxlaya bilər."}
+  ],
+  daun:[
+    {t:"Vizual-təkrarlayıcı akademik tapşırıq", m:"şəkilli iş vərəqi", r:"Vizual təkrar Down sindromunda öyrənməni gücləndirir."}
+  ],
+  serebral:[
+    {t:"Adaptiv formatda (böyük düymələr/keys) koqnitiv oyun", m:"adaptiv planşet/keys", r:"Fiziki maneələrin aradan qaldırılması koqnitiv iştiraka imkan verir."}
+  ],
+  nitq:[
+    {t:"Şəkil-söz uyğunlaşdırma tapşırığı", m:"şəkil-söz kartları", r:"Vizual-verbal əlaqə söz ehtiyatının möhkəmlənməsinə kömək edir."}
+  ]
+},
+valideyn:[
+  {t:"Gündəlik rutinin vizual cədvəllə təqdimi", m:"vizual gündəlik cədvəl", r:"Rutinin əvvəlcədən görünməsi keçid çətinliyini azaldır."},
+  {t:"Birgə kitab oxuma (10-15 dəqiqə)", m:"yaşa uyğun şəkilli kitab", r:"Birgə oxuma söz ehtiyatını və valideyn-uşaq əlaqəsini gücləndirir."},
+  {t:"Sadə, aydın cümlələrlə danışma", m:"—", r:"Sadələşdirilmiş dil reseptiv anlamanı asanlaşdırır."},
+  {t:"Müsbət davranışı dərhal mükafatlandırma", m:"tərif, jeton sistemi", r:"Dərhal müsbət pekləndirmə davranışın təkrarlanma ehtimalını artırır."},
+  {t:"Davranış partlayışı zamanı sakit, sabit reaksiya", m:"—", r:"Sakit reaksiya davranışın gücləndirilməsinin qarşısını alır və uşağa təhlükəsizlik hissi verir."},
+  {t:"Ekran vaxtının məhdudlaşdırılması və strukturlaşdırılması", m:"vaxt taймeri", r:"Həddindən artıq ekran vaxtı diqqət və nitq inkişafına mənfi təsir göstərə bilər."},
+  {t:"Sabit yuxu rejiminin qorunması", m:"yuxu rutini cədvəli", r:"Sabit yuxu rejimi emosional tənzimləməyə birbaşa təsir edir."},
+  {t:"Birgə məişət tapşırığı (masa yığma və s.)", m:"gündəlik əşyalar", r:"Məişət bacarıqları funksional müstəqilliyi artırır."},
+  {t:"Gəzinti zamanı adlandırma oyunu", m:"—", r:"Təbii mühitdə söz ehtiyatının genişləndirilməsi daha effektivdir."},
+  {t:"Sadə seçim təklif etmə (iki variant arasından)", m:"iki əşya/şəkil", r:"Seçim imkanı özünüifadəni və qərar qəbuletmə bacarığını inkişaf etdirir."},
+  {t:"Növbəli sadə oyun (top, kublar)", m:"top/kublar", r:"Ailə daxilində növbə gözləmə sosial bacarıqları möhkəmləndirir."},
+  {t:"Emosiyaların adlandırılmasına kömək", m:"emosiya kartları", r:"Emosiyanı adlandırmaq özünütənzimləmənin ilk addımıdır."},
+  {t:"Musiqi ilə birgə hərəkət fəaliyyəti", m:"sadə musiqi", r:"Ritmik hərəkət həm motor, həm emosional tənzimləməyə kömək edir."},
+  {t:"Mütəxəssis tövsiyələrinin evdə təkrarlanması", m:"sessiya qeydləri", r:"Ev-mərkəz ardıcıllığı proqresi əhəmiyyətli dərəcədə sürətləndirir."}
+]
+};
+
+const LEVEL_TXT = ["Asan","Orta","Çətin"];
+function levelForDay(day, totalDays){
+  const ratio = day/totalDays;
+  if(ratio<0.34) return 0; if(ratio<0.7) return 1; return 2;
+}
+function durationForDay(day){ return 15 + Math.min(20, Math.floor(day/6)*3); }
+
+function pickDeck(specialistBank, diagCat){
+  const core = specialistBank.umumi || [];
+  const extra = specialistBank[diagCat] || [];
+  return core.concat(extra, extra); // diaqnoza uyğun fəaliyyətlər daha çox ağırlıqlı
+}
+
+function buildRotation(deck, seedKey, count){
+  // uzun dövr üçün fərqli seed-lərlə təkrar-təkrar shuffle edib kifayət qədər fərqli ardıcıllıq yaradır
+  let out = [];
+  let round = 0;
+  while(out.length < count){
+    const shuffled = seededShuffle(deck, seedFromString(seedKey+'_r'+round));
+    out = out.concat(shuffled);
+    round++;
+  }
+  return out;
+}
+
+/* ---------- PLAN GENERASİYASI ---------- */
+let CURRENT_PLAN = null;
+
+function collectFormData(){
+  const val = id => document.getElementById(id).value.trim();
+  return {
+    ad: val('f_ad'), soyad: val('f_soyad'), ataadi: val('f_ataadi'), dogum: val('f_dogum'), yas: val('f_yas'), cins: val('f_cins'),
+    boy: val('f_boy'), cheki: val('f_cheki'), qtarix: val('f_qtarix'), baslama: val('f_baslama'), kurator: val('f_kurator'),
+    diaqnoz: val('f_diaqnoz'), diaqnoz2: val('f_diaqnoz2'), icd: val('f_icd'), diaqtarix: val('f_diaqtarix'),
+    evvelki: val('f_evvelki'), derman: val('f_derman'), allergiya: val('f_allergiya'), tibbiqeyd: val('f_tibbiqeyd'),
+    hamile: val('f_hamile'), yerime: val('f_yerime'), ilksoz: val('f_ilksoz'), ilkcumle: val('f_ilkcumle'), tualet: val('f_tualet'), ozunexidmet: val('f_ozunexidmet'),
+    nitqsev: val('f_nitqsev'), reseptiv: val('f_reseptiv'), aac: val('f_aac'), ekolaliya: val('f_ekolaliya'), adreaksiya: val('f_adreaksiya'), gosterish: val('f_gosterish'),
+    gozkontakt: val('f_gozkontakt'), birgediqqet: val('f_birgediqqet'), munasibet: val('f_munasibet'), oyun: val('f_oyun'), novbe: val('f_novbe'),
+    davranislar: getCheckedChips('behaviorChips'), davranisdiger: val('f_davranisdiger'),
+    sensor: getCheckedChips('sensoryChips'),
+    irimotor: val('f_irimotor'), xirdamotor: val('f_xirdamotor'), tarazliq: val('f_tarazliq'), qelem: val('f_qelem'),
+    diqqet: val('f_diqqet'), yaddas: val('f_yaddas'), akademik: val('f_akademik'), oxuyazi: val('f_oxuyazi'),
+    narahatliq: val('f_narahatliq'), meqsed: val('f_meqsed'), evdevaxt: val('f_evdevaxt'), bacigardas: val('f_bacigardas'), mekteb: val('f_mekteb'),
+    muddet: parseInt(document.getElementById('f_muddet').value,10)
+  };
+}
+
+function buildGoals(data, diagCat){
+  const name = data.ad || 'Uşaq';
+  const short = [];
+  const mid = [];
+  const long = [];
+  const focusMap = {
+    autizm:["göz kontaktının sabitləşdirilməsi","funksional ünsiyyət başlanğıcının formalaşması","sensor tənzimləmənin yaxşılaşdırılması"],
+    daun:["xırda motorika gücləndirilməsi","reseptiv nitqin genişləndirilməsi","gündəlik həyat bacarıqlarının inkişafı"],
+    serebral:["postural sabitliyin artırılması","alternativ kommunikasiya bacarığının inkişafı","funksional müstəqilliyin artırılması"],
+    gerilik:["addım-addım akademik bacarıqların mənimsənilməsi","təkrar əsaslı yaddaş möhkəmləndirilməsi","gündəlik rutinlərə uyğunlaşma"],
+    nitq:["artikulyasiyanın korreksiyası","söz ehtiyatının genişləndirilməsi","cümlə qurma bacarığının inkişafı"],
+    dehb:["diqqət müddətinin tədricən artırılması","impulsiv davranışın idarə olunması","struktura uyğunlaşma bacarığı"],
+    umumi:["ümumi inkişaf sahələrinin dəstəklənməsi","sosial-emosional bacarıqların formalaşması","koqnitiv bacarıqların gücləndirilməsi"]
+  };
+  const foci = focusMap[diagCat] || focusMap.umumi;
+  short.push(`${name} üçün ${data.muddet===30?'2 həftə':'4 həftə'} ərzində ${foci[0]} istiqamətində müşahidə olunan irəliləyiş.`);
+  short.push(`Gündəlik sessiyalarda minimum 70% iştirak səviyyəsinin qorunması.`);
+  if(data.davranislar.length) short.push(`"${data.davranislar[0]}" davranışının tezliyində qeydə alınan azalma.`);
+  mid.push(`${data.muddet===30?'3-cü həftədən':'6-cı həftədən'} etibarən ${foci[1]} sahəsində sabit irəliləyiş.`);
+  mid.push(`Ailə tərəfindən evdə tətbiq olunan strategiyaların müstəqil şəkildə davam etdirilməsi.`);
+  long.push(`Plan sonunda ${foci[2]} sahəsində qiymətləndirilə bilən, ölçülə bilən inkişaf.`);
+  long.push(`${data.meqsed ? 'Ailənin bildirdiyi məqsədə ("'+data.meqsed.slice(0,60)+ (data.meqsed.length>60?'…':'') +'") doğru real irəliləyiş.' : 'Növbəti qiymətləndirmə dövrü üçün yeni, daha yüksək məqsədlərin təyin olunmasına hazırlıq.'}`);
+  return {short, mid, long};
+}
+
+function specHtml(cls, name, item, day, lvl){
+  return `<div class="spec-block">
+    <span class="spec-name ${cls}">${name}</span>
+    <div class="act-title">${item.t}</div>
+    <div class="act-meta">⏱ ${durationForDay(day)} dəq · Səviyyə: ${LEVEL_TXT[lvl]} · Material: ${item.m}</div>
+    <div class="act-why"><b>Niyə bu fəaliyyət aparılır?</b><br>${item.r}</div>
+  </div>`;
+}
+
+function generatePlan(data){
+  const diagCat = detectDiagCategory(data.diaqnoz + ' ' + data.diaqnoz2);
+  const ageGroup = detectAgeGroup(data.yas, data.dogum);
+  const totalDays = data.muddet;
+  const childKey = (data.ad+data.soyad+data.dogum+data.diaqnoz).toLowerCase().replace(/\s+/g,'_') || ('anon_'+Date.now());
+
+  const decks = {
+    psixoloq: pickDeck(BANK.psixoloq, diagCat),
+    loqoped: pickDeck(BANK.loqoped, diagCat),
+    ergoterapevt: pickDeck(BANK.ergoterapevt, diagCat),
+    pedaqoq: pickDeck(BANK.pedaqoq, diagCat),
+    valideyn: BANK.valideyn
+  };
+  const rot = {
+    psixoloq: buildRotation(decks.psixoloq, childKey+'_psi', totalDays),
+    loqoped: buildRotation(decks.loqoped, childKey+'_loq', totalDays),
+    ergoterapevt: buildRotation(decks.ergoterapevt, childKey+'_erg', totalDays),
+    pedaqoq: buildRotation(decks.pedaqoq, childKey+'_ped', totalDays),
+    valideyn: buildRotation(decks.valideyn, childKey+'_val', totalDays*2)
+  };
+
+  const days = [];
+  for(let d=1; d<=totalDays; d++){
+    const lvl = levelForDay(d, totalDays);
+    days.push({
+      day:d, lvl,
+      psixoloq: rot.psixoloq[d-1],
+      loqoped: rot.loqoped[d-1],
+      ergoterapevt: rot.ergoterapevt[d-1],
+      pedaqoq: rot.pedaqoq[d-1],
+      valideyn1: rot.valideyn[(d-1)*2],
+      valideyn2: rot.valideyn[(d-1)*2+1]
+    });
+  }
+
+  const goals = buildGoals(data, diagCat);
+
+  return {
+    data, diagCat, ageGroup, totalDays, days, goals,
+    createdAt: new Date().toISOString(),
+    childKey, notes:[]
+  };
+}
+
+/* ---------- RENDER ---------- */
+function renderPlan(plan){
+  CURRENT_PLAN = plan;
+  document.getElementById('planSection').style.display='block';
+  const d = plan.data;
+  document.getElementById('planTitleName').textContent = `${d.ad} ${d.soyad||''} — Fərdi Reabilitasiya Planı`;
+  document.getElementById('planTitleSub').textContent = `Yaş: ${d.yas||'—'} · Diaqnoz: ${d.diaqnoz} · Müddət: ${plan.totalDays} gün · Kurator: ${d.kurator||'—'}`;
+  document.getElementById('planBadges').innerHTML =
+    `<span class="badge">${plan.totalDays===30?'1 Aylıq Plan':'3 Aylıq Plan'}</span>
+     <span class="badge">Başlama: ${d.baslama||'—'}</span>
+     <span class="badge">Hazırlanma: ${new Date(plan.createdAt).toLocaleDateString('az-AZ')}</span>`;
+
+  const gg = document.getElementById('goalsGrid');
+  gg.innerHTML = `
+    <div class="goal-card"><h4>Qısamüddətli</h4><ul>${plan.goals.short.map(x=>'<li>'+x+'</li>').join('')}</ul></div>
+    <div class="goal-card"><h4>Ortamüddətli</h4><ul>${plan.goals.mid.map(x=>'<li>'+x+'</li>').join('')}</ul></div>
+    <div class="goal-card"><h4>Uzunmüddətli</h4><ul>${plan.goals.long.map(x=>'<li>'+x+'</li>').join('')}</ul></div>
+  `;
+
+  const weeks = Math.ceil(plan.totalDays/7);
+  const nav = document.getElementById('weekNav');
+  nav.innerHTML = Array.from({length:weeks},(_,i)=>`<button class="week-btn ${i===0?'active':''}" data-w="${i}" onclick="showWeek(${i})">${i*7+1}-${Math.min((i+1)*7,plan.totalDays)}-ci gün</button>`).join('');
+
+  const cont = document.getElementById('daysContainer');
+  cont.innerHTML = plan.days.map(day=>`
+    <div class="day-card" data-week="${Math.floor((day.day-1)/7)}">
+      <div class="day-head" onclick="this.nextElementSibling.classList.toggle('open')">
+        <b>${day.day}-ci Gün</b><span class="lvl">Səviyyə: ${LEVEL_TXT[day.lvl]}</span>
+      </div>
+      <div class="day-body">
+        ${specHtml('psi','Klinik Psixoloq', day.psixoloq, day.day, day.lvl)}
+        ${specHtml('loq','Loqoped', day.loqoped, day.day, day.lvl)}
+        ${specHtml('ergo','Erqoterapevt', day.ergoterapevt, day.day, day.lvl)}
+        ${specHtml('pedaqoq','Psixopedaqoq', day.pedaqoq, day.day, day.lvl)}
+        <div class="spec-block">
+          <span class="spec-name valideyn">Valideyn Planı</span>
+          <div class="act-title">1) ${day.valideyn1.t}</div>
+          <div class="act-meta">Material: ${day.valideyn1.m}</div>
+          <div class="act-why"><b>Niyə?</b> ${day.valideyn1.r}</div>
+          <div class="act-title" style="margin-top:10px">2) ${day.valideyn2.t}</div>
+          <div class="act-meta">Material: ${day.valideyn2.m}</div>
+          <div class="act-why"><b>Niyə?</b> ${day.valideyn2.r}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  document.querySelectorAll('.day-card')[0]?.querySelector('.day-body').classList.add('open');
+  showWeek(0);
+  renderReport(plan);
+  renderNotes(plan);
+  window.scrollTo({top:document.getElementById('planSection').offsetTop-20, behavior:'smooth'});
+}
+
+function showWeek(w){
+  document.querySelectorAll('.week-btn').forEach(b=>b.classList.toggle('active', +b.dataset.w===w));
+  document.querySelectorAll('.day-card').forEach(c=> c.style.display = (+c.dataset.week===w)?'block':'none');
+}
+
+function renderReport(plan){
+  const totalActs = plan.totalDays*5;
+  document.getElementById('reportBody').innerHTML = `
+    <div class="grid g2">
+      <div class="field"><label>Ümumi Fəaliyyət Sayı</label><input readonly value="${totalActs}"></div>
+      <div class="field"><label>Diaqnoz Kateqoriyası</label><input readonly value="${plan.diagCat}"></div>
+      <div class="field"><label>Yaş Qrupu</label><input readonly value="${plan.ageGroup}"></div>
+      <div class="field"><label>Qeydə Alınmış Qeydlər</label><input readonly value="${plan.notes.length}"></div>
+    </div>
+    <p class="hint">Hesabat "Planı Yenilə" funksiyası ilə hər yeniləmədən sonra avtomatik təzələnir. Həftəlik/aylıq PDF hesabat üçün "Çap/PDF" düyməsindən istifadə edin.</p>
+  `;
+}
+
+function renderNotes(plan){
+  const log = document.getElementById('notesLog');
+  if(!plan.notes.length){ log.innerHTML='<p class="hint">Hələ qeyd əlavə edilməyib.</p>'; return; }
+  log.innerHTML = '<h4 style="color:var(--navy);margin-top:18px">Qeyd Tarixçəsi</h4>' + plan.notes.slice().reverse().map(n=>`
+    <div style="border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13.5px">
+      <b>${new Date(n.date).toLocaleString('az-AZ')}</b><br>
+      <b>Mütəxəssis:</b> ${n.spec||'—'}<br><b>Valideyn:</b> ${n.parent||'—'}<br>
+      <b>Çətinlik:</b> ${n.diff||'—'}<br><b>Uğur:</b> ${n.win||'—'}
+    </div>`).join('');
+}
+
+/* ---------- QEYD SAXLAMA / YENİLƏMƏ ---------- */
+function saveNote(){
+  if(!CURRENT_PLAN) return;
+  CURRENT_PLAN.notes.push({
+    date:new Date().toISOString(),
+    spec:document.getElementById('note_spec').value,
+    parent:document.getElementById('note_parent').value,
+    diff:document.getElementById('note_diff').value,
+    win:document.getElementById('note_win').value
+  });
+  ['note_spec','note_parent','note_diff','note_win'].forEach(id=>document.getElementById(id).value='');
+  persistChild(CURRENT_PLAN);
+  renderNotes(CURRENT_PLAN);
+  renderReport(CURRENT_PLAN);
+  toast('Qeyd saxlanıldı');
+}
+
+function renewPlan(){
+  if(!CURRENT_PLAN) return;
+  const diffWords = CURRENT_PLAN.notes.map(n=>n.diff||'').join(' ').length;
+  const winWords = CURRENT_PLAN.notes.map(n=>n.win||'').join(' ').length;
+  toast(winWords>=diffWords ? '📈 İrəliləyiş nəzərə alınaraq plan çətinləşdirilir…' : '🔄 Çətinliklər nəzərə alınaraq plan tənzimlənir…');
+  setTimeout(()=>{
+    const newSeedSuffix = '_v'+(Date.now());
+    CURRENT_PLAN.childKey += newSeedSuffix; // yeni fərqli ardıcıllıq üçün
+    const regenerated = generatePlan(CURRENT_PLAN.data);
+    regenerated.notes = CURRENT_PLAN.notes;
+    persistChild(regenerated);
+    renderPlan(regenerated);
+    toast('✅ Plan yeniləndi');
+  }, 600);
+}
+
+/* ---------- YADDAŞ (localStorage) ---------- */
+const STORE_KEY = 'an_rehab_plans_v1';
+function getStore(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY))||{}; }catch(e){ return {}; } }
+function persistChild(plan){
+  const store = getStore();
+  store[plan.childKey] = plan;
+  localStorage.setItem(STORE_KEY, JSON.stringify(store));
+  refreshSavedSelect();
+}
+function refreshSavedSelect(){
+  const store = getStore();
+  const sel = document.getElementById('savedSelect');
+  sel.innerHTML = '<option value="">📁 Yaddaşdan uşaq seç…</option>' +
+    Object.keys(store).map(k=>`<option value="${k}">${store[k].data.ad} ${store[k].data.soyad||''} — ${store[k].data.diaqnoz}</option>`).join('');
+}
+document.getElementById('savedSelect').addEventListener('change', function(){
+  if(!this.value) return;
+  const store = getStore();
+  const plan = store[this.value];
+  if(plan){ renderPlan(plan); document.getElementById('intakeForm').style.display='none'; }
+});
+refreshSavedSelect();
+
+function newAssessment(){
+  document.getElementById('intakeForm').reset();
+  document.getElementById('intakeForm').style.display='block';
+  document.getElementById('planSection').style.display='none';
+  document.querySelectorAll('.chip.on').forEach(c=>c.classList.remove('on'));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ---------- FORM SUBMIT ---------- */
+document.getElementById('intakeForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const data = collectFormData();
+  if(!data.ad || !data.diaqnoz){ toast('Zəhmət olmasa Ad və Əsas diaqnoz sahələrini doldurun'); return; }
+  const plan = generatePlan(data);
+  persistChild(plan);
+  document.getElementById('intakeForm').style.display='none';
+  renderPlan(plan);
+});
+
+/* ---------- EXPORT / IMPORT ---------- */
+function downloadBlob(content, filename, type){
+  const blob = new Blob([content], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+function exportJSON(){
+  if(!CURRENT_PLAN) return;
+  downloadBlob(JSON.stringify(CURRENT_PLAN,null,2), `plan_${CURRENT_PLAN.data.ad}_${Date.now()}.json`, 'application/json');
+  toast('JSON yükləndi');
+}
+function importJSON(e){
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      const plan = JSON.parse(ev.target.result);
+      persistChild(plan);
+      document.getElementById('intakeForm').style.display='none';
+      renderPlan(plan);
+      toast('Plan yükləndi');
+    }catch(err){ toast('Fayl oxunmadı'); }
+  };
+  reader.readAsText(file);
+}
+function exportWord(){
+  if(!CURRENT_PLAN) return;
+  const html = document.getElementById('planSection').innerHTML;
+  const doc = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'
+  xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="utf-8"><title>Plan</title></head><body>${html}</body></html>`;
+  downloadBlob(doc, `plan_${CURRENT_PLAN.data.ad}.doc`, 'application/msword');
+  toast('Word faylı yükləndi');
+}
+function exportExcel(){
+  if(!CURRENT_PLAN) return;
+  let rows = [['Gün','Səviyyə','Klinik Psixoloq','Loqoped','Erqoterapevt','Psixopedaqoq','Valideyn 1','Valideyn 2']];
+  CURRENT_PLAN.days.forEach(d=>{
+    rows.push([d.day, LEVEL_TXT[d.lvl], d.psixoloq.t, d.loqoped.t, d.ergoterapevt.t, d.pedaqoq.t, d.valideyn1.t, d.valideyn2.t]);
+  });
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  downloadBlob('\uFEFF'+csv, `plan_${CURRENT_PLAN.data.ad}.csv`, 'text/csv;charset=utf-8;');
+  toast('Excel (CSV) yükləndi');
+}
+</script>
+</body>
+</html>
