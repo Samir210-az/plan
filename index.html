@@ -217,7 +217,7 @@ main{padding:36px 0 80px}
   .hero,.no-print,.footer,.submit-bar,.week-nav{display:none !important}
   body{background:#fff}
   .card,.day-card,.plan-head{box-shadow:none; border:1px solid #ccc; break-inside:avoid}
-  .day-body{display:block !important}
+  .day-card,.day-body{display:block !important}
   main{padding:0}
 }
 </style>
@@ -422,8 +422,7 @@ main{padding:36px 0 80px}
         <div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ Çap / PDF</button>
           <button class="btn btn-outline btn-sm" onclick="exportJSON()">⬇ JSON</button>
-          <button class="btn btn-outline btn-sm" onclick="exportWord()">📄 Word</button>
-          <button class="btn btn-outline btn-sm" onclick="exportExcel()">📊 Excel</button>
+          <button class="btn btn-outline btn-sm" onclick="exportHTML()">💾 HTML Yüklə</button>
           <button class="btn btn-outline btn-sm" onclick="document.getElementById('importFile').click()">⬆ JSON Yüklə</button>
           <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
           <button class="btn btn-primary btn-sm" onclick="renewPlan()">🔄 Planı Yenilə</button>
@@ -1238,23 +1237,94 @@ function importJSON(e){
   };
   reader.readAsText(file);
 }
-function exportWord(){
-  if(!CURRENT_PLAN) return;
-  const html = document.getElementById('planSection').innerHTML;
-  const doc = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'
-  xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="utf-8"><title>Plan</title></head><body>${html}</body></html>`;
-  downloadBlob(doc, `plan_${CURRENT_PLAN.data.ad}.doc`, 'application/msword');
-  toast('Word faylı yükləndi');
+/* ---------- TAM MÜSTƏQİL HTML İXRACI (rəngli günlər, yalnız plan məzmunu) ---------- */
+const DAY_COLORS = [
+  {bg:"#eaf3ff", bd:"#2f7fe0", tx:"#0b2545"},
+  {bg:"#eafaf3", bd:"#12b3a8", tx:"#0b3a34"},
+  {bg:"#fdf3e8", bd:"#e07b1e", tx:"#5a3410"},
+  {bg:"#f5edfd", bd:"#7c5cff", tx:"#2e1a66"},
+  {bg:"#fdeaf0", bd:"#e0507f", tx:"#5a1027"},
+  {bg:"#eef9e8", bd:"#5fae2f", tx:"#254010"},
+  {bg:"#eafbfd", bd:"#17a3c0", tx:"#0a3a45"},
+  {bg:"#fdf8e6", bd:"#d1a30f", tx:"#4a3a05"}
+];
+function exportSpecBlockHtml(name, item, colorTx){
+  const stepsHtml = (item.steps||[]).map(s=>`<li>${s}</li>`).join('');
+  return `<div style="margin:12px 0;padding:12px 14px;background:#ffffffb0;border-radius:10px;border:1px solid #e3e9f2">
+    <div style="font-size:11.5px;font-weight:800;color:#fff;background:${colorTx};display:inline-block;padding:3px 10px;border-radius:6px;margin-bottom:8px">${name}</div>
+    <div style="font-weight:700;font-size:14.5px;margin-bottom:3px">${item.t}</div>
+    <div style="font-size:12.5px;color:#5c7089;margin-bottom:6px">Material: ${item.m}</div>
+    ${item.obj?`<div style="font-size:13px;background:#eef6ff;border-left:3px solid #2f7fe0;padding:7px 10px;border-radius:0 6px 6px 0;margin-top:6px"><b>🎯 Məqsəd:</b> ${item.obj}</div>`:''}
+    ${stepsHtml?`<div style="font-size:11.5px;font-weight:800;color:#5c7089;text-transform:uppercase;margin-top:10px">İcra qaydası</div><ol style="margin:6px 0 0 18px;padding:0;font-size:13px">${stepsHtml}</ol>`:''}
+    <div style="font-size:13px;background:#fbfdff;border-left:3px solid #12b3a8;padding:7px 10px;border-radius:0 6px 6px 0;margin-top:8px"><b>🔬 Niyə?</b> ${item.r}</div>
+    ${item.eval?`<div style="font-size:13px;background:#f2fbf7;border-left:3px solid #1c8a5a;padding:7px 10px;border-radius:0 6px 6px 0;margin-top:6px"><b>✅ Qiymətləndirmə:</b> ${item.eval}</div>`:''}
+    ${item.adapt?`<div style="font-size:13px;background:#fff8ee;border-left:3px solid #e07b1e;padding:7px 10px;border-radius:0 6px 6px 0;margin-top:6px"><b>⚙️ Uyğunlaşdırma:</b> ${item.adapt}</div>`:''}
+  </div>`;
 }
-function exportExcel(){
+function buildExportHTML(plan){
+  const d = plan.data;
+  const daysHtml = plan.days.map(day=>{
+    const c = DAY_COLORS[(day.day-1)%DAY_COLORS.length];
+    return `<section style="background:${c.bg};border:2px solid ${c.bd};border-radius:16px;padding:18px 20px;margin-bottom:22px;page-break-inside:avoid">
+      <h2 style="margin:0 0 4px;color:${c.tx};font-size:19px">${day.day}-ci Gün <span style="font-size:13px;font-weight:600;opacity:.75">— Səviyyə: ${LEVEL_TXT[day.lvl]}</span></h2>
+      ${exportSpecBlockHtml('Klinik Psixoloq', day.psixoloq, c.bd)}
+      ${exportSpecBlockHtml('Loqoped', day.loqoped, c.bd)}
+      ${exportSpecBlockHtml('Erqoterapevt', day.ergoterapevt, c.bd)}
+      ${exportSpecBlockHtml('Psixopedaqoq', day.pedaqoq, c.bd)}
+      ${exportSpecBlockHtml('Valideyn Planı (1)', day.valideyn1, c.bd)}
+      ${exportSpecBlockHtml('Valideyn Planı (2)', day.valideyn2, c.bd)}
+    </section>`;
+  }).join('');
+
+  const goalsHtml = `<section style="background:#fff;border:1.5px solid #dbe6f3;border-radius:16px;padding:20px;margin-bottom:26px">
+    <h2 style="margin:0 0 12px;color:#0b2545;font-size:19px">🎯 SMART Məqsədlər</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+      <div><h4 style="color:#1e5aa8;font-size:12.5px;text-transform:uppercase;margin:0 0 6px">Qısamüddətli</h4><ul style="margin:0;padding-left:18px;font-size:13.5px">${plan.goals.short.map(x=>'<li>'+x+'</li>').join('')}</ul></div>
+      <div><h4 style="color:#1e5aa8;font-size:12.5px;text-transform:uppercase;margin:0 0 6px">Ortamüddətli</h4><ul style="margin:0;padding-left:18px;font-size:13.5px">${plan.goals.mid.map(x=>'<li>'+x+'</li>').join('')}</ul></div>
+      <div><h4 style="color:#1e5aa8;font-size:12.5px;text-transform:uppercase;margin:0 0 6px">Uzunmüddətli</h4><ul style="margin:0;padding-left:18px;font-size:13.5px">${plan.goals.long.map(x=>'<li>'+x+'</li>').join('')}</ul></div>
+    </div>
+  </section>`;
+
+  return `<!DOCTYPE html>
+<html lang="az"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fərdi Reabilitasiya Planı — ${d.ad} ${d.soyad||''}</title>
+<style>
+  body{font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; background:#f5f9fd; color:#1b2733; margin:0; line-height:1.55}
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px 40px}
+  .top{background:linear-gradient(120deg,#0b2545,#1e5aa8 45%,#12b3a8 120%); color:#fff; padding:34px 24px; text-align:center; border-radius:0 0 18px 18px; margin-bottom:26px}
+  .top h1{margin:0 0 4px; font-size:22px}
+  .top p{margin:2px 0; opacity:.9; font-size:14px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+  .meta span{background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.4); padding:5px 12px; border-radius:999px; font-size:12.5px}
+  footer{text-align:center; padding:24px; color:#5c7089; font-size:13px; border-top:1px solid #dbe6f3; margin-top:10px}
+  @media print{ .top{background:#0b2545 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact} section{page-break-inside:avoid} }
+</style>
+</head>
+<body>
+  <div class="top">
+    <h1>AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</h1>
+    <p>Fərdi Reabilitasiya Planı (Individual Rehabilitation Program)</p>
+    <div class="meta">
+      <span>${d.ad} ${d.soyad||''}</span>
+      <span>Yaş: ${d.yas||'—'}</span>
+      <span>Diaqnoz: ${d.diaqnoz}</span>
+      <span>${plan.totalDays===30?'1 Aylıq (30 gün)':'3 Aylıq (90 gün)'}</span>
+      <span>Başlama: ${d.baslama||'—'}</span>
+      <span>Kurator: ${d.kurator||'—'}</span>
+    </div>
+  </div>
+  <div class="wrap">
+    ${goalsHtml}
+    ${daysHtml}
+  </div>
+  <footer>AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</footer>
+</body></html>`;
+}
+function exportHTML(){
   if(!CURRENT_PLAN) return;
-  let rows = [['Gün','Səviyyə','Klinik Psixoloq','Loqoped','Erqoterapevt','Psixopedaqoq','Valideyn 1','Valideyn 2']];
-  CURRENT_PLAN.days.forEach(d=>{
-    rows.push([d.day, LEVEL_TXT[d.lvl], d.psixoloq.t, d.loqoped.t, d.ergoterapevt.t, d.pedaqoq.t, d.valideyn1.t, d.valideyn2.t]);
-  });
-  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  downloadBlob('\uFEFF'+csv, `plan_${CURRENT_PLAN.data.ad}.csv`, 'text/csv;charset=utf-8;');
-  toast('Excel (CSV) yükləndi');
+  const html = buildExportHTML(CURRENT_PLAN);
+  downloadBlob(html, `plan_${CURRENT_PLAN.data.ad}_${CURRENT_PLAN.totalDays}gun.html`, 'text/html;charset=utf-8;');
+  toast('HTML fayl yükləndi — bu faylı açıb Ctrl+P ilə tam planı çap edə bilərsiniz');
 }
 </script>
 </body>
