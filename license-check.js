@@ -45,16 +45,20 @@
   function phoneKey(p){ return p.replace('+',''); }
   function getSession(){ try{ return JSON.parse(localStorage.getItem(SESSION_KEY))||null; }catch(e){ return null; } }
   function setSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+  function clearSession(){ localStorage.removeItem(SESSION_KEY); }
 
   var approved=false;
   function isVerified(){ return approved; }
 
+  var activeWatchKey=null;
   function watchApproval(key, cb){
+    activeWatchKey = key;
     ensureFirebase().then(function(){
       firebase.database().ref('registrations/'+TOOL_ID+'/'+key).on('value', function(snap){
         var v=snap.val();
         approved = !!(v && v.approved);
         if(typeof cb==='function') cb(approved, v);
+        renderWidget();
       });
     });
   }
@@ -91,7 +95,13 @@
     + '.anp-err{color:#b34242;font-size:.82rem;min-height:1.1em;margin-top:6px}'
     + '#anpVerifyWait{text-align:center}';
 
-  function injectCSS(){ if(document.getElementById('anpStyle')) return; var st=document.createElement('style'); st.id='anpStyle'; st.textContent=CSS; document.head.appendChild(st); }
+  var WIDGET_CSS = '#anpAccWidget{position:fixed;bottom:14px;right:14px;z-index:9997;font-family:inherit}'
+    + '.anp-acc-btn{background:#6A0000;color:#fff;border:none;border-radius:999px;padding:9px 16px;font-size:.82rem;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.2);display:flex;align-items:center;gap:6px}'
+    + '.anp-acc-btn.pending{background:#b34242}'
+    + '.anp-acc-chip{background:#fff;border:1px solid #e7ddd0;border-radius:999px;padding:6px 8px 6px 14px;font-size:.82rem;font-weight:700;color:#333;box-shadow:0 6px 18px rgba(0,0,0,.15);display:flex;align-items:center;gap:8px}'
+    + '.anp-acc-logout{background:#f3ece0;border:none;border-radius:999px;padding:6px 12px;font-size:.76rem;font-weight:700;color:#6A0000;cursor:pointer}';
+
+  function injectCSS(){ if(document.getElementById('anpStyle')) return; var st=document.createElement('style'); st.id='anpStyle'; st.textContent=CSS+WIDGET_CSS; document.head.appendChild(st); }
 
   function buildModal(){
     if(document.getElementById('anpVerifyOverlay')) return;
@@ -169,7 +179,7 @@
           var isBypass = BYPASS_PHONES.indexOf(phone)>-1;
           dbRef.set({ adSoyad:name, isYeri:work, phone:phone, pin:pin, ts:Date.now(), approved:isBypass, bypass:isBypass }).then(function(){
             setSession({name:name, work:work, phone:phone});
-            if(isBypass){ approved=true; closeModal(); if(typeof pendingCb==='function'){ var cb=pendingCb; pendingCb=null; cb(); } }
+            if(isBypass){ approved=true; closeModal(); renderWidget(); if(typeof pendingCb==='function'){ var cb=pendingCb; pendingCb=null; cb(); } }
             else { watchApproval(key, function(){}); showWait({name:name, phone:phone}); }
             btn.disabled=false; btn.textContent='Hesab yarat';
           });
@@ -180,13 +190,54 @@
           var v=snap.val();
           if(String(v.pin)!==String(pin)){ err.textContent='PIN yanlışdır.'; btn.disabled=false; btn.textContent='Daxil ol'; return; }
           setSession({name:v.adSoyad, work:v.isYeri, phone:phone});
-          if(v.approved){ approved=true; closeModal(); if(typeof pendingCb==='function'){ var cb=pendingCb; pendingCb=null; cb(); } }
+          if(v.approved){ approved=true; closeModal(); renderWidget(); if(typeof pendingCb==='function'){ var cb=pendingCb; pendingCb=null; cb(); } }
           else { watchApproval(key, function(){}); showWait({name:v.adSoyad, phone:phone}); }
           btn.disabled=false; btn.textContent='Daxil ol';
         });
       }
     }).catch(function(e){ err.textContent='Xəta baş verdi: '+(e.message||e.code||'naməlum'); btn.disabled=false; btn.textContent=regMode?'Hesab yarat':'Daxil ol'; });
   }
+
+  function logout(){
+    if(activeWatchKey){
+      ensureFirebase().then(function(){
+        firebase.database().ref('registrations/'+TOOL_ID+'/'+activeWatchKey).off();
+      });
+      activeWatchKey=null;
+    }
+    clearSession();
+    approved=false;
+    renderWidget();
+  }
+
+  function buildWidget(){
+    if(document.getElementById('anpAccWidget')) return;
+    injectCSS();
+    var el=document.createElement('div'); el.id='anpAccWidget';
+    document.body.appendChild(el);
+  }
+  function renderWidget(){
+    var el=document.getElementById('anpAccWidget');
+    if(!el) return;
+    var s=getSession();
+    if(!s){
+      el.innerHTML='<button class="anp-acc-btn" id="anpAccBtn">👤 Hesabım</button>';
+      document.getElementById('anpAccBtn').onclick=function(){ openVerifyModal(function(){}); };
+    } else if(!approved){
+      el.innerHTML='<button class="anp-acc-btn pending" id="anpAccBtn">⏳ Gözləyir</button>';
+      document.getElementById('anpAccBtn').onclick=function(){ openVerifyModal(function(){}); };
+    } else {
+      var nameShort=(s.name||'İstifadəçi').split(' ')[0];
+      el.innerHTML='<div class="anp-acc-chip">👤 '+nameShort+' <button class="anp-acc-logout" id="anpLogoutBtn">Çıxış</button></div>';
+      document.getElementById('anpLogoutBtn').onclick=function(){
+        if(confirm('Hesabdan çıxmaq istəyirsiniz?')) logout();
+      };
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    buildWidget();
+    renderWidget();
+  });
 
   /* Konteynerdə ilk klikə qədər gözləyir, sonra qeydiyyat/aktivləşdirmə tələb edir.
      itemSelector verilməsə, konteynerin özü hədəf sayılır (məs. tək düymə). */
