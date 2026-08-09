@@ -221,6 +221,26 @@ main{padding:36px 0 80px}
   main{padding:0}
 }
 </style>
+<script src="license-check.js" data-tool="plan"></script>
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    if(window.LICENSE && LICENSE.init){
+      LICENSE.init('#intakeForm', 'button[type=submit]');
+    }
+    var tapEl = document.getElementById('anpLogoTap');
+    if(tapEl){
+      var tapCount = 0, tapTimer = null;
+      tapEl.addEventListener('click', function(){
+        tapCount++;
+        clearTimeout(tapTimer);
+        if(tapCount >= 5){ tapCount = 0; location.href = 'admin.html'; return; }
+        tapTimer = setTimeout(function(){ tapCount = 0; }, 900);
+      });
+    }
+  });
+})();
+</script>
 </head>
 <body>
 
@@ -229,7 +249,7 @@ main{padding:36px 0 80px}
     <div class="brand">
       <div class="brand-badge">AN</div>
       <div>
-        <h1>AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</h1>
+        <h1 id="anpLogoTap" style="cursor:default">AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</h1>
         <p>Elmi Rəhbər: Nahidə Axundova</p>
       </div>
     </div>
