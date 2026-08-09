@@ -191,15 +191,19 @@
   /* Konteynerdə ilk klikə qədər gözləyir, sonra qeydiyyat/aktivləşdirmə tələb edir.
      itemSelector verilməsə, konteynerin özü hədəf sayılır (məs. tək düymə). */
   window.LICENSE = {
-    init: function(containerSelector, itemSelector){
+    init: function(containerSelector, itemSelector, eventType){
+      eventType = eventType || 'click';
       var host = document.querySelector(containerSelector);
       if(!host) return;
-      host.addEventListener('click', function(e){
+      host.addEventListener(eventType, function(e){
         var target = itemSelector ? e.target.closest(itemSelector) : (e.target===host ? host : e.target.closest(containerSelector));
         if(!target) return;
         if(isVerified()) return;
         e.preventDefault(); e.stopPropagation();
-        openVerifyModal(function(){ target.click(); });
+        openVerifyModal(function(){
+          if(eventType==='click'){ target.click(); }
+          else { target.dispatchEvent(new Event(eventType, {bubbles:true})); }
+        });
       }, true);
     },
     isVerified: isVerified
