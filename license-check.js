@@ -258,6 +258,7 @@
         });
       }, true);
     },
-    isVerified: isVerified
+    isVerified: isVerified,
+    _openGate: openVerifyModal
   };
 })();
