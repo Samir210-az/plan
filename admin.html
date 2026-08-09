@@ -1,0 +1,132 @@
+<!DOCTYPE html><html lang="az"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SuperAdmin — Qeydiyyatlar</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{--bordo:#6A0000;--teal:#2A9D8F;--teal-2:#1f7a6f;--gold:#D2A55D;--gold-2:#b9863a;--cream:#F3ECE0;--paper:#FBF7F0;--line:#e7ddd0;--ink-2:#6b5d54;--r:14px;--r-lg:20px;--shadow-sm:0 2px 10px rgba(90,60,30,.06);--shadow-lg:0 20px 60px rgba(90,60,30,.18)}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--paper);color:#2a1c1c}
+.admin-wrap{max-width:900px;margin:0 auto;padding:60px 24px 60px}
+.pin-box{max-width:340px;margin:120px auto;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 28px;box-shadow:var(--shadow-lg);text-align:center}
+.pin-box input{width:100%;font-size:1.1rem;text-align:center;letter-spacing:.15em;padding:12px;border:1px solid var(--line);border-radius:10px;margin:16px 0;font-family:monospace;box-sizing:border-box}
+.pin-err{color:#b34242;font-size:.85rem;min-height:1.2em}
+.btn{border:none;border-radius:10px;padding:12px;font-size:.95rem;font-weight:700;cursor:pointer}
+.btn-primary{background:var(--bordo);color:#fff;width:100%}
+.admin-table{width:100%;border-collapse:collapse}
+.admin-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:6px}
+.admin-count{background:var(--bordo);color:#fff;border-radius:999px;padding:5px 14px;font-size:.82rem;font-weight:700}
+#adminSearch{max-width:260px;padding:10px 14px;border:1px solid var(--line);border-radius:10px}
+.reg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:20px}
+.reg-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm);position:relative}
+.reg-card .rc-name{font-family:Georgia,serif;font-size:1.1rem;color:var(--bordo);font-weight:700;margin-bottom:10px;padding-left:64px;padding-right:64px}
+.reg-card .rc-row{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--ink-2);margin-top:7px}
+.reg-card .rc-tag{position:absolute;top:18px;right:18px;font-size:.68rem;font-weight:800;padding:4px 10px;border-radius:999px;text-transform:uppercase}
+.reg-card .rc-tag.sms{background:#e3f4f1;color:var(--teal-2)}
+.reg-card .rc-tag.bypass{background:#faf0dd;color:var(--gold-2)}
+.reg-card .rc-status{position:absolute;top:18px;left:18px;font-size:.68rem;font-weight:800;padding:4px 10px;border-radius:999px;text-transform:uppercase}
+.reg-card .rc-status.pending{background:#fdeceb;color:#b34242}
+.reg-card .rc-status.active{background:#e3f4f1;color:var(--teal-2)}
+.reg-card .rc-actions{margin-top:14px;display:flex;gap:8px}
+.rc-btn{flex:1;border:none;border-radius:9px;padding:9px 0;font-size:.82rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;color:#333}
+.rc-btn.approve{background:var(--teal);color:#fff}
+.rc-btn.revoke{background:var(--cream);color:var(--ink-2)}
+.rc-btn.wa{background:#faf0dd;color:var(--gold-2)}
+.empty-note{text-align:center;padding:40px;color:var(--ink-2)}
+h2{margin:0}
+</style>
+</head><body>
+
+<div id="pinScreen" class="pin-box">
+  <h3 style="margin-bottom:4px">SuperAdmin girişi</h3>
+  <p style="font-size:.9rem;color:var(--ink-2)">Qeydiyyatdan keçənlərin siyahısını görmək üçün PIN daxil edin.</p>
+  <input id="pinInput" type="password" placeholder="PIN" autocomplete="off" autocapitalize="characters">
+  <div class="pin-err" id="pinErr"></div>
+  <button class="btn btn-primary" onclick="checkPin()">Daxil ol</button>
+</div>
+
+<main id="adminMain" class="admin-wrap" style="display:none">
+  <div class="admin-top">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <h2 id="pageTitle">Qeydiyyatdan keçənlər</h2>
+      <span class="admin-count" id="regCount">0</span>
+      <span class="admin-count" id="regActiveCount" style="background:var(--teal)">0 aktiv</span>
+      <span class="admin-count" id="regPendingCount" style="background:#b34242">0 gözləyir</span>
+    </div>
+    <input id="adminSearch" type="text" placeholder="Ad, iş yeri və ya nömrə axtar..." oninput="renderTable()">
+  </div>
+  <div class="reg-grid" id="regBody"></div>
+  <div class="empty-note" id="emptyNote" style="display:none">Hələ heç kim qeydiyyatdan keçməyib.</div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-database-compat.js"></script>
+<script>
+const ADMIN_PIN = "AL2026EA";
+const TOOL_ID = "plan";
+const TOOL_TITLE = "Fərdi Reabilitasiya Planı";
+const FB_CONFIG = {
+  apiKey: "AIzaSyCBhyGNzZRGgQShP_C9kwAzTm_g_0zJlzg",
+  authDomain: "an-psixoloji-33442.firebaseapp.com",
+  databaseURL: "https://an-psixoloji-33442-default-rtdb.firebaseio.com",
+  projectId: "an-psixoloji-33442",
+  storageBucket: "an-psixoloji-33442.firebasestorage.app",
+  messagingSenderId: "528809299356",
+  appId: "1:528809299356:web:59cae89a64e446dc520c59"
+};
+document.getElementById('pageTitle').textContent = TOOL_TITLE + ' — Qeydiyyatlar';
+let allRegs = [];
+
+function checkPin(){
+  const v = document.getElementById('pinInput').value.trim();
+  if(v !== ADMIN_PIN){ document.getElementById('pinErr').textContent = 'Yanlış PIN.'; return; }
+  document.getElementById('pinScreen').style.display='none';
+  document.getElementById('adminMain').style.display='block';
+  loadRegs();
+}
+document.getElementById('pinInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
+
+async function loadRegs(){
+  if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+  if(!firebase.auth().currentUser){
+    try{ await firebase.auth().signInAnonymously(); }catch(e){ console.error(e); }
+  }
+  firebase.database().ref('registrations/'+TOOL_ID).on('value', snap=>{
+    const val = snap.val() || {};
+    allRegs = Object.entries(val).map(([key,r])=>Object.assign({_key:key}, r)).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    renderTable();
+  });
+}
+function renderTable(){
+  const q = (document.getElementById('adminSearch').value||'').toLowerCase();
+  const filtered = allRegs.filter(r =>
+    (r.adSoyad||'').toLowerCase().includes(q) ||
+    (r.isYeri||'').toLowerCase().includes(q) ||
+    (r.phone||'').toLowerCase().includes(q)
+  );
+  const pendingCount = allRegs.filter(r=>!r.approved).length;
+  document.getElementById('regCount').textContent = allRegs.length + ' toplam';
+  document.getElementById('regActiveCount').textContent = (allRegs.length - pendingCount) + ' aktiv';
+  document.getElementById('regPendingCount').textContent = pendingCount + ' gözləyir';
+  document.getElementById('emptyNote').style.display = filtered.length ? 'none' : 'block';
+  document.getElementById('regBody').innerHTML = filtered.map(r => {
+    const d = r.ts ? new Date(r.ts).toLocaleDateString('az-AZ',{year:'numeric',month:'short',day:'numeric'}) : '—';
+    const tag = r.bypass ? '<span class="rc-tag bypass">Daxili</span>' : '<span class="rc-tag sms">İstifadəçi</span>';
+    const status = r.approved ? '<span class="rc-status active">Aktiv</span>' : '<span class="rc-status pending">Gözləyir</span>';
+    const actionBtn = r.approved
+      ? `<button class="rc-btn revoke" onclick="toggleApprove('${r._key}',false)">Deaktiv et</button>`
+      : `<button class="rc-btn approve" onclick="toggleApprove('${r._key}',true)">Aktivləşdir</button>`;
+    const waMsg = encodeURIComponent(`Salam ${r.adSoyad||''}, ${TOOL_TITLE} hesabınız aktivləşdirildi. İstifadə edə bilərsiniz.`);
+    const waBtn = r.approved ? '' : `<a class="rc-btn wa" href="https://wa.me/${(r.phone||'').replace('+','')}?text=${waMsg}" target="_blank" rel="noopener noreferrer">WhatsApp</a>`;
+    return `<div class="reg-card">${status}${tag}<div class="rc-name">${esc(r.adSoyad)}</div>
+      <div class="rc-row">🏢 <span>${esc(r.isYeri)}</span></div>
+      <div class="rc-row">📞 <span>${esc(r.phone)}</span></div>
+      <div class="rc-row">📅 <span>${d}</span></div>
+      <div class="rc-actions">${actionBtn}${waBtn}</div></div>`;
+  }).join('');
+}
+function toggleApprove(key, val){
+  firebase.database().ref('registrations/'+TOOL_ID+'/'+key+'/approved').set(val);
+}
+function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+</script>
+</body></html>
