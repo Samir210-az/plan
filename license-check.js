@@ -156,7 +156,8 @@
   function showWait(s){
     document.getElementById('anpStep1').style.display='none';
     document.getElementById('anpVerifyWait').style.display='block';
-    var msg = encodeURIComponent('Salam, mən '+(s.name||'')+'. "'+TOOL_ID+'" alətindən istifadə üçün hesabımı aktivləşdirin. Telefon: '+s.phone);
+    var siteLabel = (document.title||'').split('|')[0].split('—')[0].trim() || TOOL_ID;
+    var msg = encodeURIComponent('Salam, mən '+(s.name||'')+'. "'+siteLabel+'" saytında hesabımı aktivləşdirin.\nSayt: '+location.href+'\nTelefon: '+s.phone);
     document.getElementById('anpWaBtn').href = 'https://wa.me/'+WA_NUMBER+'?text='+msg;
   }
 
