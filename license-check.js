@@ -119,7 +119,7 @@
       + '<p class="anp-muted">Bu aləti istifadə etmək üçün bir dəfə qeydiyyatdan keç.</p>'
       + '<div id="anpFldName"><label>Ad Soyad</label><input id="anpName" type="text" placeholder="Ad Soyad"></div>'
       + '<div id="anpFldWork"><label>İş yeri</label><input id="anpWork" type="text" placeholder="Məs. AN Psixoloji Mərkəzi"></div>'
-      + '<label>Telefon nömrəsi</label><input id="anpPhone" type="tel" placeholder="+994 XX XXX XX XX">'
+      + '<label>Telefon nömrəsi</label><input id="anpPhone" type="tel" placeholder="0XX XXX XX XX">'
       + '<label id="anpPinLabel">PIN təyin et (min. 4 rəqəm)</label><input id="anpPin" type="password" maxlength="8" placeholder="••••">'
       + '<div class="anp-err" id="anpErr1"></div>'
       + '<button class="anp-btn" id="anpSubmit" type="button">Hesab yarat</button>'
@@ -170,7 +170,7 @@
     var err=document.getElementById('anpErr1'); err.textContent='';
     var phone = normalizePhone(document.getElementById('anpPhone').value);
     var pin = document.getElementById('anpPin').value.trim();
-    if(!phone){ err.textContent='Telefon nömrəsini düzgün daxil et (+994...).'; return; }
+    if(!phone){ err.textContent='Telefon nömrəsini düzgün daxil et (050/051/055/070/077/099... ilə başlayan).'; return; }
     if(!pin || pin.length<4){ err.textContent='PIN minimum 4 rəqəm olsun.'; return; }
     var btn=document.getElementById('anpSubmit'); btn.disabled=true; btn.textContent='Göndərilir…';
     var key=phoneKey(phone);
