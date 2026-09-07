@@ -92,6 +92,9 @@
     + '.anp-modal .anp-muted{font-size:.88rem;color:#666;margin-bottom:14px;line-height:1.5}'
     + '.anp-modal label{display:block;font-size:.78rem;font-weight:700;color:#555;margin:10px 0 4px}'
     + '.anp-modal input{width:100%;font-size:.95rem;padding:11px 13px;border:1px solid #ddd;border-radius:10px;box-sizing:border-box}'
+    + '.anp-phone-row{display:flex;gap:8px}'
+    + '.anp-phone-prefix{flex:none;display:flex;align-items:center;padding:0 12px;border:1px solid #ddd;border-radius:10px;background:#f7f2ea;color:#555;font-weight:700;font-size:.95rem}'
+    + '.anp-phone-row input{flex:1;min-width:0}'
     + '.anp-tabs{display:flex;gap:6px;background:#f3ece0;border-radius:999px;padding:4px;margin-bottom:14px}'
     + '.anp-tab{flex:1;border:none;background:transparent;padding:9px 0;border-radius:999px;font-size:.85rem;font-weight:700;color:#666;cursor:pointer}'
     + '.anp-tab.active{background:#6A0000;color:#fff}'
@@ -119,7 +122,7 @@
       + '<p class="anp-muted">Bu aləti istifadə etmək üçün bir dəfə qeydiyyatdan keç.</p>'
       + '<div id="anpFldName"><label>Ad Soyad</label><input id="anpName" type="text" placeholder="Ad Soyad"></div>'
       + '<div id="anpFldWork"><label>İş yeri</label><input id="anpWork" type="text" placeholder="Məs. AN Psixoloji Mərkəzi"></div>'
-      + '<label>Telefon nömrəsi</label><input id="anpPhone" type="tel" placeholder="0XX XXX XX XX">'
+      + '<label>Telefon nömrəsi</label><div class="anp-phone-row"><span class="anp-phone-prefix">+994</span><input id="anpPhone" type="tel" inputmode="numeric" placeholder="50 123 45 67"></div>'
       + '<label id="anpPinLabel">PIN təyin et (min. 4 rəqəm)</label><input id="anpPin" type="password" maxlength="8" placeholder="••••">'
       + '<div class="anp-err" id="anpErr1"></div>'
       + '<button class="anp-btn" id="anpSubmit" type="button">Hesab yarat</button>'
@@ -170,7 +173,7 @@
     var err=document.getElementById('anpErr1'); err.textContent='';
     var phone = normalizePhone(document.getElementById('anpPhone').value);
     var pin = document.getElementById('anpPin').value.trim();
-    if(!phone){ err.textContent='Telefon nömrəsini düzgün daxil et (050/051/055/070/077/099... ilə başlayan).'; return; }
+    if(!phone){ err.textContent='Telefon nömrəsini düzgün daxil et (9 rəqəm, +994 daxil etmə).'; return; }
     if(!pin || pin.length<4){ err.textContent='PIN minimum 4 rəqəm olsun.'; return; }
     var btn=document.getElementById('anpSubmit'); btn.disabled=true; btn.textContent='Göndərilir…';
     var key=phoneKey(phone);
