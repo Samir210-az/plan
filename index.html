@@ -90,7 +90,7 @@ main{padding:36px 0 80px}
 }
 .card .hint{color:var(--muted); font-size:13px; margin-bottom:16px}
 .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px 18px; margin-bottom:18px}
-.grid.g2{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.grid.g2{grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr))}
 .field{display:flex; flex-direction:column; gap:6px}
 .field label{font-size:12.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.3px}
 .field input, .field select, .field textarea{
@@ -504,6 +504,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
 function toggleSec(el){ el.classList.toggle('open'); el.nextElementSibling.classList.toggle('open'); }
 function scrollToId(id){ document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'}); }
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 function calcAge(){
   const v = document.getElementById('f_dogum').value;
   if(!v) return;
@@ -998,7 +999,7 @@ function collectFormData(){
 }
 
 function buildGoals(data, diagCat){
-  const name = data.ad || 'Uşaq';
+  const name = esc(data.ad) || 'Uşaq';
   const short = [];
   const mid = [];
   const long = [];
@@ -1018,7 +1019,7 @@ function buildGoals(data, diagCat){
   mid.push(`${data.muddet===30?'3-cü həftədən':'6-cı həftədən'} etibarən ${foci[1]} sahəsində sabit irəliləyiş.`);
   mid.push(`Ailə tərəfindən evdə tətbiq olunan strategiyaların müstəqil şəkildə davam etdirilməsi.`);
   long.push(`Plan sonunda ${foci[2]} sahəsində qiymətləndirilə bilən, ölçülə bilən inkişaf.`);
-  long.push(`${data.meqsed ? 'Ailənin bildirdiyi məqsədə ("'+data.meqsed.slice(0,60)+ (data.meqsed.length>60?'…':'') +'") doğru real irəliləyiş.' : 'Növbəti qiymətləndirmə dövrü üçün yeni, daha yüksək məqsədlərin təyin olunmasına hazırlıq.'}`);
+  long.push(`${data.meqsed ? 'Ailənin bildirdiyi məqsədə ("'+esc(data.meqsed.slice(0,60))+ (data.meqsed.length>60?'…':'') +'") doğru real irəliləyiş.' : 'Növbəti qiymətləndirmə dövrü üçün yeni, daha yüksək məqsədlərin təyin olunmasına hazırlıq.'}`);
   return {short, mid, long};
 }
 
@@ -1150,8 +1151,8 @@ function renderNotes(plan){
   log.innerHTML = '<h4 style="color:var(--navy);margin-top:18px">Qeyd Tarixçəsi</h4>' + plan.notes.slice().reverse().map(n=>`
     <div style="border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13.5px">
       <b>${new Date(n.date).toLocaleString('az-AZ')}</b><br>
-      <b>Mütəxəssis:</b> ${n.spec||'—'}<br><b>Valideyn:</b> ${n.parent||'—'}<br>
-      <b>Çətinlik:</b> ${n.diff||'—'}<br><b>Uğur:</b> ${n.win||'—'}
+      <b>Mütəxəssis:</b> ${esc(n.spec)||'—'}<br><b>Valideyn:</b> ${esc(n.parent)||'—'}<br>
+      <b>Çətinlik:</b> ${esc(n.diff)||'—'}<br><b>Uğur:</b> ${esc(n.win)||'—'}
     </div>`).join('');
 }
 
@@ -1201,7 +1202,7 @@ function refreshSavedSelect(){
   const store = getStore();
   const sel = document.getElementById('savedSelect');
   sel.innerHTML = '<option value="">📁 Yaddaşdan uşaq seç…</option>' +
-    Object.keys(store).map(k=>`<option value="${k}">${store[k].data.ad} ${store[k].data.soyad||''} — ${store[k].data.diaqnoz}</option>`).join('');
+    Object.keys(store).map(k=>`<option value="${esc(k)}">${esc(store[k].data.ad)} ${esc(store[k].data.soyad)||''} — ${esc(store[k].data.diaqnoz)}</option>`).join('');
 }
 document.getElementById('savedSelect').addEventListener('change', function(){
   if(!this.value) return;
@@ -1307,7 +1308,7 @@ function buildExportHTML(plan){
 
   return `<!DOCTYPE html>
 <html lang="az"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fərdi Reabilitasiya Planı — ${d.ad} ${d.soyad||''}</title>
+<title>Fərdi Reabilitasiya Planı — ${esc(d.ad)} ${esc(d.soyad)||''}</title>
 <style>
   body{font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; background:#f5f9fd; color:#1b2733; margin:0; line-height:1.55}
   .wrap{max-width:980px;margin:0 auto;padding:0 20px 40px}
@@ -1325,12 +1326,12 @@ function buildExportHTML(plan){
     <h1>AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</h1>
     <p>Fərdi Reabilitasiya Planı (Individual Rehabilitation Program)</p>
     <div class="meta">
-      <span>${d.ad} ${d.soyad||''}</span>
-      <span>Yaş: ${d.yas||'—'}</span>
-      <span>Diaqnoz: ${d.diaqnoz}</span>
+      <span>${esc(d.ad)} ${esc(d.soyad)||''}</span>
+      <span>Yaş: ${esc(d.yas)||'—'}</span>
+      <span>Diaqnoz: ${esc(d.diaqnoz)}</span>
       <span>${plan.totalDays===30?'1 Aylıq (30 gün)':'3 Aylıq (90 gün)'}</span>
       <span>Başlama: ${d.baslama||'—'}</span>
-      <span>Kurator: ${d.kurator||'—'}</span>
+      <span>Kurator: ${esc(d.kurator)||'—'}</span>
     </div>
   </div>
   <div class="wrap">

@@ -35,6 +35,11 @@
       });
     return fbReady;
   }
+  function hashPin(pin){
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin)).then(function(buf){
+      return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+    });
+  }
   function normalizePhone(v){
     var s=(v||'').replace(/[^\d+]/g,'');
     if(s.indexOf('00')===0) s='+'+s.slice(2);
@@ -95,7 +100,7 @@
     + '.anp-err{color:#b34242;font-size:.82rem;min-height:1.1em;margin-top:6px}'
     + '#anpVerifyWait{text-align:center}';
 
-  var WIDGET_CSS = '#anpAccWidget{position:fixed;bottom:14px;right:14px;z-index:9997;font-family:inherit}'
+  var WIDGET_CSS = '#anpAccWidget{position:fixed;bottom:80px;right:14px;z-index:9997;font-family:inherit}'
     + '.anp-acc-btn{background:#6A0000;color:#fff;border:none;border-radius:999px;padding:9px 16px;font-size:.82rem;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.2);display:flex;align-items:center;gap:6px}'
     + '.anp-acc-btn.pending{background:#b34242}'
     + '.anp-acc-chip{background:#fff;border:1px solid #e7ddd0;border-radius:999px;padding:6px 8px 6px 14px;font-size:.82rem;font-weight:700;color:#333;box-shadow:0 6px 18px rgba(0,0,0,.15);display:flex;align-items:center;gap:8px}'
@@ -178,7 +183,9 @@
         dbRef.once('value').then(function(existing){
           if(existing.exists()){ err.textContent='Bu nömrə ilə artıq qeydiyyat var. "Daxil ol" sekmesindən gir.'; btn.disabled=false; btn.textContent='Hesab yarat'; return; }
           var isBypass = BYPASS_PHONES.indexOf(phone)>-1;
-          dbRef.set({ adSoyad:name, isYeri:work, phone:phone, pin:pin, ts:Date.now(), approved:isBypass, bypass:isBypass }).then(function(){
+          hashPin(pin).then(function(pinHash){
+            return dbRef.set({ adSoyad:name, isYeri:work, phone:phone, pin:pinHash, ts:Date.now(), approved:isBypass, bypass:isBypass });
+          }).then(function(){
             setSession({name:name, work:work, phone:phone});
             if(isBypass){ approved=true; closeModal(); renderWidget(); if(typeof pendingCb==='function'){ var cb=pendingCb; pendingCb=null; cb(); } }
             else { watchApproval(key, function(){}); showWait({name:name, phone:phone}); }
@@ -189,11 +196,18 @@
         dbRef.once('value').then(function(snap){
           if(!snap.exists()){ err.textContent='Bu nömrə ilə qeydiyyat tapılmadı. "Qeydiyyat" sekmesindən qeydiyyatdan keç.'; btn.disabled=false; btn.textContent='Daxil ol'; return; }
           var v=snap.val();
-          if(String(v.pin)!==String(pin)){ err.textContent='PIN yanlışdır.'; btn.disabled=false; btn.textContent='Daxil ol'; return; }
-          setSession({name:v.adSoyad, work:v.isYeri, phone:phone});
-          if(v.approved){ approved=true; closeModal(); renderWidget(); if(typeof pendingCb==='function'){ var cb=pendingCb; pendingCb=null; cb(); } }
-          else { watchApproval(key, function(){}); showWait({name:v.adSoyad, phone:phone}); }
-          btn.disabled=false; btn.textContent='Daxil ol';
+          var isHashed = /^[0-9a-f]{64}$/.test(String(v.pin));
+          (isHashed ? hashPin(pin) : Promise.resolve(pin)).then(function(candidate){
+            var match = isHashed ? candidate===v.pin : String(v.pin)===String(pin);
+            if(!match){ err.textContent='PIN yanlışdır.'; btn.disabled=false; btn.textContent='Daxil ol'; return; }
+            var upgrade = isHashed ? Promise.resolve() : hashPin(pin).then(function(h){ return dbRef.child('pin').set(h); });
+            upgrade.then(function(){
+              setSession({name:v.adSoyad, work:v.isYeri, phone:phone});
+              if(v.approved){ approved=true; closeModal(); renderWidget(); if(typeof pendingCb==='function'){ var cb=pendingCb; pendingCb=null; cb(); } }
+              else { watchApproval(key, function(){}); showWait({name:v.adSoyad, phone:phone}); }
+              btn.disabled=false; btn.textContent='Daxil ol';
+            });
+          });
         });
       }
     }).catch(function(e){ err.textContent='Xəta baş verdi: '+(e.message||e.code||'naməlum'); btn.disabled=false; btn.textContent=regMode?'Hesab yarat':'Daxil ol'; });
