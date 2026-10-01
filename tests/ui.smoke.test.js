@@ -7,7 +7,7 @@ let JSDOM;
 try { JSDOM = require('jsdom').JSDOM; } catch (e) { JSDOM = null; }
 const root = path.join(__dirname, '..');
 
-function boot() {
+function boot(mode) {
   let html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   html = html.replace(/<script[^>]*src="license-check\.js"[^>]*><\/script>/, '').replace(/<script>\s*\(function\(\)\{[\s\S]*?<\/script>/, '').replace(/<script src="js\/[^"]+"><\/script>/g, '');
   const dom = new JSDOM(html, { runScripts: 'outside-only', url: 'http://localhost/', pretendToBeVisual: true });
@@ -16,6 +16,8 @@ function boot() {
   w.HTMLElement.prototype.scrollIntoView = function () {};
   w.confirm = () => true;
   w.URL.createObjectURL = () => 'blob:x'; w.URL.revokeObjectURL = () => {};
+  const demoBank = JSON.parse(fs.readFileSync(path.join(root, 'data/demo-bank.json'), 'utf8'));
+  w.PlanBank = { get: () => Promise.resolve({ bank: demoBank, mode: mode || 'full' }) };
   ['engine', 'storage', 'exports', 'app'].forEach(n => w.eval(fs.readFileSync(path.join(root, 'js', n + '.js'), 'utf8')));
   return w;
 }
@@ -98,4 +100,17 @@ test('UI: yeni dövr formu əvvəlki məlumatla doldurur və 2-ci dövr yaradır
   const st = JSON.parse(w.localStorage.getItem('an_rehab_v2'));
   assert.strictEqual(Object.values(st.children)[0].cycles.length, 2);
   assert.match(d.getElementById('planTitleSub').textContent, /dövr 2/);
+});
+
+test('UI: lisenziyasız rejimdə plan yaranmır', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {
+  const w = boot('demo');
+  const d = w.document;
+  await wait(50);
+  d.getElementById('f_ad').value = 'Əli'; d.getElementById('f_dogum').value = '2021-03-01';
+  d.getElementById('f_diaqnoz').value = 'Autizm spektr pozuntusu';
+  d.getElementById('intakeForm').dispatchEvent(new w.Event('submit', { cancelable: true }));
+  await wait(200);
+  assert.strictEqual(d.getElementById('planSection').hidden, true);
+  assert.strictEqual(JSON.parse(w.localStorage.getItem('an_rehab_v2') || '{"children":{}}').children && Object.keys(JSON.parse(w.localStorage.getItem('an_rehab_v2') || '{"children":{}}').children).length, 0);
+  assert.match(d.getElementById('modeBanner').textContent, /lisenziya/i);
 });
