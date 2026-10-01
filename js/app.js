@@ -128,14 +128,9 @@
   }
   function renderChildren() {
     var list = store.listChildren(owner());
-    var sel = $('savedSelect');
-    sel.innerHTML = '<option value="">📁 Yaddaşdan uşaq seç…</option>' + list.map(function (c) {
-      return '<option value="' + esc(c.key) + '">' + esc(c.name) + '</option>';
-    }).join('');
-    sel.disabled = !list.length;
-    var card = $('childrenCard');
-    card.hidden = !list.length;
-    $('childrenList').innerHTML = list.map(function (c) {
+    $('savedBtn').textContent = '📁 Yaddaşdan uşaq seç' + (list.length ? ' (' + list.length + ')' : '');
+    $('childrenCard').hidden = !state.listOpen;
+    $('childrenList').innerHTML = !list.length ? '<p class="muted">Bu hesabda hələ qeydə alınmış uşaq yoxdur.</p>' : list.map(function (c) {
       return '<div class="child-row"><div><b>' + esc(c.name) + '</b><span class="muted"> · ' + c.cycles + ' dövr · ' + esc(X.fmtDate(c.start)) + ' – ' + esc(X.fmtDate(c.end)) + '</span></div>' +
         '<div class="no-print"><button class="btn btn-outline btn-sm" data-action="open-child" data-key="' + esc(c.key) + '">Planı aç</button> ' +
         '<button class="btn btn-primary btn-sm" data-action="new-cycle" data-key="' + esc(c.key) + '">Yeni dövr</button> ' +
@@ -342,6 +337,7 @@
     if (!t) return;
     var a = t.getAttribute('data-action'), key = t.getAttribute('data-key');
     if (a === 'week') { state.week = +t.getAttribute('data-w'); renderPlan(); }
+    else if (a === 'toggle-children') toggleChildren();
     else if (a === 'open-child') openChild(key);
     else if (a === 'new-cycle') startNextCycle(key);
     else if (a === 'del-child') { if (window.confirm('Bu uşağın bütün planları və qeydləri silinsin?')) { saveCheck(store.removeChild(key, owner())); touch(key); if (state.childKey === key) { state.childKey = null; $('planSection').hidden = true; } renderChildren(); } }
@@ -425,9 +421,17 @@
     renderPlan();
   }
 
+  function toggleChildren(force) {
+    state.listOpen = typeof force === 'boolean' ? force : !state.listOpen;
+    $('childrenCard').hidden = !state.listOpen;
+    $('savedBtn').setAttribute('aria-expanded', state.listOpen ? 'true' : 'false');
+    if (state.listOpen) $('childrenCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   function openChild(key) {
     var c = store.getChild(key, owner());
     if (!c) return;
+    toggleChildren(false);
     var last = c.cycles[c.cycles.length - 1];
     state.childKey = key; state.cycleN = last.n; state.week = 1;
     fillForm(last.form || c.form);
@@ -468,7 +472,6 @@
 
   function onChange(ev) {
     var t = ev.target, row = t.closest('.logrow');
-    if (t.id === 'savedSelect') { if (t.value) openChild(t.value); t.value = ''; return; }
     if (row) {
       var key = row.getAttribute('data-key'), parts = key.split('|');
       var field = t.getAttribute('data-f');
