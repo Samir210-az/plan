@@ -137,3 +137,27 @@ test('UI: təsdiq gözlənilir, müdir təsdiqləyir, ixrac sənədində əks ol
   await wait(100);
   assert.match(d.getElementById('approvalBlock').textContent, /Təsdiq gözlənilir/);
 });
+
+test('UI: ehtiyat nüsxə yüklənəndə plan avtomatik açılır, qeydlər görünür', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {
+  const src = boot();
+  let d = src.document;
+  await wait(50);
+  d.getElementById('f_ad').value = 'Əli'; d.getElementById('f_dogum').value = '2021-03-01';
+  d.getElementById('f_diaqnoz').value = 'Autizm spektr pozuntusu'; d.getElementById('f_baslama').value = '2026-10-05';
+  d.getElementById('intakeForm').dispatchEvent(new src.Event('submit', { cancelable: true }));
+  await wait(200);
+  const data = JSON.parse(src.localStorage.getItem('an_rehab_v2'));
+  const cy = Object.values(data.children)[0].cycles[0];
+  const k = cy.plan.sessions[0].day + '|psixoloq|' + cy.plan.sessions[0].items.psixoloq.list[0].a;
+  cy.log = {}; cy.log[k] = { att: 'beli', r: '3', note: 'Yaxşı cavab verdi' };
+  const dst = boot();
+  await wait(50);
+  assert.strictEqual(dst.document.getElementById('planSection').hidden, true);
+  const input = dst.document.getElementById('importFile');
+  const file = new dst.File([JSON.stringify(data)], 'b.json', { type: 'application/json' });
+  Object.defineProperty(input, 'files', { value: [file], configurable: true });
+  input.dispatchEvent(new dst.Event('change'));
+  await wait(300);
+  assert.strictEqual(dst.document.getElementById('planSection').hidden, false);
+  assert.match(dst.document.getElementById('planTitleName').textContent, /Əli/);
+});
