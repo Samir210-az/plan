@@ -270,3 +270,28 @@ test('UI: loqo göstərilir və 5 kliklə admin panelinə keçid loqoya bağlıd
   assert.strictEqual(d.querySelector('.brand h1').id, '', 'başlıqda tələ yoxdur');
   w.close();
 });
+
+test('UI: test nəticəsini və bütün nəticələri silmək', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {
+  const w = boot();
+  const d = w.document;
+  await wait(50);
+  d.getElementById('f_ad').value = 'Eli'; d.getElementById('f_soyad').value = 'M';
+  d.getElementById('f_dogum').value = '2019-03-05'; d.getElementById('f_diaqnoz').value = 'DEHB';
+  d.getElementById('intakeForm').dispatchEvent(new w.Event('submit', { cancelable: true, bubbles: true }));
+  await wait(200);
+  const inputs = d.querySelectorAll('#testsBody input[data-f="score"]');
+  assert.ok(inputs.length >= 2);
+  for (let i = 0; i < 2; i++) { inputs[i].value = String(10 + i); inputs[i].dispatchEvent(new w.Event('change', { bubbles: true })); }
+  await wait(50);
+  const res = () => Object.values(JSON.parse(w.localStorage.getItem('an_rehab_v2')).children)[0].cycles[0].results;
+  w.PlanApp.onLicenseChange(); await wait(100);
+  assert.strictEqual(Object.keys(res()).length, 2);
+  d.querySelector('[data-action="del-test"]').click();
+  await wait(50);
+  assert.strictEqual(Object.keys(res()).length, 1, 'bir nəticə silindi');
+  d.querySelector('[data-action="del-all-tests"]').click();
+  await wait(50);
+  assert.strictEqual(Object.keys(res()).length, 0, 'hamısı silindi');
+  assert.strictEqual(d.querySelector('[data-action="del-all-tests"]'), null);
+  w.close();
+});
