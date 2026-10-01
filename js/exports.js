@@ -196,7 +196,7 @@
 
   function fullHtml(form, cycle, bank) {
     var p = cycle.plan;
-    return wrap('Plan ' + form.ad, headerHtml(form, cycle) + warningsHtml(p) + needsHtml(p) + goalsHtml(p) + testsHtml(p, cycle.results) + sessionsHtml(p, bank, cycle.log) + homeHtml(p, bank, false) + approvalHtml(cycle));
+    return wrap('Plan ' + form.ad, headerHtml(form, cycle) + warningsHtml(p) + needsHtml(p) + goalsHtml(p) + testsHtml(p, cycle.results) + sessionsHtml(p, bank, cycle.log) + homeHtml(p, bank, false));
   }
 
   function parentHtml(form, cycle, bank) {
