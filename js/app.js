@@ -104,6 +104,7 @@
     }
     Promise.all([loadBank(), state.catalogP]).then(function (all) {
       var b = all[0];
+      if (b.mode !== 'full') { askLicense(); return; }
       var plan;
       try { plan = E.generate(f, b.bank, { catalog: state.catalog, cycle: n, prior: prior, childKey: key }); }
       catch (e) { toast('Plan yaradıla bilmədi: ' + e.message); return; }
@@ -127,7 +128,7 @@
     var el = $('modeBanner');
     if (state.mode === 'full' || !state.bank) { el.hidden = true; return; }
     el.hidden = false;
-    el.textContent = 'Nümunə rejimi: plan yalnız ' + Object.keys(state.bank.act).length + ' məşğələdən qurulur. Lisenziya ilə tam baza açılır.';
+    el.textContent = 'Lisenziya yoxdur: plan yaratmaq və yaradılmış planları açmaq üçün aktiv lisenziya lazımdır.';
   }
 
   /* ---------- plan göstərişi ---------- */
@@ -141,7 +142,15 @@
   function renderPlan() {
     var cur = current();
     if (!cur) { $('planSection').hidden = true; return; }
-    loadBank().then(function (b) { paint(cur, b.bank); });
+    loadBank().then(function (b) {
+      if (b.mode !== 'full') { $('planSection').hidden = true; return; }
+      paint(cur, b.bank);
+    });
+  }
+  function askLicense() {
+    toast('Plan yaratmaq və açmaq üçün aktiv lisenziya lazımdır. Yuxarıdan Google ilə daxil olub sorğu göndərin.');
+    var bar = $('licenseBar');
+    if (bar && bar.scrollIntoView) bar.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function paint(cur, bank) {
@@ -151,7 +160,7 @@
     $('planTitleSub').textContent = p.profile.ageLabel + ' · dövr ' + cur.cycle.n + ' · ' + X.fmtDate(p.start) + ' – ' + X.fmtDate(p.end);
     var pr = E.progress(p, bank, log);
     $('planBadges').innerHTML = '<span class="badge">Həftədə ' + p.profile.sessionsPerWeek + ' seans</span><span class="badge">Ayda ' + p.sessions.length + ' seans</span>' +
-      '<span class="badge">' + p.tests.length + ' test planlanıb</span><span class="badge">Sonrakı dövr: ' + esc(X.fmtDate(p.nextStart)) + '</span>' + (cur.cycle.mode === 'demo' ? '<span class="badge warn">Nümunə</span>' : '');
+      '<span class="badge">' + p.tests.length + ' test planlanıb</span><span class="badge">Sonrakı dövr: ' + esc(X.fmtDate(p.nextStart)) + '</span>';
     $('warningsBlock').innerHTML = X.warningsHtml(p).replace(/class="warn"/g, 'class="alert"');
     $('needsBody').innerHTML = X.needsHtml(p).replace(/<h2>.*?<\/h2>/, '');
     $('goalsGrid').innerHTML = X.goalsHtml(p).replace(/<h2>.*?<\/h2>/, '');
@@ -304,7 +313,7 @@
   function withCur(fn) {
     var cur = current();
     if (!cur) return;
-    loadBank().then(function (b) { fn({ cycle: cur.cycle, child: cur.child, form: function () { return cur.cycle.form || cur.child.form; } }, b.bank); });
+    loadBank().then(function (b) { if (b.mode !== 'full') { askLicense(); return; } fn({ cycle: cur.cycle, child: cur.child, form: function () { return cur.cycle.form || cur.child.form; } }, b.bank); });
   }
   function fname(c, kind, ext) {
     var f = c.form();
