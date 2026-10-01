@@ -1,0 +1,211 @@
+{
+ "m-chat-r": {
+  "ad": "M-CHAT-R",
+  "alt": "Autizm üçün erkən skrininq anketi",
+  "tip": "Skrininq",
+  "yas": "16–30 aylıq uşaqlar",
+  "kim": "Valideyn doldurur, mütəxəssis nəticəni şərh edir",
+  "muddet": "5–10 dəqiqə",
+  "ne": "Kiçik yaşlı uşaqda autizm spektr pozuntusu riskini göstərən davranışları skrininq edir.",
+  "link": "https://samir210-az.github.io/m-chat-r/",
+  "lisenziyali": false
+ },
+ "gobdo-2": {
+  "ad": "GOBDÖ-2",
+  "alt": "Gilliam Autizm Qiymətləndirmə Şkalası-2 (Türk uyğunlaşdırması)",
+  "tip": "Qiymətləndirmə şkalası",
+  "yas": "3–23 yaş",
+  "kim": "Şəxsi yaxşı tanıyan valideyn, müəllim və ya mütəxəssis",
+  "muddet": "10–15 dəqiqə",
+  "ne": "Müşahidə olunan davranışların nə qədər tez-tez baş verdiyinə görə autizm ehtimalını qiymətləndirir.",
+  "link": "https://autism-az.vercel.app/",
+  "lisenziyali": false
+ },
+ "ados-2": {
+  "ad": "ADOS-2",
+  "alt": "Autizm Diaqnostik Müşahidə Cədvəli, ikinci nəşr",
+  "tip": "Diaqnostik",
+  "yas": "12 aydan böyüklərə qədər",
+  "kim": "Xüsusi təlim keçmiş klinik mütəxəssis",
+  "muddet": "Təxminən 40–60 dəqiqə",
+  "ne": "Uşağın ünsiyyət, sosial qarşılıqlı əlaqə, oyun və məhdud təkrarlanan davranışlarını planlaşdırılmış oyun və söhbət tapşırıqları vasitəsilə birbaşa müşahidə edir.",
+  "link": "https://samir210-az.github.io/an-qiymetlendirme-sistemi/#ados2",
+  "lisenziyali": true
+ },
+ "adi-r": {
+  "ad": "ADI-R",
+  "alt": "Autizm Diaqnostik Müsahibəsi, yenilənmiş",
+  "tip": "Müsahibə",
+  "yas": "Əqli yaşı ən azı 2 il olan uşaq və böyüklər",
+  "kim": "Təlim keçmiş klinik mütəxəssis, cavab verən isə uşağı yaxşı tanıyan valideyn",
+  "muddet": "Təxminən 1,5–2,5 saat",
+  "ne": "Valideynlə strukturlaşdırılmış müsahibə vasitəsilə uşağın inkişaf tarixçəsini və hazırkı davranışını əhatə edir.",
+  "link": "https://samir210-az.github.io/an-qiymetlendirme-sistemi/#adir",
+  "lisenziyali": true
+ },
+ "denver-ii": {
+  "ad": "Denver II",
+  "alt": "Denver İnkişaf Skrininq Testi",
+  "tip": "Skrininq",
+  "yas": "Doğuşdan 6 yaşa qədər",
+  "kim": "Psixoloq, pediatr və ya təlim keçmiş mütəxəssis",
+  "muddet": "15–20 dəqiqə",
+  "ne": "Uşağın motor, nitq və sosial inkişafının yaşına uyğun olub-olmadığını yoxlayır.",
+  "link": "https://samir210-az.github.io/goog/",
+  "lisenziyali": true
+ },
+ "erken-inkishaf": {
+  "ad": "Erkən İnkişaf qiymətləndirməsi",
+  "alt": "Mərkəzin strukturlaşdırılmış dəyərləndirmə aləti",
+  "tip": "Qiymətləndirmə",
+  "yas": "Erkən inkişaf yaşındakı uşaqlar",
+  "kim": "Mərkəzin mütəxəssisi",
+  "muddet": "Uşağa görə dəyişir",
+  "ne": "Uşağın ümumi inkişaf profilini və mütəxəssisin tövsiyələrini bir yerdə toplayır.",
+  "link": "https://samir210-az.github.io/TEST/",
+  "lisenziyali": false
+ },
+ "usaqiq": {
+  "ad": "UşaqIQ",
+  "alt": "Valideyn anketi ilə inkişaf profili və fərdi ev planı",
+  "tip": "Valideyn anketi",
+  "yas": "1–2, 3–4, 5–6 və 7+ yaş",
+  "kim": "Valideyn",
+  "muddet": "21 sual",
+  "ne": "Valideynin cavablarına əsasən uşağın nitq, motorika, idrak, sosial-emosional və özünəxidmət sahələrindəki inkişafını göstərir və evdə tətbiq olunacaq fəaliyyətlər təklif edir.",
+  "link": "https://samir210-az.github.io/usaq_iq/",
+  "lisenziyali": false
+ },
+ "erken-mudaxile": {
+  "ad": "Erkən Müdaxilə platforması",
+  "alt": "İnkişaf skrininqi (v2) və izləmə",
+  "tip": "Skrininq və izləmə",
+  "yas": "Xüsusi qayğıya ehtiyacı olan müxtəlif yaşlı uşaqlar",
+  "kim": "Valideyn və mütəxəssis",
+  "muddet": "Uşağa görə dəyişir",
+  "ne": "İnkişaf skrininqini keçirir və nəticələri zaman üzrə izləməyə imkan verir.",
+  "link": "https://samir210-az.github.io/erken-mudaxile/",
+  "lisenziyali": false
+ },
+ "wisc-v": {
+  "ad": "WISC-V",
+  "alt": "Wechsler Uşaq Zəka (IQ) Şkalası, beşinci nəşr",
+  "tip": "Diaqnostik (IQ)",
+  "yas": "6–16 yaş 11 ay",
+  "kim": "Lisenziyalı psixoloq",
+  "muddet": "Təxminən 60–80 dəqiqə",
+  "ne": "Uşağın ümumi zehni qabiliyyətini (IQ) və onun hansı sahələrdən ibarət olduğunu ölçür.",
+  "link": "https://samir210-az.github.io/an-qiymetlendirme-sistemi/#wiscv",
+  "lisenziyali": true
+ },
+ "leiter-3": {
+  "ad": "Leiter-3",
+  "alt": "Leiter beynəlxalq performans şkalası (qeyri-şifahi zəka, IQ), üçüncü nəşr",
+  "tip": "Diaqnostik (IQ)",
+  "yas": "3–75 yaş",
+  "kim": "Lisenziyalı psixoloq",
+  "muddet": "Təxminən 30–45 dəqiqə",
+  "ne": "Nitqdən asılı olmayan qeyri-şifahi zəkanı və diqqət, yaddaş funksiyalarını ölçür.",
+  "link": "https://samir210-az.github.io/an-qiymetlendirme-sistemi/#leiter3",
+  "lisenziyali": true
+ },
+ "vineland-3": {
+  "ad": "Vineland-3",
+  "alt": "Vineland adaptiv davranış şkalası, üçüncü nəşr",
+  "tip": "Qiymətləndirmə (müsahibə və anket)",
+  "yas": "Doğuşdan 90 yaşa qədər",
+  "kim": "Psixoloq valideynlə müsahibə aparır və ya valideyn, müəllim anket doldurur",
+  "muddet": "20–60 dəqiqə",
+  "ne": "Uşağın gündəlik həyatda real olaraq nə bacardığını ölçür: ünsiyyət, özünə xidmət, sosial münasibət və hərəkət.",
+  "link": "https://samir210-az.github.io/an-qiymetlendirme-sistemi/#vineland3",
+  "lisenziyali": true
+ },
+ "sensory-profile-2": {
+  "ad": "Sensory Profile 2",
+  "alt": "Sensor profil, ikinci nəşr",
+  "tip": "Anket",
+  "yas": "Doğuşdan 14 yaş 11 aya qədər (yaşa görə ayrı formalar)",
+  "kim": "Valideyn və ya müəllim doldurur, ergoterapevt və ya psixoloq şərh edir",
+  "muddet": "10–20 dəqiqə",
+  "ne": "Uşağın səs, işıq, toxunuş, hərəkət və digər hisslərə gündəlik reaksiyasını qiymətləndirir.",
+  "link": "https://samir210-az.github.io/an-qiymetlendirme-sistemi/#sp2",
+  "lisenziyali": true
+ },
+ "ttap": {
+  "ad": "TTAP",
+  "alt": "Keçid və peşə yönümlü qiymətləndirmə profili",
+  "tip": "Qiymətləndirmə",
+  "yas": "Yeniyetmə və böyüklər (TTAP əsasən autizmli gənclər üçün işlənib)",
+  "kim": "Mütəxəssis müşahidə və müsahibə ilə",
+  "muddet": "Fərdi, bir neçə görüşə yayıla bilər",
+  "ne": "Gəncin müstəqil yaşamaq və işləmək üçün hansı bacarıqlara malik olduğunu çoxsahəli şəkildə qiymətləndirir.",
+  "link": "https://samir210-az.github.io/AN/",
+  "lisenziyali": false
+ },
+ "vb-mapp": {
+  "ad": "VB-MAPP",
+  "alt": "Şifahi davranış mərhələlərinin qiymətləndirilməsi və yerləşdirmə proqramı",
+  "tip": "Qiymətləndirmə",
+  "yas": "Normal inkişafda 0–48 ay səviyyəsi (autizmli və ya nitq gecikməsi olan uşaqlar üçün)",
+  "kim": "ABA mütəxəssisi (BCBA və ya təlim keçmiş terapevt)",
+  "muddet": "Bir neçə seans",
+  "ne": "Uşağın dil, öyrənmə və sosial bacarıqlarını Skinnerin şifahi davranış təhlilinə əsasən qiymətləndirir.",
+  "link": "https://samir210-az.github.io/aba-terapiya/tools/vb-mapp.html",
+  "lisenziyali": true
+ },
+ "afls": {
+  "ad": "AFLS",
+  "alt": "Funksional həyat bacarıqlarının qiymətləndirilməsi",
+  "tip": "Qiymətləndirmə",
+  "yas": "Uşaqdan böyüklərə qədər",
+  "kim": "ABA mütəxəssisi, müəllim, valideyn",
+  "muddet": "Seçilmiş modullara görə dəyişir",
+  "ne": "Gündəlik həyatda müstəqil işləmək üçün lazım olan bacarıqları qiymətləndirir.",
+  "link": "https://samir210-az.github.io/aba-terapiya/tools/afls.html",
+  "lisenziyali": true
+ },
+ "fba": {
+  "ad": "FBA",
+  "alt": "Funksional davranış qiymətləndirməsi",
+  "tip": "Qiymətləndirmə üsulu",
+  "yas": "Bütün yaşlar",
+  "kim": "Davranış analitiki, psixoloq",
+  "muddet": "Bir neçə gün və ya həftə",
+  "ne": "Problem davranışın nə üçün baş verdiyini, yəni funksiyasını müəyyən edir.",
+  "link": "https://samir210-az.github.io/aba-terapiya/tools/fba.html",
+  "lisenziyali": true
+ },
+ "scared": {
+  "ad": "SCARED",
+  "alt": "Uşaqlarda narahatlıqla bağlı emosional pozuntuların skrininqi",
+  "tip": "Anket",
+  "yas": "8–18 yaş (valideyn forması bütün yaşlar üçün)",
+  "kim": "Uşaq və valideyn ayrıca doldurur, psixoloq şərh edir",
+  "muddet": "10–15 dəqiqə",
+  "ne": "Uşaq və yeniyetmələrdə narahatlıq pozuntusu əlamətlərini skrininq edir.",
+  "link": "https://samir210-az.github.io/cbt/",
+  "lisenziyali": true
+ },
+ "cbt-klinik": {
+  "ad": "CBT Klinik Qiymətləndirmə",
+  "alt": "Valideyn, uşaq və müəllim anketləri",
+  "tip": "Anket",
+  "yas": "Uşaqlar və yeniyetmələr",
+  "kim": "Valideyn, uşaq və müəllim ayrıca doldurur, psixoloq şərh edir",
+  "muddet": "Hər forma 5–10 dəqiqə",
+  "ne": "Narahatlıq, emosiyanın idarə olunması, sosial bacarıqlar, davranış və gündəlik fəaliyyəti koqnitiv davranış terapiyası nöqteyi-nəzərindən qiymətləndirir.",
+  "link": "https://samir210-az.github.io/Cbt1/",
+  "lisenziyali": true
+ },
+ "y-bocs": {
+  "ad": "Y-BOCS",
+  "alt": "Yeyl-Braun obsessiv-kompulsiv şkalası",
+  "tip": "Klinik şkala",
+  "yas": "Uşaq, yeniyetmə və böyüklər (uşaqlar üçün CY-BOCS versiyası var)",
+  "kim": "Klinik müsahibə ilə mütəxəssis",
+  "muddet": "20–40 dəqiqə",
+  "ne": "Obsessiv-kompulsiv pozuntunun şiddətini ölçür.",
+  "link": "https://ai-test-az.vercel.app/questionnaire/ocd",
+  "lisenziyali": true
+ }
+}
