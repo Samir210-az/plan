@@ -436,33 +436,34 @@
 
   // ---- testlər ----
   var TEST_RULES = [
-    { id: 'm-chat-r', who: 'psixoloq', min: 15, when: function (p) { return p.ageM != null && p.ageM >= 16 && p.ageM <= 30 && !p.dxConfirmed; }, first: true, why: 'Yaş 16–30 ay aralığındadır və autizm diaqnozu təsdiqlənməyib: erkən risk skrininqi.' },
-    { id: 'ados-2', who: 'psixoloq', min: 60, when: function (p) { return !p.dxConfirmed && p.ageM != null && p.ageM >= 12 && p.needs.joint >= 2 && (p.dx.indexOf('asd') >= 0 || p.needs.play >= 2); }, first: true, why: 'Sosial-ünsiyyət əlamətləri qeyd olunub, diaqnoz təsdiqlənməyib: standart müşahidə ilə dəqiqləşdirmə.' },
-    { id: 'adi-r', who: 'psixoloq', min: 120, when: function (p) { return !p.dxConfirmed && p.ageM != null && p.ageM >= 24 && p.dx.indexOf('asd') >= 0; }, first: true, why: 'Diaqnozu tarixçə ilə təsdiqləmək üçün valideyn müsahibəsi.' },
-    { id: 'gobdo-2', who: 'psixoloq', min: 15, when: function (p) { return p.dx.indexOf('asd') >= 0 && p.ageM != null && p.ageM >= 36 && p.ageM <= 276; }, phases: ['baseline', 'mid', 'retest'], why: 'Autizm əlamətlərinin tezliyini aylıq müqayisə etmək üçün qısa şkala.' },
-    { id: 'denver-ii', who: 'psixoloq', min: 20, when: function (p) { return p.ageM != null && p.ageM <= 72; }, phases: ['baseline', 'mid', 'retest'], why: 'Yaş 6-dan aşağıdır: inkişaf sahələri üzrə skrininq və aylıq irəliləyişə nəzarət.' },
-    { id: 'erken-inkishaf', who: 'psixoloq', min: 30, when: function (p) { return p.ageM != null && p.ageM <= 72; }, phases: ['baseline', 'mid', 'retest'], why: 'Erkən inkişaf yaşında sahələr üzrə vəziyyətin ölçülməsi.' },
-    { id: 'usaqiq', who: 'psixoloq', min: 20, when: function (p) { return p.ageM != null && p.ageM >= 12 && p.ageM <= 96; }, phases: ['baseline', 'mid', 'retest'], why: 'Valideyn anketi: evdəki müşahidələrin planla birgə izlənməsi.' },
-    { id: 'erken-mudaxile', who: 'psixoloq', min: 20, when: function (p) { return p.ageM != null && p.ageM <= 72; }, phases: ['mid'], why: 'Ay ortasında izləmə: plan işləyirsə davam, işləmirsə düzəliş.' },
-    { id: 'wisc-v', who: 'psixoloq', min: 80, when: function (p) { return p.ageM != null && p.ageM >= 72 && p.ageM <= 203 && (p.dx.some(function (d) { return ['id', 'gdd', 'adhd', 'learning'].indexOf(d) >= 0; }) || p.needs.academic >= 2); }, first: true, everyN: 6, why: 'Koqnitiv profilin dəqiqləşdirilməsi; tez-tez təkrarlanmır (məşq effekti).' },
-    { id: 'leiter-3', who: 'psixoloq', min: 45, when: function (p) { return p.ageM != null && p.ageM >= 36 && (p.needs.expressive >= 2 || p.dx.indexOf('asd') >= 0) && !(p.ageM >= 72 && p.ageM <= 203 && p.dx.indexOf('id') >= 0); }, first: true, everyN: 6, why: 'Nitq məhdud olduqda qeyri-verbal koqnitiv qiymətləndirmə.' },
-    { id: 'vineland-3', who: 'psixoloq', min: 40, when: function () { return true; }, first: true, everyN: 3, why: 'Gündəlik həyat bacarıqlarının ümumi profili; hər 3 ayda bir yenilənir.' },
-    { id: 'sensory-profile-2', who: 'ergoterapevt', min: 20, when: function (p) { return p.needs.sensory >= 1; }, first: true, everyN: 3, why: 'Sensor xüsusiyyətlər qeyd olunub: ergoterapiya planının əsası.' },
-    { id: 'ttap', who: 'psixoloq', min: 60, when: function (p) { return p.ageM != null && p.ageM >= 144 && p.dx.indexOf('asd') >= 0; }, first: true, everyN: 3, why: 'Yeniyetmə yaşında funksional keçid bacarıqları.' },
-    { id: 'vb-mapp', who: 'psixoloq', min: 60, when: function (p) { return p.ageM != null && p.ageM <= 120 && (p.dx.indexOf('asd') >= 0 || p.dx.indexOf('speech') >= 0 || p.dx.indexOf('gdd') >= 0 || p.needs.expressive >= 2); }, phases: ['baseline', 'mid', 'retest'], retestFocus: true, why: 'Nitq və öyrənmə bacarıqlarının mərhələ üzrə izlənməsi. Təkrar yoxlamada yalnız fokus sahələr götürülür.' },
-    { id: 'afls', who: 'ergoterapevt', min: 40, when: function (p) { return p.needs.selfcare >= 2 || p.needs.toilet >= 2; }, first: true, everyN: 3, why: 'Özünəxidmət çatışmazlığı var: funksional həyat bacarıqlarının ölçülməsi.' },
-    { id: 'fba', who: 'psixoloq', min: 30, when: function (p) { return p.needs.behavior >= 2; }, phases: ['baseline', 'mid', 'retest'], why: 'Problem davranış var: funksiyanın təyini və tezliyin aylıq müqayisəsi.' },
-    { id: 'scared', who: 'psixoloq', min: 15, when: function (p) { return p.ageM != null && p.ageM >= 96 && p.ageM <= 216 && p.needs.anxiety >= 2; }, phases: ['baseline', 'mid', 'retest'], why: 'Narahatlıq əlamətləri: şkala ilə aylıq dəyişikliyin izlənməsi.' },
-    { id: 'cbt-klinik', who: 'psixoloq', min: 20, when: function (p) { return p.ageM != null && p.ageM >= 72 && (p.needs.emotion >= 2 || p.needs.anxiety >= 1); }, phases: ['baseline', 'mid', 'retest'], why: 'Emosional-davranış sahəsinin valideyn, uşaq və müəllim formaları ilə yoxlanması.' },
-    { id: 'y-bocs', who: 'psixoloq', min: 40, when: function (p) { return p.dx.indexOf('ocd') >= 0; }, phases: ['baseline', 'mid', 'retest'], why: 'Obsessiv-kompulsiv əlamətlər: şiddətin aylıq ölçülməsi (uşaqlar üçün CY-BOCS versiyası).' }
+    { id: 'm-chat-r', pri: 1, who: 'psixoloq', min: 15, when: function (p) { return p.ageM != null && p.ageM >= 16 && p.ageM <= 30 && !p.dxConfirmed; }, first: true, why: 'Yaş 16–30 ay aralığındadır və autizm diaqnozu təsdiqlənməyib: erkən risk skrininqi.' },
+    { id: 'ados-2', pri: 1, who: 'psixoloq', min: 60, when: function (p) { return !p.dxConfirmed && p.ageM != null && p.ageM >= 12 && p.needs.joint >= 2 && (p.dx.indexOf('asd') >= 0 || p.needs.play >= 2); }, first: true, why: 'Sosial-ünsiyyət əlamətləri qeyd olunub, diaqnoz təsdiqlənməyib: standart müşahidə ilə dəqiqləşdirmə.' },
+    { id: 'adi-r', pri: 1, who: 'psixoloq', min: 120, when: function (p) { return !p.dxConfirmed && p.ageM != null && p.ageM >= 24 && p.dx.indexOf('asd') >= 0; }, first: true, why: 'Diaqnozu tarixçə ilə təsdiqləmək üçün valideyn müsahibəsi.' },
+    { id: 'gobdo-2', pri: 2, who: 'psixoloq', min: 15, when: function (p) { return p.dx.indexOf('asd') >= 0 && p.ageM != null && p.ageM >= 36 && p.ageM <= 276; }, phases: ['baseline', 'mid', 'retest'], why: 'Autizm əlamətlərinin tezliyini aylıq müqayisə etmək üçün qısa şkala.' },
+    { id: 'denver-ii', pri: 4, who: 'psixoloq', min: 20, when: function (p) { return p.ageM != null && p.ageM <= 72; }, phases: ['baseline', 'mid', 'retest'], why: 'Yaş 6-dan aşağıdır: inkişaf sahələri üzrə skrininq və aylıq irəliləyişə nəzarət.' },
+    { id: 'erken-inkishaf', pri: 4, who: 'psixoloq', min: 30, when: function (p) { return p.ageM != null && p.ageM <= 72; }, phases: ['baseline', 'mid', 'retest'], why: 'Erkən inkişaf yaşında sahələr üzrə vəziyyətin ölçülməsi.' },
+    { id: 'erken-mudaxile', pri: 4, who: 'psixoloq', min: 20, when: function (p) { return p.ageM != null && p.ageM <= 72; }, phases: ['mid'], why: 'Ay ortasında izləmə: plan işləyirsə davam, işləmirsə düzəliş.' },
+    { id: 'wisc-v', pri: 2, who: 'psixoloq', min: 80, when: function (p) { return p.ageM != null && p.ageM >= 72 && p.ageM <= 203 && (p.dx.some(function (d) { return ['id', 'gdd', 'adhd', 'learning'].indexOf(d) >= 0; }) || p.needs.academic >= 2); }, first: true, everyN: 6, why: 'Koqnitiv profilin dəqiqləşdirilməsi; tez-tez təkrarlanmır (məşq effekti).' },
+    { id: 'leiter-3', pri: 3, who: 'psixoloq', min: 45, when: function (p) { return p.ageM != null && p.ageM >= 36 && (p.needs.expressive >= 2 || p.dx.indexOf('asd') >= 0) && !(p.ageM >= 72 && p.ageM <= 203 && p.dx.indexOf('id') >= 0); }, first: true, everyN: 6, why: 'Nitq məhdud olduqda qeyri-verbal koqnitiv qiymətləndirmə.' },
+    { id: 'vineland-3', pri: 3, who: 'psixoloq', min: 40, when: function () { return true; }, first: true, everyN: 3, why: 'Gündəlik həyat bacarıqlarının ümumi profili; hər 3 ayda bir yenilənir.' },
+    { id: 'sensory-profile-2', pri: 3, who: 'ergoterapevt', min: 20, when: function (p) { return p.needs.sensory >= 1; }, first: true, everyN: 3, why: 'Sensor xüsusiyyətlər qeyd olunub: ergoterapiya planının əsası.' },
+    { id: 'ttap', pri: 3, who: 'psixoloq', min: 60, when: function (p) { return p.ageM != null && p.ageM >= 144 && p.dx.indexOf('asd') >= 0; }, first: true, everyN: 3, why: 'Yeniyetmə yaşında funksional keçid bacarıqları.' },
+    { id: 'vb-mapp', pri: 2, who: 'psixoloq', min: 60, when: function (p) { return p.ageM != null && p.ageM <= 120 && (p.dx.indexOf('asd') >= 0 || p.dx.indexOf('speech') >= 0 || p.dx.indexOf('gdd') >= 0 || p.needs.expressive >= 2); }, phases: ['baseline', 'mid', 'retest'], retestFocus: true, why: 'Nitq və öyrənmə bacarıqlarının mərhələ üzrə izlənməsi. Təkrar yoxlamada yalnız fokus sahələr götürülür.' },
+    { id: 'afls', pri: 3, who: 'ergoterapevt', min: 40, when: function (p) { return p.needs.selfcare >= 2 || p.needs.toilet >= 2; }, first: true, everyN: 3, why: 'Özünəxidmət çatışmazlığı var: funksional həyat bacarıqlarının ölçülməsi.' },
+    { id: 'fba', pri: 2, who: 'psixoloq', min: 30, when: function (p) { return p.needs.behavior >= 2; }, phases: ['baseline', 'mid', 'retest'], why: 'Problem davranış var: funksiyanın təyini və tezliyin aylıq müqayisəsi.' },
+    { id: 'scared', pri: 3, who: 'psixoloq', min: 15, when: function (p) { return p.ageM != null && p.ageM >= 96 && p.ageM <= 216 && p.needs.anxiety >= 2; }, phases: ['baseline', 'mid', 'retest'], why: 'Narahatlıq əlamətləri: şkala ilə aylıq dəyişikliyin izlənməsi.' },
+    { id: 'cbt-klinik', pri: 3, who: 'psixoloq', min: 20, when: function (p) { return p.ageM != null && p.ageM >= 72 && (p.needs.emotion >= 2 || p.needs.anxiety >= 1); }, phases: ['baseline', 'mid', 'retest'], why: 'Emosional-davranış sahəsinin valideyn, uşaq və müəllim formaları ilə yoxlanması.' },
+    { id: 'y-bocs', pri: 2, who: 'psixoloq', min: 40, when: function (p) { return p.dx.indexOf('ocd') >= 0; }, phases: ['baseline', 'mid', 'retest'], why: 'Obsessiv-kompulsiv əlamətlər: şiddətin aylıq ölçülməsi (uşaqlar üçün CY-BOCS versiyası).' }
   ];
+
+  var TEST_CAP = { baseline: 4, mid: 2, retest: 2 };
 
   function retestDays(sdates) {
     var late = sdates.filter(function (s) { return s.day >= 26; });
     return late.length ? late.slice(-3) : sdates.slice(-1);
   }
 
-  function selectTests(p, catalog, cycle, sdates, prior) {
+  function selectTests(p, catalog, cycle, sdates, prior, notes) {
     var out = [];
     if (!sdates.length) return out;
     var first3 = sdates.slice(0, 5);
@@ -480,19 +481,30 @@
         min: rule.min, link: c.link || '', licensed: !!c.lisenziyali, reason: rule.why + (extra ? ' ' + extra : '')
       });
     }
-    TEST_RULES.slice().sort(function (a, b) { return b.min - a.min; }).forEach(function (r) {
+    var cand = [];
+    TEST_RULES.forEach(function (r) {
       if (!catalog[r.id] || !r.when(p)) return;
       var phases = r.phases;
       if (!phases) {
         var due = r.everyN ? ((cycle - 1) % r.everyN === 0) : (r.first && cycle === 1);
-        if (!due) return;
-        place(first3, r, 'baseline', cycle > 1 ? 'Planlı yenidən qiymətləndirmə.' : '');
+        if (due) cand.push({ r: r, phase: 'baseline', days: first3, extra: cycle > 1 ? 'Planlı yenidən qiymətləndirmə.' : '' });
         return;
       }
-      if (phases.indexOf('baseline') >= 0 && cycle === 1) place(first3, r, 'baseline');
-      if (phases.indexOf('mid') >= 0) place(midDays, r, 'mid', r.phases.indexOf('retest') >= 0 ? 'Ara yoxlama: eyni test qısa formada, yalnız dəyişikliyi görmək üçün.' : '');
-      if (phases.indexOf('retest') >= 0) place(last3, r, 'retest', r.retestFocus && cycle >= 1 ? 'Yalnız bu dövrdə işlənmiş sahələr üzrə.' : '');
+      if (phases.indexOf('baseline') >= 0 && cycle === 1) cand.push({ r: r, phase: 'baseline', days: first3, extra: '' });
+      if (phases.indexOf('mid') >= 0) cand.push({ r: r, phase: 'mid', days: midDays, extra: phases.indexOf('retest') >= 0 ? 'Ara yoxlama: eyni test qısa formada, yalnız dəyişikliyi görmək üçün.' : '' });
+      if (phases.indexOf('retest') >= 0) cand.push({ r: r, phase: 'retest', days: last3, extra: r.retestFocus ? 'Yalnız bu dövrdə işlənmiş sahələr üzrə.' : '' });
     });
+    var kept = [], skipped = {};
+    ['baseline', 'mid', 'retest'].forEach(function (ph) {
+      var list = cand.filter(function (c) { return c.phase === ph; })
+        .sort(function (a, b) { return a.r.pri - b.r.pri || a.r.min - b.r.min; });
+      list.forEach(function (c, i) {
+        if (i < TEST_CAP[ph]) { kept.push(c); skipped[c.r.id] = false; }
+        else skipped[c.r.id] = (skipped[c.r.id] !== false);
+      });
+    });
+    kept.sort(function (a, b) { return b.r.min - a.r.min; }).forEach(function (c) { place(c.days, c.r, c.phase, c.extra); });
+    if (notes) Object.keys(skipped).filter(function (id) { return skipped[id]; }).forEach(function (id) { notes.push((catalog[id] && catalog[id].ad) || id); });
     out.sort(function (a, b) { return a.day - b.day || (a.id < b.id ? -1 : 1); });
     return out;
   }
@@ -568,13 +580,17 @@
       return { n: w, theme: themes[w - 1], from: from, to: to, fromDate: toISO(addDays(parseISO(start), from - 1)), toDate: toISO(addDays(parseISO(start), to - 1)) };
     });
 
+    var skippedTests = [];
+    var tests = selectTests(p, catalog, cycle, sdates, prior, skippedTests);
+    var planWarnings = p.warnings.slice();
+    if (skippedTests.length) planWarnings.push('Plan həddindən artıq yüklənməsin deyə bu dövrdə növbəti testlər planlaşdırılmayıb: ' + skippedTests.join(', ') + '. Mütəxəssis lazım bilərsə, əlavə edə bilər.');
     var plan = {
       v: ENGINE_VERSION, bankVersion: bank.version || 0, cycle: cycle, childKey: childKey, seed: seed,
       createdAt: opts.now || new Date().toISOString(), start: start, end: toISO(addDays(parseISO(start), CYCLE_DAYS - 1)),
       nextStart: toISO(addDays(parseISO(start), CYCLE_DAYS)),
       profile: p, sessionMin: sm, weeks: weeks, sessions: sessions, home: home,
-      tests: selectTests(p, catalog, cycle, sdates, prior),
-      goals: buildGoals(bank, p, form.ad), warnings: p.warnings,
+      tests: tests,
+      goals: buildGoals(bank, p, form.ad), warnings: planWarnings,
       coverage: pools
     };
     return plan;
