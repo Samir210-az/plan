@@ -236,10 +236,27 @@
         '<td data-l="Mərhələ">' + esc(X.PHASE[t.phase]) + '</td><td data-l="Kim aparır">' + esc(X.SPEC_LABEL[t.who] || t.who) + (t.licensed ? '<br><span class="muted">lisenziyalı mütəxəssis</span>' : '') + '<br><span class="muted">~' + t.min + ' dəq</span></td>' +
         '<td data-l="Niyə" class="why">' + esc(t.reason) + '</td>' +
         '<td data-l="Nəticə"><input class="mini" aria-label="' + esc(t.name) + ' nəticə" data-test="' + esc(t.id) + '" data-phase="' + esc(t.phase) + '" data-f="score" value="' + esc(r.score || '') + '" placeholder="bal / nəticə">' +
-        '<input class="mini" aria-label="' + esc(t.name) + ' qeyd" data-test="' + esc(t.id) + '" data-phase="' + esc(t.phase) + '" data-f="note" value="' + esc(r.note || '') + '" placeholder="qeyd"></td></tr>';
+        '<input class="mini" aria-label="' + esc(t.name) + ' qeyd" data-test="' + esc(t.id) + '" data-phase="' + esc(t.phase) + '" data-f="note" value="' + esc(r.note || '') + '" placeholder="qeyd">' +
+        (r.score || r.note ? '<button type="button" class="btn btn-ghost btn-sm" data-action="del-test" data-test="' + esc(t.id) + '" data-phase="' + esc(t.phase) + '" aria-label="' + esc(t.name) + ' nəticəsini sil">Nəticəni sil</button>' : '') + '</td></tr>';
     }).join('');
+    var any = p.tests.some(function (t) { var r = res[t.id] && res[t.id][t.phase]; return r && (r.score || r.note); });
     $('testsBody').innerHTML = '<p class="hint">Testlər 1-ci həftədə (başlanğıc), təxminən 15-ci gündə (ara) və ayın sonunda (yekun) planlaşdırılır, yəni hər 10-15 gündən bir. Nəticəni daxil edin: növbəti dövr planı və müqayisə bunlara əsaslanır.' + (cur.cycle.n > 1 ? ' IQ və Vineland kimi testlər hər ay təkrarlanmır.' : '') + '</p>' +
-      '<div class="table-wrap"><table class="tbl"><thead><tr><th>Tarix</th><th>Test</th><th>Mərhələ</th><th>Kim aparır</th><th>Niyə</th><th>Nəticə</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + (X.deferredNote(p) ? '<p class="muted small">' + esc(X.deferredNote(p)) + '</p>' : '');
+      '<div class="table-wrap"><table class="tbl"><thead><tr><th>Tarix</th><th>Test</th><th>Mərhələ</th><th>Kim aparır</th><th>Niyə</th><th>Nəticə</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + (X.deferredNote(p) ? '<p class="muted small">' + esc(X.deferredNote(p)) + '</p>' : '') +
+      (any ? '<p class="no-print"><button type="button" class="btn btn-ghost btn-sm" data-action="del-all-tests">Bütün test nəticələrini sil</button></p>' : '');
+  }
+  function delTest(id, ph) {
+    if (!window.confirm('Bu testin daxil edilmiş nəticəsi silinsin?')) return;
+    saveCheck(store.updateCycle(state.childKey, state.cycleN, function (cy) {
+      if (!cy.results || !cy.results[id]) return;
+      delete cy.results[id][ph];
+      if (!Object.keys(cy.results[id]).length) delete cy.results[id];
+    }));
+    renderPlan();
+  }
+  function delAllTests() {
+    if (!window.confirm('Bu dövrdə daxil edilmiş BÜTÜN test nəticələri silinsin? Bu əməliyyat geri qaytarılmır.')) return;
+    saveCheck(store.updateCycle(state.childKey, state.cycleN, function (cy) { cy.results = {}; }));
+    renderPlan();
   }
 
   function paintWeeks(p) {
@@ -344,6 +361,8 @@
     else if (a === 'new-assessment') newAssessment();
     else if (a === 'print') withCur(function (c, b) { showDoc(X.fullHtml(c.form(), c.cycle, b), fname(c, 'plan', 'html')); });
     else if (a === 'spec-print') withCur(function (c, b) { showDoc(X.specialistHtml(c.form(), c.cycle, b, { spec: $('specSel').value, week: +$('specPeriod').value || 0, perSession: $('specPerSession').checked }), fname(c, 'mutexessis-' + $('specSel').value, 'html')); });
+    else if (a === 'del-test') delTest(t.getAttribute('data-test'), t.getAttribute('data-phase'));
+    else if (a === 'del-all-tests') delAllTests();
     else if (a === 'retime') retime();
     else if (a === 'sig-clear') clearSig();
     else if (a === 'approve') approve();
