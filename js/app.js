@@ -76,8 +76,17 @@
   }
 
   /* ---------- uşaq siyahısı ---------- */
+  function owner() {
+    var u = window.PlanBank && window.PlanBank.state && window.PlanBank.state.user;
+    return u && u.uid || null;
+  }
   function renderChildren() {
-    var list = store.listChildren();
+    var list = store.listChildren(owner());
+    var sel = $('savedSelect');
+    sel.innerHTML = '<option value="">📁 Yaddaşdan uşaq seç…</option>' + list.map(function (c) {
+      return '<option value="' + esc(c.key) + '">' + esc(c.name) + '</option>';
+    }).join('');
+    sel.disabled = !list.length;
     var card = $('childrenCard');
     card.hidden = !list.length;
     $('childrenList').innerHTML = list.map(function (c) {
@@ -94,8 +103,10 @@
     var f = collectForm();
     if (!f.ad || !f.diaqnoz || (!f.dogum && !f.yas)) { toast('Ad, doğum tarixi və əsas diaqnoz mütləq doldurulmalıdır.'); return; }
     if (!f.baslama) { f.baslama = E.todayISO(); $('f_baslama').value = f.baslama; }
-    var key = store.childKey(f);
-    var child = store.getChild(key);
+    var me = owner();
+    if (!me) { askLicense(); return; }
+    var key = store.childKey(f, me);
+    var child = store.getChild(key, me);
     var n = 1, prior = null;
     if (state.pending && state.pending.key === key) { n = state.pending.cycle; prior = state.pending.prior; }
     else if (child && child.cycles.length) {
@@ -110,7 +121,7 @@
       catch (e) { toast('Plan yaradıla bilmədi: ' + e.message); return; }
       var prev = child && child.cycles.filter(function (c) { return c.n === n - 1; })[0];
       var cycle = { n: n, plan: plan, log: {}, results: {}, notes: [], form: f, mode: b.mode, prevResults: prev ? prev.results : null };
-      saveCheck(store.putCycle(f, cycle));
+      saveCheck(store.putCycle(f, cycle, me));
       state.pending = null; state.childKey = key; state.cycleN = n; state.week = 1;
       $('cycleBanner').hidden = true;
       renderChildren(); renderPlan();
@@ -133,7 +144,7 @@
 
   /* ---------- plan göstərişi ---------- */
   function current() {
-    var c = store.getChild(state.childKey);
+    var c = store.getChild(state.childKey, owner());
     if (!c) return null;
     var cy = c.cycles.filter(function (x) { return x.n === state.cycleN; })[0];
     return cy ? { child: c, cycle: cy } : null;
@@ -245,7 +256,7 @@
     var specRows = Object.keys(pr.bySpec).map(function (sp) { return '<span class="badge">' + esc(X.SPEC_LABEL[sp]) + ': ' + pr.bySpec[sp] + '/4</span>'; }).join('');
     var tn = p.tests.length, td = 0, res = cur.cycle.results || {};
     p.tests.forEach(function (t) { if (res[t.id] && res[t.id][t.phase] && res[t.id][t.phase].score) td++; });
-    var prev = store.getChild(state.childKey).cycles.filter(function (c) { return c.n === cur.cycle.n - 1; })[0];
+    var prev = store.getChild(state.childKey, owner()).cycles.filter(function (c) { return c.n === cur.cycle.n - 1; })[0];
     $('reportBody').innerHTML = '<div class="stats"><div><b>' + pr.planned + '</b><span>planlaşdırılan məşğələ</span></div><div><b>' + pr.completionPct + '%</b><span>qeyd olunub</span></div>' +
       '<div><b>' + pr.attendancePct + '%</b><span>iştirak</span></div><div><b>' + (pr.avg == null ? '-' : pr.avg + '/4') + '</b><span>orta müstəqillik</span></div><div><b>' + td + '/' + tn + '</b><span>test nəticəsi daxil edilib</span></div></div>' +
       (specRows ? '<p>' + specRows + '</p>' : '') + (needRows ? '<h3>Sahələr üzrə orta müstəqillik</h3>' + needRows : '<p class="muted">Seans qeydləri daxil edildikcə sahələr üzrə irəliləyiş burada görünəcək.</p>') +
@@ -255,14 +266,14 @@
   function paintCycleBox(cur, pr) {
     var p = cur.cycle.plan, today = E.todayISO();
     var endNear = today >= E.toISO(E.addDays(E.parseISO(p.start), 25));
-    var hasNext = store.getChild(state.childKey).cycles.some(function (c) { return c.n === cur.cycle.n + 1; });
+    var hasNext = store.getChild(state.childKey, owner()).cycles.some(function (c) { return c.n === cur.cycle.n + 1; });
     $('cycleBox').innerHTML = '<p>' + (endNear ? '<b>Dövr başa çatır.</b> ' : '') + 'Yekun testlər aparıldıqdan və nəticələr daxil edildikdən sonra yeni dövrə keçin: forma əvvəlki məlumatlarla dolur, yenilənmiş qiymətləndirməyə görə yeni 30 günlük plan hazırlanır. Seans qeydlərindəki müstəqillik qiymətləri yeni planın başlanğıc səviyyəsini təyin edir.</p>' +
       '<button class="btn btn-primary" data-action="new-cycle" data-key="' + esc(state.childKey) + '">' + (hasNext ? 'Növbəti dövrü yenidən hazırla' : 'Yeni dövr hazırla') + '</button>';
   }
 
   /* ---------- yeni dövr ---------- */
   function startNextCycle(key) {
-    var c = store.getChild(key);
+    var c = store.getChild(key, owner());
     if (!c) return;
     var last = c.cycles[c.cycles.length - 1];
     loadBank().then(function (b) {
@@ -287,7 +298,7 @@
     if (a === 'week') { state.week = +t.getAttribute('data-w'); renderPlan(); }
     else if (a === 'open-child') openChild(key);
     else if (a === 'new-cycle') startNextCycle(key);
-    else if (a === 'del-child') { if (window.confirm('Bu uşağın bütün planları və qeydləri silinsin?')) { saveCheck(store.removeChild(key)); if (state.childKey === key) { state.childKey = null; $('planSection').hidden = true; } renderChildren(); } }
+    else if (a === 'del-child') { if (window.confirm('Bu uşağın bütün planları və qeydləri silinsin?')) { saveCheck(store.removeChild(key, owner())); if (state.childKey === key) { state.childKey = null; $('planSection').hidden = true; } renderChildren(); } }
     else if (a === 'new-assessment') newAssessment();
     else if (a === 'print') withCur(function (c, b) { showDoc(X.fullHtml(c.form(), c.cycle, b), fname(c, 'plan', 'html')); });
     else if (a === 'spec-print') withCur(function (c, b) { showDoc(X.specialistHtml(c.form(), c.cycle, b, { spec: $('specSel').value, week: +$('specPeriod').value || 0, perSession: $('specPerSession').checked }), fname(c, 'mutexessis-' + $('specSel').value, 'html')); });
@@ -369,7 +380,7 @@
   }
 
   function openChild(key) {
-    var c = store.getChild(key);
+    var c = store.getChild(key, owner());
     if (!c) return;
     var last = c.cycles[c.cycles.length - 1];
     state.childKey = key; state.cycleN = last.n; state.week = 1;
@@ -411,6 +422,7 @@
 
   function onChange(ev) {
     var t = ev.target, row = t.closest('.logrow');
+    if (t.id === 'savedSelect') { if (t.value) openChild(t.value); t.value = ''; return; }
     if (row) {
       var key = row.getAttribute('data-key'), parts = key.split('|');
       var field = t.getAttribute('data-f');
@@ -445,11 +457,11 @@
     if (file.size > 20 * 1024 * 1024) { toast('Fayl çox böyükdür.'); return; }
     var r = new FileReader();
     r.onload = function () {
-      var res = store.importData(String(r.result), 'merge');
+      var res = store.importData(String(r.result), 'merge', owner());
       if (!res.ok) { toast(res.error || 'Fayl yüklənmədi'); return; }
       toast('Yükləndi: ' + res.added + ' dövr əlavə olundu.');
       renderChildren();
-      var first = store.listChildren()[0];
+      var first = store.listChildren(owner())[0];
       if (first) openChild(first.key);
     };
     r.readAsText(file);
@@ -484,15 +496,26 @@
     updateSeansInfo();
     if (!safeLocal()) toast('Brauzer yaddaşı əlçatan deyil: qeydlər bu səhifə bağlananda itəcək. Ehtiyat nüsxə yükləyin.');
     state.catalogP = fetch('data/tests-catalog.json').then(function (r) { return r.json(); }).then(function (c) { state.catalog = c; }).catch(function () { state.catalog = {}; });
+    syncOwner();
+    if (window.PlanBank && window.PlanBank.get) window.PlanBank.get().then(syncOwner);
+  }
+
+  function syncOwner() {
+    var me = owner();
+    if (me) store.adoptLegacy(me);
     renderChildren();
-    var list = store.listChildren();
-    if (list.length) { var c = store.getChild(list[0].key); state.childKey = list[0].key; state.cycleN = c.cycles[c.cycles.length - 1].n; $('planSection').hidden = false; renderPlan(); }
-    else $('planSection').hidden = true;
+    var cur = state.childKey && store.getChild(state.childKey, me);
+    if (!cur) {
+      state.childKey = null;
+      var list = store.listChildren(me);
+      if (list.length) { var c = store.getChild(list[0].key, me); state.childKey = list[0].key; state.cycleN = c.cycles[c.cycles.length - 1].n; $('planSection').hidden = false; renderPlan(); }
+      else $('planSection').hidden = true;
+    } else if (!$('planSection').hidden) renderPlan();
   }
 
   function onLicenseChange() {
     state.bank = null;
-    if (state.childKey && !$('planSection').hidden) renderPlan();
+    syncOwner();
     renderModeBanner();
   }
 
