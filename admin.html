@@ -30,12 +30,12 @@ main{max-width:980px;margin:0 auto;padding:20px 16px 60px}
 .msg{margin:10px 0;font-size:14px}.msg.err{color:var(--warn)}.msg.ok{color:var(--ok)}
 [hidden]{display:none!important}
 </style>
-<link rel="icon" id="favicon" href="">
+<link rel="icon" type="image/png" href="img/favicon-96.png">
 <script src="js/brand.js"></script>
 </head>
 <body>
 <header>
-  <h1 style="display:flex;align-items:center;gap:12px"><span id="brandMark" aria-hidden="true"></span>Plan lisenziya paneli</h1>
+  <h1 style="display:flex;align-items:center;gap:12px"><span id="brandMark" style="background:#fff;border-radius:8px;padding:3px 6px;display:inline-flex"></span>Plan lisenziya paneli</h1>
   <div class="actions"><span id="who"></span><button class="btn" id="out" type="button" hidden>Çıxış</button></div>
 </header>
 <main>
@@ -189,6 +189,6 @@ main{max-width:980px;margin:0 auto;padding:20px 16px 60px}
   }
 })();
 </script>
-<script>(function(){var m=document.getElementById('brandMark');if(m&&window.PlanBrand){m.innerHTML=PlanBrand.logo(36,true);document.getElementById('favicon').href=PlanBrand.favicon();}})();</script>
+<script>(function(){var m=document.getElementById('brandMark');if(m&&window.PlanBrand){m.innerHTML=PlanBrand.logo(36);}})();</script>
 </body>
 </html>

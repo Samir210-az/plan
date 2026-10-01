@@ -69,10 +69,10 @@
 
   var CENTER = 'AN Psixoloji Dəstək və Reabilitasiya Mərkəzi';
   function brandRow() {
-    return '<div class="brandrow">' + B.logo(46, false) + '<p class="center">' + CENTER + '</p></div>';
+    return '<div class="brandrow">' + B.logo(56) + '<p class="center">' + CENTER + '</p></div>';
   }
   function miniHead(name, what) {
-    return '<div class="minihead">' + B.logo(26, false) + '<span><b>' + esc(CENTER) + '</b> · ' + esc(name) + ' · ' + esc(what) + '</span></div>';
+    return '<div class="minihead">' + B.logo(26) + '<span><b>' + esc(CENTER) + '</b> · ' + esc(name) + ' · ' + esc(what) + '</span></div>';
   }
 
   function headerHtml(form, cycle) {

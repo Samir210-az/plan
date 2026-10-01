@@ -266,7 +266,7 @@ test('UI: loqo göstərilir və 5 kliklə admin panelinə keçid loqoya bağlıd
   d.dispatchEvent(new w.Event('DOMContentLoaded'));
   await wait(30);
   const logo = d.getElementById('anpLogoTap');
-  assert.ok(logo.querySelector('svg'), 'loqo SVG yerləşib');
+  assert.ok(logo.querySelector('img'), 'loqo şəkli yerləşib');
   assert.strictEqual(d.querySelector('.brand h1').id, '', 'başlıqda tələ yoxdur');
   w.close();
 });

@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" id="favicon" href="">
+<link rel="icon" type="image/png" href="img/favicon-96.png">
+<link rel="apple-touch-icon" href="img/favicon-96.png">
 <meta name="theme-color" content="#0c2f3d">
 <title>Fərdi Reabilitasiya Planı Generatoru | AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</title>
 <style>
@@ -44,11 +45,11 @@ a{color:var(--blue2)}
 .hero-inner{position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:28px; flex-wrap:wrap}
 .brand{display:flex; gap:16px; align-items:center}
 .brand-badge{
-  width:58px;height:58px;border-radius:16px;flex:none;
+  height:62px;min-width:62px;padding:8px 10px;border-radius:16px;flex:none;background:#fff;color:var(--navy);
   display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;
   box-shadow:0 6px 18px rgba(0,0,0,.25); touch-action:manipulation; -webkit-user-select:none; user-select:none;
 }
-.brand-badge svg{display:block;border-radius:16px}
+.brand-badge img{display:block}
 .brand h1{margin:0; font-size:15px; letter-spacing:.5px; font-weight:600; opacity:.85; text-transform:uppercase}
 .brand p{margin:2px 0 0; font-size:13px; opacity:.7}
 .hero-title{font-size:clamp(28px,4vw,42px); font-weight:800; margin:26px 0 6px; letter-spacing:-.5px}
@@ -287,9 +288,7 @@ body.viewing{overflow:hidden}
 (function(){
   document.addEventListener('DOMContentLoaded', function(){
     var tapEl = document.getElementById('anpLogoTap');
-    if(tapEl && window.PlanBrand){ tapEl.innerHTML = PlanBrand.logo(58, true); tapEl.style.cssText = 'cursor:default'; }
-    var fav = document.getElementById('favicon');
-    if(fav && window.PlanBrand) fav.href = PlanBrand.favicon();
+    if(tapEl && window.PlanBrand){ tapEl.innerHTML = PlanBrand.logo(46); tapEl.style.cssText = 'cursor:default'; }
     if(tapEl){
       var tapCount = 0, tapTimer = null;
       tapEl.addEventListener('click', function(){

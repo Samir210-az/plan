@@ -306,10 +306,10 @@ test('loqo: bütün çıxarışların başlığında və hər seans səhifəsind
   const f = { ad: 'Həsən', soyad: 'H', dogum: '2018-10-18', diaqnoz: 'Autizm', baslama: '2026-11-01' };
   const plan = E.generate(f, demo, { catalog: {}, today: '2026-10-02' });
   const cy = { n: 1, plan, log: {}, results: {} };
-  assert.match(X.fullHtml(f, cy, demo), /class="brandrow"><svg/);
-  assert.match(X.parentHtml(f, cy, demo), /class="brandrow"><svg/);
+  assert.match(X.fullHtml(f, cy, demo), /class="brandrow"><img/);
+  assert.match(X.parentHtml(f, cy, demo), /class="brandrow"><img/);
   const sp = X.specialistHtml(f, cy, demo, { spec: 'psixoloq', week: 0, perSession: true });
-  assert.match(sp, /class="brandrow"><svg/);
+  assert.match(sp, /class="brandrow"><img/);
   const mini = (sp.match(/class="minihead"/g) || []).length;
   const pages = (sp.match(/class="day newpage"/g) || []).length;
   assert.ok(pages > 5 && mini === pages, 'hər yeni səhifədə kiçik başlıq var');
