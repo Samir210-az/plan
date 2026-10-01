@@ -260,6 +260,7 @@ test('ixrac başlığı: uşaq, yaş, mərkəz və mütəxəssis adı', () => {
   const html = X.fullHtml(f, { n: 1, plan, log: {}, results: {} }, demo);
   assert.match(html, /AN Psixoloji Dəstək və Reabilitasiya Mərkəzi/);
   assert.match(html, /Həsən Həsənov, 8 yaş · Reabilitasiya Planı/);
+  assert.strictEqual((html.match(/class="appr /g) || []).length, 1, 'təsdiq bloku yalnız planın başında olur');
   assert.match(html, /Kurator mütəxəssis: <b>Axundova Nahidə<\/b>/);
 });
 
