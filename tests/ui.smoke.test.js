@@ -18,7 +18,7 @@ function boot(mode, user) {
   w.URL.createObjectURL = () => 'blob:x'; w.URL.revokeObjectURL = () => {};
   const demoBank = JSON.parse(fs.readFileSync(path.join(root, 'data/demo-bank.json'), 'utf8'));
   w.PlanBank = { state: { user: user === undefined ? { uid: 'u1' } : user }, get: () => Promise.resolve({ bank: demoBank, mode: mode || 'full' }) };
-  ['engine', 'storage', 'exports', 'app'].forEach(n => w.eval(fs.readFileSync(path.join(root, 'js', n + '.js'), 'utf8')));
+  ['brand', 'engine', 'storage', 'exports', 'app'].forEach(n => w.eval(fs.readFileSync(path.join(root, 'js', n + '.js'), 'utf8')));
   return w;
 }
 const wait = (ms) => new Promise(r => setTimeout(r, ms));
@@ -255,5 +255,18 @@ test('UI: köhnə (40 dəq) plan üçün 45-ə yenilə düyməsi', { skip: !JSDO
   await wait(100);
   assert.strictEqual(d.getElementById('lenNote').textContent, '');
   assert.strictEqual(Object.values(JSON.parse(w.localStorage.getItem('an_rehab_v2')).children)[0].cycles[0].plan.sessionMin, 45);
+  w.close();
+});
+
+test('UI: loqo göstərilir və 5 kliklə admin panelinə keçid loqoya bağlıdır', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {
+  const w = boot();
+  const d = w.document;
+  const inline = fs.readFileSync(path.join(root, 'index.html'), 'utf8').match(/<script>\s*(\(function\(\)\{[\s\S]*?)<\/script>/)[1];
+  w.eval(inline);
+  d.dispatchEvent(new w.Event('DOMContentLoaded'));
+  await wait(30);
+  const logo = d.getElementById('anpLogoTap');
+  assert.ok(logo.querySelector('svg'), 'loqo SVG yerləşib');
+  assert.strictEqual(d.querySelector('.brand h1').id, '', 'başlıqda tələ yoxdur');
   w.close();
 });

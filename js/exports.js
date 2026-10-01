@@ -1,7 +1,7 @@
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory(require('./engine.js'));
-  else root.PlanExports = factory(root.Engine);
-})(typeof self !== 'undefined' ? self : this, function (E) {
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('./engine.js'), require('./brand.js'));
+  else root.PlanExports = factory(root.Engine, root.PlanBrand);
+})(typeof self !== 'undefined' ? self : this, function (E, B) {
   'use strict';
 
   var SPEC_LABEL = { psixoloq: 'Klinik psixoloq', loqoped: 'Loqoped', ergoterapevt: 'Erqoterapevt', pedaqoq: 'Psixopedaqoq', valideyn: 'Valideyn (ev proqramı)' };
@@ -40,30 +40,44 @@
       '</div>';
   }
 
-  var CSS = 'body{font-family:Segoe UI,Arial,sans-serif;color:#1b2733;line-height:1.5;font-size:13px;margin:24px}' +
-    '.center{margin:0 0 6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#1e5aa8;font-weight:700}h1{font-size:22px;color:#0b2545;margin:0 0 4px}h2{font-size:17px;color:#1e5aa8;border-bottom:2px solid #dbe6f3;padding-bottom:4px;margin-top:26px}' +
-    'h3{font-size:14px;background:#eaf3ff;padding:6px 10px;border-radius:6px;margin:16px 0 6px}h4{font-size:13px;margin:10px 0 4px;color:#0b2545}' +
-    '.lv{font-weight:400;color:#5c7089;font-size:11px}.act{border:1px solid #dbe6f3;border-radius:8px;padding:8px 12px;margin:8px 0}' +
+  var CSS = 'body{font-family:Segoe UI,Arial,sans-serif;color:#1d2a30;line-height:1.5;font-size:13px;margin:24px}' +
+    '.center{margin:0 0 6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#0e6a82;font-weight:700}h1{font-size:22px;color:#0c2f3d;margin:0 0 4px}h2{font-size:17px;color:#0e6a82;border-bottom:2px solid #e1ddd1;padding-bottom:4px;margin-top:26px}' +
+    'h3{font-size:14px;background:#e8f3f5;padding:6px 10px;border-radius:6px;margin:16px 0 6px}h4{font-size:13px;margin:10px 0 4px;color:#0c2f3d}' +
+    '.lv{font-weight:400;color:#5d6b72;font-size:11px}.act{border:1px solid #e1ddd1;border-radius:8px;padding:8px 12px;margin:8px 0}' +
     '.act p{margin:3px 0}.act ol,.act ul{margin:3px 0 3px 18px;padding:0}table{border-collapse:collapse;width:100%;margin:8px 0}' +
-    'td,th{border:1px solid #c9d8ea;padding:5px 7px;text-align:left;vertical-align:top;font-size:12px}th{background:#eaf3ff}' +
-    '.warn{border:2px solid #c0392b;background:#fdecea;padding:8px 12px;border-radius:8px;margin:8px 0}.muted{color:#5c7089}' +
-    '.day{margin-top:14px}.newpage{page-break-before:always}.recbox{border:1px dashed #9db4d0;border-radius:8px;padding:6px 12px;margin:-2px 0 10px;page-break-inside:avoid}.rec{margin:4px 0}.line{display:inline-block;border-bottom:1px solid #7b8fa8;width:70%}h2,h3,h4{page-break-after:avoid}.act p,.act li{orphans:3;widows:3}tr{page-break-inside:avoid}' +
-    '.appr{border:2px solid;border-radius:8px;padding:8px 12px;margin:10px 0;page-break-inside:avoid}.appr.ok{border-color:#1f7a4d;background:#eaf7f0}.appr.wait{border-color:#c0392b;background:#fdecea}.appr .sig{margin-top:14px}' +
-    '@page{margin:14mm}footer{margin-top:30px;font-size:11px;color:#5c7089;border-top:1px solid #dbe6f3;padding-top:8px}';
+    'td,th{border:1px solid #d9d4c6;padding:5px 7px;text-align:left;vertical-align:top;font-size:12px}th{background:#e8f3f5}' +
+    '.warn{border:2px solid #c0392b;background:#fdecea;padding:8px 12px;border-radius:8px;margin:8px 0}.muted{color:#5d6b72}' +
+    '.day{margin-top:14px}.newpage{page-break-before:always}.recbox{border:1px dashed #b3ad9c;border-radius:8px;padding:6px 12px;margin:-2px 0 10px;page-break-inside:avoid}.rec{margin:4px 0}.line{display:inline-block;border-bottom:1px solid #8d8776;width:70%}h2,h3,h4{page-break-after:avoid}.act p,.act li{orphans:3;widows:3}tr{page-break-inside:avoid}' +
+    '.appr{border:2px solid;border-radius:8px;padding:8px 12px;margin:10px 0;page-break-inside:avoid}.appr.ok{border-color:#1f7a4d;background:#eaf7f0}.appr.wait{border-color:#c0392b;background:#fdecea}.appr .sig{margin-top:14px}.sigimg{height:56px;vertical-align:middle}' +
+    '.brandrow{display:flex;align-items:center;gap:12px;margin:0 0 8px}.brandrow .center{margin:0}.minihead{display:flex;align-items:center;gap:10px;border-bottom:2px solid #e1ddd1;padding-bottom:8px;margin-bottom:10px;font-size:12px;color:#5d6b72}' +
+    '@page{margin:14mm}footer{margin-top:30px;font-size:11px;color:#5d6b72;border-top:1px solid #e1ddd1;padding-top:8px}';
+
+  function safeSig(s) {
+    return typeof s === 'string' && s.length < 60000 && /^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(s) ? s : '';
+  }
 
   function approvalHtml(cycle) {
     var a = cycle && cycle.approval;
     if (a && a.by) {
+      var sig = safeSig(a.sig);
       return '<div class="appr ok"><b>Təsdiq edilib.</b> ' + esc(a.by) + (a.role ? ' (' + esc(a.role) + ')' : '') + ' · ' + fmtDate(a.at) +
-        '<div class="sig">İmza: ______________________</div></div>';
+        '<div class="sig">İmza: ' + (sig ? '<img class="sigimg" alt="İmza" src="' + sig + '">' : '______________________') + '</div></div>';
     }
     return '<div class="appr wait"><b>Təsdiq gözlənilir (qaralama).</b> Plan mərkəz rəhbərliyi tərəfindən təsdiqlənənədək tətbiq edilməməlidir.' +
       '<div class="sig">Mərkəz müdiri: ______________________ &nbsp; İmza: ____________ &nbsp; Tarix: ____________</div></div>';
   }
 
+  var CENTER = 'AN Psixoloji Dəstək və Reabilitasiya Mərkəzi';
+  function brandRow() {
+    return '<div class="brandrow">' + B.logo(46, false) + '<p class="center">' + CENTER + '</p></div>';
+  }
+  function miniHead(name, what) {
+    return '<div class="minihead">' + B.logo(26, false) + '<span><b>' + esc(CENTER) + '</b> · ' + esc(name) + ' · ' + esc(what) + '</span></div>';
+  }
+
   function headerHtml(form, cycle) {
     var p = cycle.plan, name = [form.ad, form.soyad].filter(Boolean).join(' ');
-    return '<p class="center">AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</p>' +
+    return brandRow() +
       '<h1>' + esc(name) + ', ' + esc(p.profile.ageLabel) + ' · Reabilitasiya Planı</h1>' +
       '<p class="muted">' + (form.kurator ? 'Kurator mütəxəssis: <b>' + esc(form.kurator) + '</b> · ' : '') +
       'Dövr ' + cycle.n + ' · ' + fmtDate(p.start) + ' – ' + fmtDate(p.end) + ' · həftədə ' + p.profile.sessionsPerWeek + ' seans (ayda ' + p.sessions.length + ')' +
@@ -93,7 +107,7 @@
     var tests = p.tests.filter(function (t) { return t.who === sp && (!wk || (t.day >= wk.from && t.day <= wk.to)); });
     var title = SPEC_LABEL[sp] + ' planı · ' + (wk ? 'həftə ' + wk.n + ' (' + fmtDate(wk.fromDate) + ' – ' + fmtDate(wk.toDate) + ')' : 'bütün ay');
     var name = [form.ad, form.soyad].filter(Boolean).join(' ');
-    var out = '<p class="center">AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</p>' +
+    var out = brandRow() +
       '<h1>' + esc(name) + ', ' + esc(p.profile.ageLabel) + ' · ' + esc(title) + '</h1>' +
       '<p class="muted">' + (form.kurator ? 'Kurator mütəxəssis: <b>' + esc(form.kurator) + '</b> · ' : '') + 'Dövr ' + cycle.n + ' · ' + fmtDate(p.start) + ' – ' + fmtDate(p.end) +
       (form.diaqnoz ? ' · Diaqnoz: ' + esc(form.diaqnoz) : '') + ' · seans ' + p.sessionMin + ' dəq</p>' + approvalHtml(cycle) + warningsHtml(p);
@@ -106,7 +120,7 @@
     out += '<h2>Seanslar</h2>';
     sess.forEach(function (s, i) {
       var it = s.items[sp];
-      out += '<div class="day' + (opts.perSession && i > 0 ? ' newpage' : '') + '"><h3>' + fmtDate(s.date) + ', ' + esc(WD[s.weekday]) + ' (gün ' + s.day + ', həftə ' + s.week + ')' +
+      out += '<div class="day' + (opts.perSession && i > 0 ? ' newpage' : '') + '">' + (opts.perSession && i > 0 ? miniHead(name, SPEC_LABEL[sp]) : '') + '<h3>' + fmtDate(s.date) + ', ' + esc(WD[s.weekday]) + ' (gün ' + s.day + ', həftə ' + s.week + ')' +
         (it.kind === 'baseline' ? ' · tanışlıq seansı' : it.kind === 'retest' ? ' · yekun mərhələ' : '') + '</h3>';
       var dt = p.tests.filter(function (t) { return t.day === s.day && t.who === sp; });
       if (dt.length) out += '<p><b>Bu gün test:</b> ' + dt.map(function (t) { return esc(t.name + ' (' + PHASE[t.phase] + ', ~' + t.min + ' dəq)'); }).join(', ') + '</p>';
@@ -224,6 +238,6 @@
     return out;
   }
 
-  return { specialistHtml: specialistHtml, deferredNote: deferredNote, approvalHtml: approvalHtml, esc: esc, fmtDate: fmtDate, wdName: wdName, fullHtml: fullHtml, parentHtml: parentHtml, activityBlock: activityBlock,
+  return { safeSig: safeSig, specialistHtml: specialistHtml, deferredNote: deferredNote, approvalHtml: approvalHtml, esc: esc, fmtDate: fmtDate, wdName: wdName, fullHtml: fullHtml, parentHtml: parentHtml, activityBlock: activityBlock,
     comparisonHtml: comparisonHtml, flatResults: flat, SPEC_LABEL: SPEC_LABEL, PHASE: PHASE, LV: LV, WD: WD, testsHtml: testsHtml, needsHtml: needsHtml, goalsHtml: goalsHtml, warningsHtml: warningsHtml };
 });
