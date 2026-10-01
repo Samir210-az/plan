@@ -19,6 +19,15 @@
     "plan_bank": {
       ".read": "auth != null && ((auth.token.email === 'samir.akhundoff@gmail.com' && auth.token.email_verified === true) || root.child('plan_licenses').child(auth.uid).child('expiresAt').val() > now)",
       ".write": "auth != null && auth.token.email === 'samir.akhundoff@gmail.com' && auth.token.email_verified === true"
+    },
+    "plan_children": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$ck": {
+          ".write": "auth != null && auth.uid === $uid && root.child('plan_licenses').child($uid).child('expiresAt').val() > now",
+          ".validate": "newData.hasChildren(['json', 'mt']) && newData.child('json').isString() && newData.child('json').val().length <= 3000000 && newData.child('mt').isNumber()"
+        }
+      }
     }
   }
 }

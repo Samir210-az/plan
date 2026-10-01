@@ -55,5 +55,5 @@ test('plan_requests: istifadəçi yalnız öz uid-i altında və öz e-poçtu il
 });
 
 test('qaydalar fraqmenti mövcud qaydaları ələ keçirmir: yalnız plan_* açarları', () => {
-  assert.deepStrictEqual(Object.keys(rules).sort(), ['plan_bank', 'plan_licenses', 'plan_requests']);
+  assert.deepStrictEqual(Object.keys(rules).sort(), ['plan_bank', 'plan_children', 'plan_licenses', 'plan_requests']);
 });

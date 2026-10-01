@@ -66,6 +66,8 @@
       var c = d.children[key] || { key: key, form: form, cycles: [] };
       c.form = form;
       if (owner) c.owner = owner;
+      cycle.mt = c.mt = Date.now();
+      if (d.deleted) delete d.deleted[key];
       var i = -1;
       c.cycles.forEach(function (x, idx) { if (x.n === cycle.n) i = idx; });
       if (i >= 0) c.cycles[i] = cycle; else c.cycles.push(cycle);
@@ -88,7 +90,7 @@
         var c = d.children[k];
         if (c.owner) return;
         var nk = childKey(c.form, owner);
-        c.owner = owner; c.key = nk;
+        c.owner = owner; c.key = nk; c.mt = c.mt || Date.now();
         if (d.children[nk]) { var ex = d.children[nk]; c.cycles.forEach(function (cy) { if (!ex.cycles.some(function (x) { return x.n === cy.n; })) ex.cycles.push(cy); }); ex.cycles.sort(function (a, b) { return a.n - b.n; }); }
         else d.children[nk] = c;
         delete d.children[k]; n++;
@@ -104,6 +106,7 @@
       var cy = c.cycles.filter(function (x) { return x.n === n; })[0];
       if (!cy) return { ok: false, error: 'missing' };
       fn(cy);
+      cy.mt = c.mt = Date.now();
       return save(d);
     }
 
@@ -111,6 +114,8 @@
       var d = load();
       if (owner && d.children[key] && d.children[key].owner !== owner) return { ok: false, error: 'forbidden' };
       delete d.children[key];
+      d.deleted = d.deleted || {};
+      d.deleted[key] = Date.now();
       return save(d);
     }
 
@@ -126,13 +131,15 @@
       Object.keys(parsed.children).forEach(function (k0) {
         var inc = parsed.children[k0];
         var k = owner ? childKey(inc.form, owner) : k0;
-        if (owner) { inc.owner = owner; inc.key = k; }
+        if (owner) { inc.owner = owner; inc.key = k; inc.mt = Date.now(); if (cur.deleted) delete cur.deleted[k]; }
         if (!cur.children[k]) { cur.children[k] = inc; added += inc.cycles.length; return; }
+        var before = added;
         inc.cycles.forEach(function (cy) {
           var exists = cur.children[k].cycles.some(function (x) { return x.n === cy.n; });
-          if (!exists) { cur.children[k].cycles.push(cy); added++; }
+          if (!exists) { cy.mt = Date.now(); cur.children[k].cycles.push(cy); added++; }
         });
         cur.children[k].cycles.sort(function (a, b) { return a.n - b.n; });
+        if (added > before) cur.children[k].mt = Date.now();
       });
       var r = save(cur);
       r.added = added;

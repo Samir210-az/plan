@@ -147,6 +147,7 @@ main{padding:36px 0 80px}
 .goal-card ul{margin:0; padding-left:18px; font-size:14px}
 .goal-card li{margin-bottom:6px}
 
+.sync-bad{color:#b3261e}
 .appr-box{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.appr-box.ok{border-color:#1f7a4d;background:#eaf7f0}.appr-box.wait{border-color:#c0392b;background:#fff6f5}.appr-box input[type=checkbox]{flex:none;min-width:0;width:18px;height:18px;padding:0;margin:0 6px 0 0}.appr-box label{display:inline-flex;align-items:center}.appr-box select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}.appr-box input{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;min-width:160px;flex:1}
 .week-nav{display:flex; gap:8px; flex-wrap:wrap; margin:20px 0 8px}
 .week-btn{
@@ -323,7 +324,8 @@ body.viewing{overflow:hidden}
 
   <div class="card" id="childrenCard" hidden>
     <h2><span class="num">&#9662;</span> Qeydə alınmış uşaqlar</h2>
-    <div class="hint">Plan və seans qeydləri bu brauzerdə saxlanılır. Düzənli olaraq ehtiyat nüsxə yükləyin.</div>
+    <div class="hint">Qeydlər daxil olduğunuz Google hesabına bağlıdır: yalnız siz görürsünüz və başqa cihazdan eyni hesabla daxil olduqda da açılır. Yenə də ara-sıra ehtiyat nüsxə yükləyin.</div>
+    <div class="hint no-print" id="syncState" role="status"></div>
     <div id="childrenList"></div>
     <div class="no-print" style="margin:14px 0 18px;display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn btn-outline btn-sm" data-action="backup">Ehtiyat nüsxə yüklə</button>
@@ -577,6 +579,7 @@ body.viewing{overflow:hidden}
 
 <script src="js/engine.js"></script>
 <script src="js/storage.js"></script>
+<script src="js/sync.js"></script>
 <script src="js/exports.js"></script>
 <script src="js/license.js"></script>
 <script src="js/app.js"></script>

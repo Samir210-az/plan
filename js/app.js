@@ -18,7 +18,53 @@
   function $(id) { return document.getElementById(id); }
   function toast(msg) { var t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('show'); }, 3200); }
 
+  var cloud = { sync: null, at: 0, touched: {}, timer: null };
+  function setSyncState(text, bad) {
+    var el = $('syncState');
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'hint no-print' + (bad ? ' sync-bad' : '');
+  }
+  function cloudApi() {
+    var B = window.PlanBank;
+    if (!cloud.sync && window.PlanSync && B && B.firebaseReady) {
+      var db = function () { return B.firebaseReady().then(function (fb) { return fb.database(); }); };
+      cloud.sync = window.PlanSync.create(store, {
+        fetchAll: function (uid) { return db().then(function (d) { return d.ref('plan_children/' + uid).once('value'); }).then(function (s) { return s.val() || {}; }); },
+        put: function (uid, rk, node) { return db().then(function (d) { return d.ref('plan_children/' + uid + '/' + rk).set(node); }); }
+      }, window.PlanStorage.validate);
+    }
+    return cloud.sync;
+  }
+  function cloudFail(e) {
+    var denied = e && /permission|PERMISSION/.test(String(e.code || e.message || ''));
+    setSyncState(denied ? 'Bulud sinxronu işləmir: lisenziya aktiv deyil və ya Firebase qaydaları yayımlanmayıb. Qeydlər yalnız bu cihazdadır.' : 'Bulud əlçatmazdır, qeydlər bu cihazda saxlanılır və internet gələndə göndəriləcək.', true);
+  }
+  function cloudSync() {
+    var me = owner(), api = cloudApi();
+    if (!me || !api) return Promise.resolve();
+    setSyncState('Bulud ilə sinxronlaşdırılır…');
+    return api.fullSync(me).then(function (r) {
+      cloud.at = Date.now();
+      if (r.ok === false) { setSyncState('Bu cihazın yaddaşı sinxron üçün oxuna bilmədi.', true); return; }
+      var t = new Date(); setSyncState('Bulud ilə sinxronlaşdırıldı: ' + ('0' + t.getHours()).slice(-2) + ':' + ('0' + t.getMinutes()).slice(-2) + '. Qeydlər hesabınızla bağlıdır və başqa cihazdan da görünür.');
+      if (r.pulled || r.removed) syncOwner();
+    }).catch(cloudFail);
+  }
+  function touch(key) {
+    if (!key || !owner() || !cloudApi()) return;
+    cloud.touched[key] = 1;
+    clearTimeout(cloud.timer);
+    cloud.timer = setTimeout(function () {
+      var keys = Object.keys(cloud.touched), me = owner(), api = cloudApi();
+      cloud.touched = {};
+      if (!me || !api) return;
+      Promise.all(keys.map(function (k) { return api.push(me, k); })).then(function () { cloud.at = Date.now(); }).catch(cloudFail);
+    }, 1200);
+  }
+
   function saveCheck(r) {
+    if (r && r.ok !== false) touch(r.key || state.childKey);
     if (r && r.ok === false) toast(r.error === 'quota' ? 'Brauzer yaddaşı doludur. Ehtiyat nüsxəni yükləyib köhnə qeydləri silin.' : 'Yaddaşa yazmaq mümkün olmadı. Ehtiyat nüsxə yükləyin.');
     return r;
   }
@@ -298,7 +344,7 @@
     if (a === 'week') { state.week = +t.getAttribute('data-w'); renderPlan(); }
     else if (a === 'open-child') openChild(key);
     else if (a === 'new-cycle') startNextCycle(key);
-    else if (a === 'del-child') { if (window.confirm('Bu uşağın bütün planları və qeydləri silinsin?')) { saveCheck(store.removeChild(key, owner())); if (state.childKey === key) { state.childKey = null; $('planSection').hidden = true; } renderChildren(); } }
+    else if (a === 'del-child') { if (window.confirm('Bu uşağın bütün planları və qeydləri silinsin?')) { saveCheck(store.removeChild(key, owner())); touch(key); if (state.childKey === key) { state.childKey = null; $('planSection').hidden = true; } renderChildren(); } }
     else if (a === 'new-assessment') newAssessment();
     else if (a === 'print') withCur(function (c, b) { showDoc(X.fullHtml(c.form(), c.cycle, b), fname(c, 'plan', 'html')); });
     else if (a === 'spec-print') withCur(function (c, b) { showDoc(X.specialistHtml(c.form(), c.cycle, b, { spec: $('specSel').value, week: +$('specPeriod').value || 0, perSession: $('specPerSession').checked }), fname(c, 'mutexessis-' + $('specSel').value, 'html')); });
@@ -460,7 +506,7 @@
       var res = store.importData(String(r.result), 'merge', owner());
       if (!res.ok) { toast(res.error || 'Fayl yüklənmədi'); return; }
       toast('Yükləndi: ' + res.added + ' dövr əlavə olundu.');
-      renderChildren();
+      renderChildren(); cloudSync();
       var first = store.listChildren(owner())[0];
       if (first) openChild(first.key);
     };
@@ -497,7 +543,8 @@
     if (!safeLocal()) toast('Brauzer yaddaşı əlçatan deyil: qeydlər bu səhifə bağlananda itəcək. Ehtiyat nüsxə yükləyin.');
     state.catalogP = fetch('data/tests-catalog.json').then(function (r) { return r.json(); }).then(function (c) { state.catalog = c; }).catch(function () { state.catalog = {}; });
     syncOwner();
-    if (window.PlanBank && window.PlanBank.get) window.PlanBank.get().then(syncOwner);
+    if (window.PlanBank && window.PlanBank.get) window.PlanBank.get().then(function () { syncOwner(); cloudSync(); });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && Date.now() - cloud.at > 60000) cloudSync(); });
   }
 
   function syncOwner() {
@@ -516,6 +563,7 @@
   function onLicenseChange() {
     state.bank = null;
     syncOwner();
+    cloudSync();
     renderModeBanner();
   }
 
