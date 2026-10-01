@@ -508,6 +508,13 @@ details.day>summary::-webkit-details-marker{display:none}
       </div>
       <div id="warningsBlock"></div>
       <div id="approvalBlock" class="no-print"></div>
+      <div class="appr-box no-print" id="specExport">
+        <b>Mütəxəssis planı:</b>
+        <select id="specSel" aria-label="Mütəxəssis"><option value="psixoloq">Klinik psixoloq</option><option value="loqoped">Loqoped</option><option value="ergoterapevt">Erqoterapevt</option><option value="pedaqoq">Psixopedaqoq</option></select>
+        <select id="specPeriod" aria-label="Müddət"><option value="1">Həftə 1</option><option value="2">Həftə 2</option><option value="3">Həftə 3</option><option value="4">Həftə 4</option><option value="0">Bütün ay</option></select>
+        <label><input type="checkbox" id="specPerSession"> hər seans ayrı vərəqdə</label>
+        <button type="button" class="btn btn-outline btn-sm" data-action="spec-print">Çap / PDF</button>
+      </div>
       <div class="export-row no-print">
         <button type="button" class="btn btn-sm" style="background:var(--sky);color:var(--blue)" data-action="goto" data-target="needsBlock">Plan nəyə əsaslanır</button>
         <button type="button" class="btn btn-sm" style="background:var(--sky);color:var(--blue)" data-action="goto" data-target="goalsBlock">Məqsədlər</button>

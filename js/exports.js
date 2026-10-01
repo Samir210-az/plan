@@ -47,7 +47,7 @@
     '.act p{margin:3px 0}.act ol,.act ul{margin:3px 0 3px 18px;padding:0}table{border-collapse:collapse;width:100%;margin:8px 0}' +
     'td,th{border:1px solid #c9d8ea;padding:5px 7px;text-align:left;vertical-align:top;font-size:12px}th{background:#eaf3ff}' +
     '.warn{border:2px solid #c0392b;background:#fdecea;padding:8px 12px;border-radius:8px;margin:8px 0}.muted{color:#5c7089}' +
-    '.day{margin-top:14px}h2,h3,h4{page-break-after:avoid}.act p,.act li{orphans:3;widows:3}tr{page-break-inside:avoid}' +
+    '.day{margin-top:14px}.newpage{page-break-before:always}.recbox{border:1px dashed #9db4d0;border-radius:8px;padding:6px 12px;margin:-2px 0 10px;page-break-inside:avoid}.rec{margin:4px 0}.line{display:inline-block;border-bottom:1px solid #7b8fa8;width:70%}h2,h3,h4{page-break-after:avoid}.act p,.act li{orphans:3;widows:3}tr{page-break-inside:avoid}' +
     '.appr{border:2px solid;border-radius:8px;padding:8px 12px;margin:10px 0;page-break-inside:avoid}.appr.ok{border-color:#1f7a4d;background:#eaf7f0}.appr.wait{border-color:#c0392b;background:#fdecea}.appr .sig{margin-top:14px}' +
     '@page{margin:14mm}footer{margin-top:30px;font-size:11px;color:#5c7089;border-top:1px solid #dbe6f3;padding-top:8px}';
 
@@ -74,6 +74,49 @@
   function deferredNote(p) {
     var d = p.testsDeferred || [];
     return d.length ? 'Yüklənmə çox olmasın deyə bu dövrdə planlaşdırılmayan testlər: ' + d.join(', ') + '. Mütəxəssis lazım bilərsə əlavə edə bilər.' : '';
+  }
+
+  var RATING_LINE = '1 tam dəstək · 2 qismən · 3 az dəstək · 4 müstəqil';
+
+  function sessionRecordBox(e) {
+    var att = e && e.att;
+    var line = '<p class="rec">İştirak: ' + (att === 'bəli' ? '<b>☒ bəli</b> ☐ xeyr' : att === 'xeyr' ? '☐ bəli <b>☒ xeyr</b>' : '☐ bəli &nbsp; ☐ xeyr') +
+      ' &nbsp;·&nbsp; Qiymət (' + RATING_LINE + '): ' + (e && e.r ? '<b>' + esc(e.r) + '</b>' : '____') + '</p>' +
+      '<p class="rec">Qeyd: ' + (e && e.note ? esc(e.note) : '<span class="line"></span>') + '</p>';
+    return '<div class="recbox">' + line + '</div>';
+  }
+
+  function specialistHtml(form, cycle, bank, opts) {
+    var p = cycle.plan, sp = opts.spec, log = cycle.log || {};
+    var wk = opts.week ? p.weeks[opts.week - 1] : null;
+    var sess = p.sessions.filter(function (s) { return s.items[sp] && (!wk || s.week === wk.n); });
+    var tests = p.tests.filter(function (t) { return t.who === sp && (!wk || (t.day >= wk.from && t.day <= wk.to)); });
+    var title = SPEC_LABEL[sp] + ' planı · ' + (wk ? 'həftə ' + wk.n + ' (' + fmtDate(wk.fromDate) + ' – ' + fmtDate(wk.toDate) + ')' : 'bütün ay');
+    var name = [form.ad, form.soyad].filter(Boolean).join(' ');
+    var out = '<p class="center">AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</p>' +
+      '<h1>' + esc(name) + ', ' + esc(p.profile.ageLabel) + ' · ' + esc(title) + '</h1>' +
+      '<p class="muted">' + (form.kurator ? 'Kurator mütəxəssis: <b>' + esc(form.kurator) + '</b> · ' : '') + 'Dövr ' + cycle.n + ' · ' + fmtDate(p.start) + ' – ' + fmtDate(p.end) +
+      (form.diaqnoz ? ' · Diaqnoz: ' + esc(form.diaqnoz) : '') + ' · seans ' + p.sessionMin + ' dəq</p>' + approvalHtml(cycle) + warningsHtml(p);
+    if (wk) out += '<p class="muted"><b>Həftənin mövzusu:</b> ' + esc(wk.theme) + '</p>';
+    if (tests.length) {
+      out += '<h2>Bu dövrdə sizin aparacağınız testlər</h2><table><tr><th>Tarix</th><th>Test</th><th>Mərhələ</th><th>Müddət</th><th>Niyə</th></tr>' +
+        tests.map(function (t) { return '<tr><td>' + fmtDate(t.date) + '<br><span class="muted">' + esc(wdName(t.date)) + ', gün ' + t.day + '</span></td><td><b>' + esc(t.name) + '</b></td><td>' + esc(PHASE[t.phase]) + '</td><td>~' + t.min + ' dəq</td><td>' + esc(t.reason) + '</td></tr>'; }).join('') + '</table>';
+    }
+    if (!sess.length) return wrap(title + ' ' + name, out + '<p class="muted">Bu dövrdə seçilmiş müddət üçün bu mütəxəssisə seans planlaşdırılmayıb.</p>');
+    out += '<h2>Seanslar</h2>';
+    sess.forEach(function (s, i) {
+      var it = s.items[sp];
+      out += '<div class="day' + (opts.perSession && i > 0 ? ' newpage' : '') + '"><h3>' + fmtDate(s.date) + ', ' + esc(WD[s.weekday]) + ' (gün ' + s.day + ', həftə ' + s.week + ')' +
+        (it.kind === 'baseline' ? ' · tanışlıq seansı' : it.kind === 'retest' ? ' · yekun mərhələ' : '') + '</h3>';
+      var dt = p.tests.filter(function (t) { return t.day === s.day && t.who === sp; });
+      if (dt.length) out += '<p><b>Bu gün test:</b> ' + dt.map(function (t) { return esc(t.name + ' (' + PHASE[t.phase] + ', ~' + t.min + ' dəq)'); }).join(', ') + '</p>';
+      if (bank.rituals && bank.rituals[sp]) out += '<p class="muted"><b>Başlanğıc:</b> ' + esc(bank.rituals[sp].open) + ' <b>Son:</b> ' + esc(bank.rituals[sp].close) + '</p>';
+      it.list.forEach(function (item) {
+        out += activityBlock(bank, item) + sessionRecordBox(log[s.day + '|' + sp + '|' + item.a]);
+      });
+      out += '</div>';
+    });
+    return wrap(title + ' ' + name, out);
   }
 
   function warningsHtml(p) {
@@ -210,6 +253,6 @@
     return out;
   }
 
-  return { deferredNote: deferredNote, approvalHtml: approvalHtml, esc: esc, fmtDate: fmtDate, wdName: wdName, fullHtml: fullHtml, parentHtml: parentHtml, wordHtml: wordHtml, csv: csv, activityBlock: activityBlock,
+  return { specialistHtml: specialistHtml, deferredNote: deferredNote, approvalHtml: approvalHtml, esc: esc, fmtDate: fmtDate, wdName: wdName, fullHtml: fullHtml, parentHtml: parentHtml, wordHtml: wordHtml, csv: csv, activityBlock: activityBlock,
     comparisonHtml: comparisonHtml, flatResults: flat, SPEC_LABEL: SPEC_LABEL, PHASE: PHASE, LV: LV, WD: WD, testsHtml: testsHtml, needsHtml: needsHtml, goalsHtml: goalsHtml, warningsHtml: warningsHtml };
 });
