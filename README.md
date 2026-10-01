@@ -1,18 +1,34 @@
 # Fərdi Reabilitasiya Planı Generatoru
 
-AN Psixoloji Dəstək və Reabilitasiya Mərkəzi üçün hazırlanmış, tək HTML fayl olaraq internetsiz işləyən Fərdi Reabilitasiya Planı Generatoru.
+AN Psixoloji Dəstək və Reabilitasiya Mərkəzi üçün 30 günlük fərdi plan alətidir. Plan qaydalara əsaslanır, süni intellektdən istifadə etmir.
 
-## Xüsusiyyətlər
-- Ətraflı uşaq qiymətləndirmə formu (şəxsi, klinik, inkişaf, nitq, sosial, davranış, sensor, motor, koqnitiv, ailə)
-- 1 aylıq (30 gün) və ya 3 aylıq (90 gün) tam fərdi plan generasiyası
-- Hər gün üçün Klinik Psixoloq, Loqoped, Erqoterapevt, Psixopedaqoq və Valideyn bölmələri
-- SMART məqsədlər (qısa/orta/uzunmüddətli)
-- Gündəlik qeydlər və "Planı Yenilə" funksiyası
-- İxrac: Çap/PDF, Word, Excel (CSV), JSON (+ geri yükləmə)
-- LocalStorage ilə uşaq məlumatlarının saxlanması
+## Plan necə qurulur
 
-## İstifadə
-`index.html` faylını brauzerdə açmaq kifayətdir, internet tələb olunmur.
+- Qiymətləndirmə formasındakı bütün sahələr 18 ehtiyac sahəsinə çevrilir (nitq, davranış, sensor, motorika, özünəxidmət, diqqət və s.).
+- Hər mütəxəssis (psixoloq, loqoped, erqoterapevt, psixopedaqoq) üçün ehtiyaca görə məşğələ seçilir; hər məşğələ üç səviyyədədir və həftə 3-dən başlayaraq çətinləşir.
+- Mütəxəssis həftədə 3, 4 və ya 5 seans seçir, aylıq cəm avtomatik hesablanır.
+- Hər seansda 1-2 məşğələ var; hər birində məqsəd, material, addımlar, nə demək, nədən çəkinmək, nəyi qeyd etmək, çətin/asan olarsa nə etmək və evdə davamı yazılıb.
+- Testlər plana hər 10-15 gündən bir düşür: başlanğıc (1-ci həftə), ara (təxminən 15-ci gün), yekun (ayın sonu). Test siyahısı mərkəzin test kataloquna əsaslanır (`data/tests-catalog.json`).
+- Təhlükəsizlik filtrləri: udma riski, epilepsiya, kiçik yaş, allergiya və özünə zərər qeydləri plana təsir edir.
+- Ayın sonunda test nəticələri və seans qeydləri daxil edilir, «Yeni dövr» yeni 30 günlük planı əvvəlki irəliləyişə görə qurur.
+
+## İxrac
+
+Çap/PDF, Word (`.doc`, HTML əsaslı), Excel üçün CSV, HTML, valideyn vərəqi və bütün qeydlərin JSON ehtiyat nüsxəsi.
+
+## Lisenziya
+
+Nümunə rejimində 10 məşğələ işləyir. Tam baza Google hesabına bağlı lisenziya ilə (1, 6 və ya 12 ay) açılır. Quraşdırma: `SETUP.md`.
+
+## Tərtibat
+
+```
+npm test
+```
+
+`js/engine.js` mühərrikdir (DOM-dan asılı deyil), `js/app.js` interfeysdir. Tam məşğələ bazası repoda yoxdur.
+
+Klinik məzmun mütəxəssislər tərəfindən nəzərdən keçirilməlidir; plan klinik qərarı əvəz etmir.
 
 ---
-By s_akhundoff — [instagram.com/securtiy_group](https://instagram.com/securtiy_group)
+[By securtiy_group](https://instagram.com/securtiy_group)

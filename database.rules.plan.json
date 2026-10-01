@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "plan_licenses": {
+      ".read": "auth != null && auth.token.email === 'samir.akhundoff@gmail.com' && auth.token.email_verified === true",
+      ".write": "auth != null && auth.token.email === 'samir.akhundoff@gmail.com' && auth.token.email_verified === true",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['email', 'expiresAt', 'issuedAt']) && newData.child('expiresAt').isNumber() && newData.child('issuedAt').isNumber()"
+      }
+    },
+    "plan_requests": {
+      ".read": "auth != null && auth.token.email === 'samir.akhundoff@gmail.com' && auth.token.email_verified === true",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && ((auth.uid === $uid && auth.token.email_verified === true) || (auth.token.email === 'samir.akhundoff@gmail.com' && auth.token.email_verified === true))",
+        ".validate": "newData.hasChildren(['email', 'name', 'ts']) && newData.child('email').val() === auth.token.email && newData.child('name').isString() && newData.child('name').val().length <= 120 && newData.child('ts').isNumber()"
+      }
+    },
+    "plan_bank": {
+      ".read": "auth != null && ((auth.token.email === 'samir.akhundoff@gmail.com' && auth.token.email_verified === true) || root.child('plan_licenses').child(auth.uid).child('expiresAt').val() > now)",
+      ".write": "auth != null && auth.token.email === 'samir.akhundoff@gmail.com' && auth.token.email_verified === true"
+    }
+  }
+}
