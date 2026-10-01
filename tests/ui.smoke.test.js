@@ -7,7 +7,7 @@ let JSDOM;
 try { JSDOM = require('jsdom').JSDOM; } catch (e) { JSDOM = null; }
 const root = path.join(__dirname, '..');
 
-function boot(mode) {
+function boot(mode, user) {
   let html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   html = html.replace(/<script[^>]*src="license-check\.js"[^>]*><\/script>/, '').replace(/<script>\s*\(function\(\)\{[\s\S]*?<\/script>/, '').replace(/<script src="js\/[^"]+"><\/script>/g, '');
   const dom = new JSDOM(html, { runScripts: 'outside-only', url: 'http://localhost/', pretendToBeVisual: true });
@@ -17,7 +17,7 @@ function boot(mode) {
   w.confirm = () => true;
   w.URL.createObjectURL = () => 'blob:x'; w.URL.revokeObjectURL = () => {};
   const demoBank = JSON.parse(fs.readFileSync(path.join(root, 'data/demo-bank.json'), 'utf8'));
-  w.PlanBank = { get: () => Promise.resolve({ bank: demoBank, mode: mode || 'full' }) };
+  w.PlanBank = { state: { user: user === undefined ? { uid: 'u1' } : user }, get: () => Promise.resolve({ bank: demoBank, mode: mode || 'full' }) };
   ['engine', 'storage', 'exports', 'app'].forEach(n => w.eval(fs.readFileSync(path.join(root, 'js', n + '.js'), 'utf8')));
   return w;
 }
@@ -61,6 +61,15 @@ test('UI: forma doldurulur, plan yaranır, qeyd və test nəticəsi saxlanılır
   ti.value = '12'; ti.dispatchEvent(new w.Event('change', { bubbles: true }));
   const cy2 = Object.values(JSON.parse(w.localStorage.getItem('an_rehab_v2')).children)[0].cycles[0];
   assert.ok(Object.values(cy2.results)[0] && Object.values(Object.values(cy2.results)[0])[0].score === '12');
+
+  const saved = d.getElementById('savedSelect');
+  assert.strictEqual(saved.options.length, 2, 'yaddaş seçimində uşaq görünür');
+  assert.strictEqual(Object.values(store.children)[0].owner, 'u1');
+  d.getElementById('planSection').hidden = true;
+  saved.value = saved.options[1].value; saved.dispatchEvent(new w.Event('change', { bubbles: true }));
+  await wait(50);
+  assert.strictEqual(d.getElementById('planSection').hidden, false, 'seçilən uşağın planı açılır');
+  assert.strictEqual(saved.value, '');
 
   w.document.querySelector('[data-action="week"][data-w="3"]').click();
   await wait(50);
@@ -184,5 +193,41 @@ test('UI: sənəd səhifə daxilində açılır (yükləmə və pəncərə təl�
     assert.ok(!d.body.classList.contains('viewing'));
   }
   assert.strictEqual(opened, 0);
+  w.close();
+});
+
+test('UI: yaddaşdan uşaq seçimi və mütəxəssis üzrə ayrılma', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {
+  const seed = {
+    v: 2, children: {
+      'eski|s|2018-01-01': { key: 'eski|s|2018-01-01', form: { ad: 'Köhnə', soyad: 'S', dogum: '2018-01-01' }, cycles: [] },
+      'u2::b|s|2019-01-01': { key: 'u2::b|s|2019-01-01', owner: 'u2', form: { ad: 'Başqa', soyad: 'S', dogum: '2019-01-01' }, cycles: [] }
+    }
+  };
+  const Storage = require('../js/storage.js');
+  const st = Storage.create(Storage.memoryStore());
+  const f = (ad) => ({ ad, soyad: 'S', dogum: '2019-01-01' });
+  const cyc = { n: 1, plan: { start: '2026-10-01', end: '2026-10-30', sessions: [], home: [], tests: [] }, log: {}, results: {}, notes: [] };
+  st.putCycle(f('Ali'), cyc, 'u1');
+  st.putCycle(f('Ali'), cyc, 'u2');
+  assert.deepStrictEqual(st.listChildren('u1').map(c => c.name), ['Ali S']);
+  assert.strictEqual(st.listChildren('u2').length, 1);
+  assert.strictEqual(st.listChildren(null).length, 0, 'daxil olmayan heç nə görmür');
+  assert.strictEqual(st.getChild(st.childKey(f('Ali'), 'u2'), 'u1'), null, 'başqasının uşağı açılmır');
+  assert.strictEqual(st.removeChild(st.childKey(f('Ali'), 'u2'), 'u1').ok, false);
+  const lg = Storage.create(Storage.memoryStore());
+  lg.save(seed);
+  assert.strictEqual(lg.adoptLegacy('u1'), 1);
+  assert.deepStrictEqual(lg.listChildren('u1').map(c => c.name), ['Köhnə S']);
+  assert.deepStrictEqual(lg.listChildren('u2').map(c => c.name), ['Başqa S']);
+  const imp = Storage.create(Storage.memoryStore());
+  const exp = st.exportAll();
+  assert.strictEqual(imp.importData(exp, 'merge', 'u3').ok, true);
+  assert.strictEqual(imp.listChildren('u3').length, 1, 'idxal edilən qeydlər idxal edənə aid olur');
+
+  const w = boot('full', { uid: 'u1' });
+  w.localStorage.setItem('an_rehab_v2', JSON.stringify({ v: 2, children: {} }));
+  await wait(50);
+  const sel = w.document.getElementById('savedSelect');
+  assert.strictEqual(sel.disabled, true, 'qeyd yoxdursa seçim bağlıdır');
   w.close();
 });
