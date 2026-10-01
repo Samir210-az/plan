@@ -246,3 +246,9 @@ test('həftədə seans sayı: minimum 3, ay üzrə cəm avtomatik hesablanır', 
   assert.ok(n5 >= 20 && n5 <= 22, 'n5=' + n5);
   assert.strictEqual(gen({ seans: '3' }, demo).sessions.length, n3);
 });
+
+test('ixrac: təsdiq bloku və səhifə boşluğu yaradan qaydalar', () => {
+  const X = require('../js/exports.js');
+  assert.match(X.approvalHtml({}), /Təsdiq gözlənilir/);
+  assert.match(X.approvalHtml({ approval: { by: 'A <b>B</b>', at: '2026-10-02' } }), /Təsdiq edilib.*A &lt;b&gt;B&lt;\/b&gt;.*02\.10\.2026/);
+});

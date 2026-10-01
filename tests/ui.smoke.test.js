@@ -114,3 +114,26 @@ test('UI: lisenziyasız rejimdə plan yaranmır', { skip: !JSDOM && 'jsdom yoxdu
   assert.strictEqual(JSON.parse(w.localStorage.getItem('an_rehab_v2') || '{"children":{}}').children && Object.keys(JSON.parse(w.localStorage.getItem('an_rehab_v2') || '{"children":{}}').children).length, 0);
   assert.match(d.getElementById('modeBanner').textContent, /lisenziya/i);
 });
+
+test('UI: təsdiq gözlənilir, müdir təsdiqləyir, ixrac sənədində əks olunur', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {
+  const w = boot();
+  const d = w.document;
+  await wait(50);
+  d.getElementById('f_ad').value = 'Əli'; d.getElementById('f_dogum').value = '2021-03-01';
+  d.getElementById('f_diaqnoz').value = 'Autizm spektr pozuntusu'; d.getElementById('f_baslama').value = '2026-10-05';
+  d.getElementById('intakeForm').dispatchEvent(new w.Event('submit', { cancelable: true }));
+  await wait(200);
+  assert.match(d.getElementById('approvalBlock').textContent, /Təsdiq gözlənilir/);
+  const st = JSON.parse(w.localStorage.getItem('an_rehab_v2'));
+  const cy0 = Object.values(st.children)[0].cycles[0];
+  d.getElementById('apprName').value = 'Nahidə Axundova';
+  d.querySelector('[data-action="approve"]').click();
+  await wait(100);
+  assert.match(d.getElementById('approvalBlock').textContent, /Təsdiq edilib.*Nahidə Axundova/);
+  const cy1 = Object.values(JSON.parse(w.localStorage.getItem('an_rehab_v2')).children)[0].cycles[0];
+  assert.strictEqual(cy1.approval.by, 'Nahidə Axundova');
+  assert.ok(!cy0.approval);
+  d.querySelector('[data-action="unapprove"]').click();
+  await wait(100);
+  assert.match(d.getElementById('approvalBlock').textContent, /Təsdiq gözlənilir/);
+});
