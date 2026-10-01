@@ -62,14 +62,17 @@ test('UI: forma doldurulur, plan yaranır, qeyd və test nəticəsi saxlanılır
   const cy2 = Object.values(JSON.parse(w.localStorage.getItem('an_rehab_v2')).children)[0].cycles[0];
   assert.ok(Object.values(cy2.results)[0] && Object.values(Object.values(cy2.results)[0])[0].score === '12');
 
-  const saved = d.getElementById('savedSelect');
-  assert.strictEqual(saved.options.length, 2, 'yaddaş seçimində uşaq görünür');
+  const btn = d.getElementById('savedBtn');
+  assert.match(btn.textContent, /\(1\)/, 'düymədə uşaq sayı görünür');
+  assert.strictEqual(d.getElementById('childrenCard').hidden, true, 'siyahı səhifədə açıq dayanmır');
   assert.strictEqual(Object.values(store.children)[0].owner, 'u1');
   d.getElementById('planSection').hidden = true;
-  saved.value = saved.options[1].value; saved.dispatchEvent(new w.Event('change', { bubbles: true }));
+  btn.click();
+  assert.strictEqual(d.getElementById('childrenCard').hidden, false, 'düymə siyahını açır');
+  d.querySelector('#childrenList [data-action="open-child"]').click();
   await wait(50);
   assert.strictEqual(d.getElementById('planSection').hidden, false, 'seçilən uşağın planı açılır');
-  assert.strictEqual(saved.value, '');
+  assert.strictEqual(d.getElementById('childrenCard').hidden, true, 'seçimdən sonra siyahı bağlanır');
 
   w.document.querySelector('[data-action="week"][data-w="3"]').click();
   await wait(50);
@@ -227,7 +230,8 @@ test('UI: yaddaşdan uşaq seçimi və mütəxəssis üzrə ayrılma', { skip: !
   const w = boot('full', { uid: 'u1' });
   w.localStorage.setItem('an_rehab_v2', JSON.stringify({ v: 2, children: {} }));
   await wait(50);
-  const sel = w.document.getElementById('savedSelect');
-  assert.strictEqual(sel.disabled, true, 'qeyd yoxdursa seçim bağlıdır');
+  w.document.getElementById('savedBtn').click();
+  assert.match(w.document.getElementById('childrenList').textContent, /hələ qeydə alınmış uşaq yoxdur/);
+  assert.ok(w.document.querySelector('#childrenCard [data-action="import"]'), 'boş olanda da geri yükləmə əlçatandır');
   w.close();
 });
