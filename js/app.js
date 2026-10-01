@@ -221,7 +221,7 @@
     paintDays(cur, bank);
     paintReport(cur, bank, pr);
     paintCycleBox(cur, pr);
-    paintApproval(cur.cycle);
+    paintApproval(cur.cycle); paintLenNote(cur);
   }
 
   function paintTests(cur, p) {
@@ -344,6 +344,7 @@
     else if (a === 'new-assessment') newAssessment();
     else if (a === 'print') withCur(function (c, b) { showDoc(X.fullHtml(c.form(), c.cycle, b), fname(c, 'plan', 'html')); });
     else if (a === 'spec-print') withCur(function (c, b) { showDoc(X.specialistHtml(c.form(), c.cycle, b, { spec: $('specSel').value, week: +$('specPeriod').value || 0, perSession: $('specPerSession').checked }), fname(c, 'mutexessis-' + $('specSel').value, 'html')); });
+    else if (a === 'retime') retime();
     else if (a === 'approve') approve();
     else if (a === 'unapprove') unapprove();
     else if (a === 'html') withCur(function (c, b) { showDoc(X.fullHtml(c.form(), c.cycle, b), fname(c, 'plan', 'html')); });
@@ -391,6 +392,22 @@
     var d = state.doc;
     if (!d) return;
     try { d.frame.contentWindow.focus(); d.frame.contentWindow.print(); } catch (e) { window.print(); }
+  }
+
+  function paintLenNote(cur) {
+    var box = $('lenNote');
+    if (!box) return;
+    var want = E.deriveProfile(cur.cycle.form || cur.child.form).sessionLen;
+    var have = cur.cycle.plan.sessionMin;
+    box.innerHTML = have === want ? '' : '<div class="banner"><b>Bu plan ' + have + ' dəqiqəlik seans üçün qurulub.</b> Seçilmiş müddət ' + want + ' dəqiqədir. Məşğələlər, seans qeydləri və testlər olduğu kimi qalır, yalnız hər məşğələnin vaxtı yenidən bölünür.<div style="margin-top:8px"><button type="button" class="btn btn-primary btn-sm" data-action="retime">' + want + ' dəqiqəyə yenilə</button></div></div>';
+  }
+  function retime() {
+    var cur = current();
+    if (!cur) return;
+    var want = E.deriveProfile(cur.cycle.form || cur.child.form).sessionLen;
+    saveCheck(store.updateCycle(state.childKey, state.cycleN, function (cy) { cy.plan = E.retimePlan(cy.plan, want); }));
+    renderPlan();
+    toast('Plan ' + want + ' dəqiqəlik seansa görə yeniləndi.');
   }
 
   function paintApproval(cy) {

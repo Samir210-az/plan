@@ -235,3 +235,25 @@ test('UI: yaddaşdan uşaq seçimi və mütəxəssis üzrə ayrılma', { skip: !
   assert.ok(w.document.querySelector('#childrenCard [data-action="import"]'), 'boş olanda da geri yükləmə əlçatandır');
   w.close();
 });
+
+test('UI: köhnə (40 dəq) plan üçün 45-ə yenilə düyməsi', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {
+  const w = boot();
+  const d = w.document;
+  await wait(50);
+  d.getElementById('f_ad').value = 'Eli'; d.getElementById('f_soyad').value = 'M';
+  d.getElementById('f_dogum').value = '2019-03-05'; d.getElementById('f_diaqnoz').value = 'DEHB';
+  d.getElementById('intakeForm').dispatchEvent(new w.Event('submit', { cancelable: true, bubbles: true }));
+  await wait(200);
+  const data = JSON.parse(w.localStorage.getItem('an_rehab_v2'));
+  const ch = Object.values(data.children)[0];
+  ch.cycles[0].plan.sessionMin = 40;
+  w.localStorage.setItem('an_rehab_v2', JSON.stringify(data));
+  w.PlanApp.onLicenseChange();
+  await wait(100);
+  assert.match(d.getElementById('lenNote').textContent, /40 dəqiqəlik/);
+  d.querySelector('[data-action="retime"]').click();
+  await wait(100);
+  assert.strictEqual(d.getElementById('lenNote').textContent, '');
+  assert.strictEqual(Object.values(JSON.parse(w.localStorage.getItem('an_rehab_v2')).children)[0].cycles[0].plan.sessionMin, 45);
+  w.close();
+});
