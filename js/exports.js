@@ -41,7 +41,7 @@
   }
 
   var CSS = 'body{font-family:Segoe UI,Arial,sans-serif;color:#1b2733;line-height:1.5;font-size:13px;margin:24px}' +
-    'h1{font-size:22px;color:#0b2545;margin:0 0 4px}h2{font-size:17px;color:#1e5aa8;border-bottom:2px solid #dbe6f3;padding-bottom:4px;margin-top:26px}' +
+    '.center{margin:0 0 6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#1e5aa8;font-weight:700}h1{font-size:22px;color:#0b2545;margin:0 0 4px}h2{font-size:17px;color:#1e5aa8;border-bottom:2px solid #dbe6f3;padding-bottom:4px;margin-top:26px}' +
     'h3{font-size:14px;background:#eaf3ff;padding:6px 10px;border-radius:6px;margin:16px 0 6px}h4{font-size:13px;margin:10px 0 4px;color:#0b2545}' +
     '.lv{font-weight:400;color:#5c7089;font-size:11px}.act{border:1px solid #dbe6f3;border-radius:8px;padding:8px 12px;margin:8px 0}' +
     '.act p{margin:3px 0}.act ol,.act ul{margin:3px 0 3px 18px;padding:0}table{border-collapse:collapse;width:100%;margin:8px 0}' +
@@ -63,9 +63,11 @@
 
   function headerHtml(form, cycle) {
     var p = cycle.plan, name = [form.ad, form.soyad].filter(Boolean).join(' ');
-    return '<h1>Fərdi Reabilitasiya Planı: ' + esc(name) + '</h1>' +
-      '<p class="muted">' + esc(p.profile.ageLabel) + ' · Dövr ' + cycle.n + ' · ' + fmtDate(p.start) + ' – ' + fmtDate(p.end) + ' · həftədə ' + p.profile.sessionsPerWeek + ' seans (ayda ' + p.sessions.length + ')' +
-      (form.diaqnoz ? ' · Diaqnoz: ' + esc(form.diaqnoz) : '') + (form.kurator ? ' · Kurator: ' + esc(form.kurator) : '') + '</p>' +
+    return '<p class="center">AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</p>' +
+      '<h1>' + esc(name) + ', ' + esc(p.profile.ageLabel) + ' · Reabilitasiya Planı</h1>' +
+      '<p class="muted">' + (form.kurator ? 'Kurator mütəxəssis: <b>' + esc(form.kurator) + '</b> · ' : '') +
+      'Dövr ' + cycle.n + ' · ' + fmtDate(p.start) + ' – ' + fmtDate(p.end) + ' · həftədə ' + p.profile.sessionsPerWeek + ' seans (ayda ' + p.sessions.length + ')' +
+      (form.diaqnoz ? ' · Diaqnoz: ' + esc(form.diaqnoz) : '') + '</p>' +
       '<p class="muted">Növbəti dövr: ' + fmtDate(p.nextStart) + ' tarixindən, yekun testlərdən sonra yeni plan hazırlanır.</p>' + approvalHtml(cycle);
   }
 

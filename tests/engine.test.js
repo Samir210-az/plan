@@ -252,3 +252,13 @@ test('ixrac: təsdiq bloku və səhifə boşluğu yaradan qaydalar', () => {
   assert.match(X.approvalHtml({}), /Təsdiq gözlənilir/);
   assert.match(X.approvalHtml({ approval: { by: 'A <b>B</b>', at: '2026-10-02' } }), /Təsdiq edilib.*A &lt;b&gt;B&lt;\/b&gt;.*02\.10\.2026/);
 });
+
+test('ixrac başlığı: uşaq, yaş, mərkəz və mütəxəssis adı', () => {
+  const X = require('../js/exports.js');
+  const f = { ad: 'Həsən', soyad: 'Həsənov', dogum: '2018-10-18', kurator: 'Axundova Nahidə', diaqnoz: 'Autizm', baslama: '2026-11-01' };
+  const plan = E.generate(f, demo, { catalog: {}, today: '2026-10-02' });
+  const html = X.fullHtml(f, { n: 1, plan, log: {}, results: {} }, demo);
+  assert.match(html, /AN Psixoloji Dəstək və Reabilitasiya Mərkəzi/);
+  assert.match(html, /Həsən Həsənov, 8 yaş · Reabilitasiya Planı/);
+  assert.match(html, /Kurator mütəxəssis: <b>Axundova Nahidə<\/b>/);
+});
