@@ -14,7 +14,7 @@ Firebase Console, layihə `an-psixoloji-33442`:
 Bu layihə başqa alətlərlə eyni Firebase layihəsini bölüşür. Mövcud qaydaları silməyin.
 
 1. Realtime Database, Rules bölməsini açın.
-2. `database.rules.plan.json` faylındakı üç açarı (`plan_licenses`, `plan_requests`, `plan_bank`) mövcud `"rules": { ... }` obyektinin içinə əlavə edin.
+2. `database.rules.plan.json` faylındakı dörd açarı (`plan_licenses`, `plan_requests`, `plan_bank`, `plan_children`) mövcud `"rules": { ... }` obyektinin içinə əlavə edin.
 3. Publish edin.
 
 Admin e-poçtu qaydalarda və `admin.html` faylında `samir.akhundoff@gmail.com` kimi yazılıb. Dəyişmək lazım olsa hər iki yerdə dəyişin.
@@ -44,3 +44,7 @@ Bazanı yenilədikdə eyni yolla yeni fayl yükləyin; lisenziyalı istifadəçi
 - Baza serverdə qorunur, lakin lisenziyalı istifadəçi açılmış məzmunu kopyalaya bilər. Texniki qoruma bunu tam aradan qaldırmır, yalnız lisenziyasız girişi bağlayır.
 - Offline işləmək üçün baza lisenziya müddəti bitənə qədər brauzerdə yadda saxlanılır. Bu yerli yoxlamadır və brauzer məlumatlarını dəyişən istifadəçi tərəfindən keçilə bilər.
 - Seans qeydləri və planlar yalnız istifadəçinin brauzerində saxlanılır. Brauzer məlumatları silinərsə itir, ona görə plan səhifəsindəki «Ehtiyat nüsxə» düyməsindən müntəzəm istifadə edin.
+
+## 4. Uşaq qeydlərinin buludda saxlanması
+
+Plan və seans qeydləri Google hesabına bağlı olaraq `plan_children/<uid>` yoluna sinxronlaşdırılır. Hər mütəxəssis yalnız öz qeydlərini oxuyur. Yazmaq üçün aktiv lisenziya lazımdır. `plan_children` açarı qaydalara əlavə edilib yayımlanmasa, qeydlər yalnız həmin cihazda qalır və səhifədə xəbərdarlıq göstərilir.
