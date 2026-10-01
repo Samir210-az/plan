@@ -8,7 +8,7 @@
   var FIELDS = ['ad', 'soyad', 'ataadi', 'dogum', 'yas', 'cins', 'boy', 'cheki', 'qtarix', 'baslama', 'kurator', 'diaqnoz', 'diaqnoz2', 'icd', 'diaqtarix',
     'evvelki', 'derman', 'allergiya', 'tibbiqeyd', 'hamile', 'yerime', 'ilksoz', 'ilkcumle', 'tualet', 'ozunexidmet', 'nitqsev', 'reseptiv', 'aac', 'ekolaliya',
     'adreaksiya', 'gosterish', 'gozkontakt', 'birgediqqet', 'munasibet', 'oyun', 'novbe', 'davranisdiger', 'irimotor', 'xirdamotor', 'tarazliq', 'qelem', 'diqqet',
-    'yaddas', 'akademik', 'oxuyazi', 'narahatliq', 'meqsed', 'evdevaxt', 'bacigardas', 'mekteb', 'seans', 'diaqtesdiq'];
+    'yaddas', 'akademik', 'oxuyazi', 'narahatliq', 'meqsed', 'evdevaxt', 'bacigardas', 'mekteb', 'seans', 'seansdeq', 'diaqtesdiq'];
   var BLANK_SELECTS = ['tualet', 'nitqsev', 'aac', 'adreaksiya', 'gosterish', 'gozkontakt', 'birgediqqet', 'oyun', 'irimotor', 'xirdamotor', 'tarazliq', 'qelem', 'diqqet', 'yaddas', 'akademik', 'oxuyazi'];
   var BEHAVIOR_LIST = ['Aqressiya', 'Özünə zərər', 'Əl çırpma', 'Fırlanma', 'Qaçma', 'Əşya atma', 'Dişləmə', 'Qışqırma', 'Ağlama', 'Hiperaktivlik', 'Diqqət çatışmazlığı', 'Rutinə bağlılıq', 'Keçid çətinliyi', 'Sensor həssaslıq', 'Yemək seçiciliyi', 'Yuxu problemi', 'Obsessiv davranışlar', 'Qorxular', 'Tiklər'];
   var SENSORY_LIST = ['Taktil həssaslıq', 'Vestibulyar həssaslıq', 'Proprioseptiv axtarış', 'Vizual həssaslıq', 'Auditor həssaslıq', 'Dad seçiciliyi', 'Qoxu həssaslığı', 'Sensor axtarışı', 'Sensor qaçınması'];
@@ -289,32 +289,55 @@
     else if (a === 'new-cycle') startNextCycle(key);
     else if (a === 'del-child') { if (window.confirm('Bu uşağın bütün planları və qeydləri silinsin?')) { saveCheck(store.removeChild(key)); if (state.childKey === key) { state.childKey = null; $('planSection').hidden = true; } renderChildren(); } }
     else if (a === 'new-assessment') newAssessment();
-    else if (a === 'print') withCur(function (c, b) { printDoc(X.fullHtml(c.form(), c.cycle, b)); });
-    else if (a === 'spec-print') withCur(function (c, b) { printDoc(X.specialistHtml(c.form(), c.cycle, b, { spec: $('specSel').value, week: +$('specPeriod').value || 0, perSession: $('specPerSession').checked })); });
+    else if (a === 'print') withCur(function (c, b) { showDoc(X.fullHtml(c.form(), c.cycle, b), fname(c, 'plan', 'html')); });
+    else if (a === 'spec-print') withCur(function (c, b) { showDoc(X.specialistHtml(c.form(), c.cycle, b, { spec: $('specSel').value, week: +$('specPeriod').value || 0, perSession: $('specPerSession').checked }), fname(c, 'mutexessis-' + $('specSel').value, 'html')); });
     else if (a === 'approve') approve();
     else if (a === 'unapprove') unapprove();
-    else if (a === 'doc') withCur(function (c, b) { download(X.wordHtml(c.form(), c.cycle, b), fname(c, 'plan', 'doc'), 'application/msword'); });
-    else if (a === 'html') withCur(function (c, b) { download(X.fullHtml(c.form(), c.cycle, b), fname(c, 'plan', 'html'), 'text/html'); });
-    else if (a === 'parent') withCur(function (c, b) { download(X.parentHtml(c.form(), c.cycle, b), fname(c, 'valideyn', 'html'), 'text/html'); });
-    else if (a === 'csv') withCur(function (c, b) { download(X.csv(c.form(), c.cycle, b), fname(c, 'plan', 'csv'), 'text/csv;charset=utf-8'); });
+    else if (a === 'html') withCur(function (c, b) { showDoc(X.fullHtml(c.form(), c.cycle, b), fname(c, 'plan', 'html')); });
+    else if (a === 'parent') withCur(function (c, b) { showDoc(X.parentHtml(c.form(), c.cycle, b), fname(c, 'valideyn', 'html')); });
+    else if (a === 'doc-close') closeDoc();
+    else if (a === 'doc-print') printViewed();
+    else if (a === 'doc-save') { if (state.doc) download(state.doc.html, state.doc.name, 'text/html'); }
     else if (a === 'backup') download(store.exportAll(), 'plan-ehtiyat-' + E.todayISO() + '.json', 'application/json');
     else if (a === 'import') $('importFile').click();
     else if (a === 'goto') { var el = $(t.getAttribute('data-target')); if (el) el.scrollIntoView({ behavior: 'smooth' }); }
   }
-  function printDoc(html) {
+  function showDoc(html, name) {
+    closeDoc();
+    var box = document.createElement('div');
+    box.id = 'docViewer';
+    box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Sənəd');
+    box.innerHTML = '<div class="dv-bar no-print"><button type="button" class="btn btn-sm btn-outline" data-action="doc-close">← Geri</button>' +
+      '<button type="button" class="btn btn-sm btn-primary" data-action="doc-print">Çap / PDF</button>' +
+      '<button type="button" class="btn btn-sm btn-outline" data-action="doc-save">Yüklə (.html)</button></div>' +
+      '<p class="dv-hint no-print">Telefonda çap və ya PDF üçün brauzer menyusundan (⋮) “Çap et” və ya “Paylaş” seçin.</p>';
     var fr = document.createElement('iframe');
-    fr.setAttribute('aria-hidden', 'true');
-    fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
-    document.body.appendChild(fr);
-    var d = fr.contentWindow.document;
-    d.open(); d.write(html); d.close();
-    var done = false;
-    function go() {
-      if (done) return; done = true;
-      try { fr.contentWindow.focus(); fr.contentWindow.print(); } catch (e) { toast('Çap açıla bilmədi. HTML yükləyib brauzerdən çap edin.'); }
-      setTimeout(function () { if (fr.parentNode) fr.parentNode.removeChild(fr); }, 60000);
-    }
-    if (d.readyState === 'complete') setTimeout(go, 50); else fr.onload = go;
+    fr.className = 'dv-frame'; fr.title = 'Sənəd';
+    fr.onload = function () { fitDoc(); };
+    fr.srcdoc = html;
+    box.appendChild(fr);
+    document.body.appendChild(box);
+    document.body.classList.add('viewing');
+    state.doc = { html: html, name: name, frame: fr };
+    box.scrollTop = 0;
+    var back = box.querySelector('[data-action="doc-close"]');
+    if (back) back.focus();
+  }
+  function fitDoc() {
+    var d = state.doc;
+    if (!d || !d.frame.contentDocument) return;
+    d.frame.style.height = (d.frame.contentDocument.documentElement.scrollHeight + 8) + 'px';
+  }
+  function closeDoc() {
+    var v = document.getElementById('docViewer');
+    if (v) v.remove();
+    document.body.classList.remove('viewing');
+    state.doc = null;
+  }
+  function printViewed() {
+    var d = state.doc;
+    if (!d) return;
+    try { d.frame.contentWindow.focus(); d.frame.contentWindow.print(); } catch (e) { window.print(); }
   }
 
   function paintApproval(cy) {
@@ -455,6 +478,8 @@
     document.addEventListener('click', onClick);
     document.addEventListener('change', onChange);
     $('importFile').addEventListener('change', onImport);
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && state.doc) closeDoc(); });
+    window.addEventListener('resize', fitDoc);
     window.addEventListener('beforeprint', beforePrint); window.addEventListener('afterprint', afterPrint);
     updateSeansInfo();
     if (!safeLocal()) toast('Brauzer yaddaşı əlçatan deyil: qeydlər bu səhifə bağlananda itəcək. Ehtiyat nüsxə yükləyin.');

@@ -14,7 +14,7 @@ AN Psixoloji Dəstək və Reabilitasiya Mərkəzi üçün 30 günlük fərdi pla
 
 ## İxrac
 
-Çap/PDF, Word (`.doc`, HTML əsaslı), Excel üçün CSV, HTML, valideyn vərəqi və bütün qeydlərin JSON ehtiyat nüsxəsi.
+Çap/PDF, HTML, mütəxəssis planı (həftəlik və ya hər seans ayrıca), valideyn vərəqi və bütün qeydlərin JSON ehtiyat nüsxəsi.
 
 ## Lisenziya
 

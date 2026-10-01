@@ -208,35 +208,6 @@
       }).join('') + '</table>' + homeHtml(p, bank, false));
   }
 
-  function wordHtml(form, cycle, bank) {
-    return fullHtml(form, cycle, bank).replace('<html lang="az">', '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" lang="az">');
-  }
-
-  function csvCell(v) {
-    var s = String(v == null ? '' : v);
-    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
-    return '"' + s.replace(/"/g, '""') + '"';
-  }
-  function csv(form, cycle, bank) {
-    var rows = [['Tarix', 'Həftənin günü', 'Gün №', 'Mütəxəssis', 'Məşğələ', 'Səviyyə', 'Dəq', 'Məqsəd', 'İştirak', 'Qiymət (1-4)', 'Qeyd']];
-    var p = cycle.plan;
-    p.sessions.forEach(function (s) {
-      E.SPECS.forEach(function (sp) {
-        var it = s.items[sp];
-        if (!it) return;
-        it.list.forEach(function (x) {
-          var a = bank.act[x.a], e = (cycle.log || {})[s.day + '|' + sp + '|' + x.a] || {};
-          rows.push([fmtDate(s.date), WD[s.weekday], s.day, SPEC_LABEL[sp], a ? a.t : x.a, x.lv, x.min, a ? a.levels[x.lv].g : '', e.att || '', e.r || '', e.note || '']);
-        });
-      });
-    });
-    p.tests.forEach(function (t) {
-      var r = (cycle.results && cycle.results[t.id] && cycle.results[t.id][t.phase]) || {};
-      rows.push([fmtDate(t.date), WD[(E.parseISO(t.date).getUTCDay() || 7)], t.day, SPEC_LABEL[t.who] || t.who, 'TEST: ' + t.name, '', t.min, PHASE[t.phase], '', r.score || '', r.note || '']);
-    });
-    return '﻿' + rows.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n');
-  }
-
   function comparisonHtml(prevCycle, cycle) {
     var rows = E.compareResults(flat(prevCycle && prevCycle.results), flat(cycle && cycle.results));
     if (!rows.length) return '';
@@ -253,6 +224,6 @@
     return out;
   }
 
-  return { specialistHtml: specialistHtml, deferredNote: deferredNote, approvalHtml: approvalHtml, esc: esc, fmtDate: fmtDate, wdName: wdName, fullHtml: fullHtml, parentHtml: parentHtml, wordHtml: wordHtml, csv: csv, activityBlock: activityBlock,
+  return { specialistHtml: specialistHtml, deferredNote: deferredNote, approvalHtml: approvalHtml, esc: esc, fmtDate: fmtDate, wdName: wdName, fullHtml: fullHtml, parentHtml: parentHtml, activityBlock: activityBlock,
     comparisonHtml: comparisonHtml, flatResults: flat, SPEC_LABEL: SPEC_LABEL, PHASE: PHASE, LV: LV, WD: WD, testsHtml: testsHtml, needsHtml: needsHtml, goalsHtml: goalsHtml, warningsHtml: warningsHtml };
 });

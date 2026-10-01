@@ -147,7 +147,7 @@ main{padding:36px 0 80px}
 .goal-card ul{margin:0; padding-left:18px; font-size:14px}
 .goal-card li{margin-bottom:6px}
 
-.appr-box{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.appr-box.ok{border-color:#1f7a4d;background:#eaf7f0}.appr-box.wait{border-color:#c0392b;background:#fff6f5}.appr-box input{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;min-width:160px;flex:1}
+.appr-box{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.appr-box.ok{border-color:#1f7a4d;background:#eaf7f0}.appr-box.wait{border-color:#c0392b;background:#fff6f5}.appr-box input[type=checkbox]{flex:none;min-width:0;width:18px;height:18px;padding:0;margin:0 6px 0 0}.appr-box label{display:inline-flex;align-items:center}.appr-box select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}.appr-box input{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;min-width:160px;flex:1}
 .week-nav{display:flex; gap:8px; flex-wrap:wrap; margin:20px 0 8px}
 .week-btn{
   border:1.5px solid var(--line); background:#fff; padding:8px 14px; border-radius:10px; cursor:pointer;
@@ -254,7 +254,15 @@ details.day>summary::-webkit-details-marker{display:none}
 @media(max-width:700px){.logrow .mini{width:100%}.bar{grid-template-columns:1fr 1fr 44px}.card{padding:20px 16px 8px}.wrap{padding:0 14px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
+#docViewer{position:fixed;inset:0;z-index:1000;background:#fff;overflow:auto}
+.dv-bar{position:sticky;top:0;z-index:2;display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line)}
+.dv-hint{margin:0;padding:8px 14px;font-size:12.5px;color:var(--muted)}
+.dv-frame{display:block;width:100%;border:0}
+body.viewing{overflow:hidden}
 @media print{
+  body.viewing>*:not(#docViewer){display:none !important}
+  #docViewer{position:static;overflow:visible}
+  body.viewing{overflow:visible}
   .hero,.no-print,.footer,.submit-bar,.week-nav{display:none !important}
   body{background:#fff}
   main>*:not(#planSection){display:none !important}
@@ -477,6 +485,8 @@ details.day>summary::-webkit-details-marker{display:none}
       <div class="grid g2">
         <div class="field"><label for="f_seans">Həftədə seans sayı</label>
           <select id="f_seans"><option value="3">Həftədə 3 dəfə (Bazar ertəsi, Çərşənbə, Cümə)</option><option value="4">Həftədə 4 dəfə</option><option value="5">Həftədə 5 dəfə (hər iş günü)</option></select></div>
+        <div class="field"><label for="f_seansdeq">Hər seansın müddəti</label>
+          <select id="f_seansdeq"><option value="45" selected>45 dəqiqə (mərkəzin standartı)</option><option value="30">30 dəqiqə</option><option value="60">60 dəqiqə</option></select></div>
         <div class="field"><label for="f_diaqtesdiq">Diaqnoz rəsmi olaraq təsdiqlənibmi?</label>
           <select id="f_diaqtesdiq"><option value="">Seçilməyib</option><option value="bəli">Bəli, təsdiqlənib</option><option value="xeyr">Xeyr, hələ dəqiqləşdirilir</option></select></div>
       </div>
@@ -500,8 +510,6 @@ details.day>summary::-webkit-details-marker{display:none}
         </div>
         <div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap">
           <button type="button" class="btn btn-outline btn-sm" data-action="print">Çap / PDF</button>
-          <button type="button" class="btn btn-outline btn-sm" data-action="doc">Word (.doc)</button>
-          <button type="button" class="btn btn-outline btn-sm" data-action="csv">Excel (CSV)</button>
           <button type="button" class="btn btn-outline btn-sm" data-action="html">HTML</button>
           <button type="button" class="btn btn-outline btn-sm" data-action="parent">Valideyn vərəqi</button>
         </div>

@@ -66,6 +66,9 @@
   }
 
   // ---- diaqnoz ----
+  var SESSION_LENGTHS = [30, 45, 60];
+  var DEFAULT_SESSION_MIN = 45;
+
   var DX = [
     ['asd', /\b(autizm|autism|asp|aspi|asperger|f84|aspd|ass)\b|autizm|spektr/],
     ['adhd', /\b(dehb|deh|adhd|f90)\b|hiperaktiv|diqqet catismazligi|diqqet pozuntusu/],
@@ -301,6 +304,7 @@
       ageM: ageM, ageLabel: ageLabel(ageM), dx: dx, needs: needs, reasons: reasons, tags: tags, flags: flags,
       warnings: warnings, unknown: unknown, dxConfirmed: asdConfirmed, concern: concern,
       sessionsPerWeek: PATTERNS[+f.seans] ? +f.seans : DEFAULT_SPW,
+      sessionLen: SESSION_LENGTHS.indexOf(+f.seansdeq) >= 0 ? +f.seansdeq : DEFAULT_SESSION_MIN,
       homeMin: Math.max(10, Math.min(120, parseInt(f.evdevaxt, 10) || 45))
     };
   }
@@ -355,10 +359,7 @@
   }
 
   function sessionMinutes(p) {
-    var a = p.needs.attention;
-    var m = a >= 3 ? 20 : a === 2 ? 30 : a === 1 ? 40 : 45;
-    if (p.ageM != null && p.ageM < 36) m = Math.min(m, 25);
-    return m;
+    return p.sessionLen || DEFAULT_SESSION_MIN;
   }
 
   function buildSessionDates(startISO, spw) {

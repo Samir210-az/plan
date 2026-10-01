@@ -161,3 +161,28 @@ test('UI: ehtiyat nüsxə yüklənəndə plan avtomatik açılır, qeydlər gör
   assert.strictEqual(dst.document.getElementById('planSection').hidden, false);
   assert.match(dst.document.getElementById('planTitleName').textContent, /Əli/);
 });
+
+test('UI: sənəd səhifə daxilində açılır (yükləmə və pəncərə tələb olunmur)', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {
+  const w = boot();
+  const d = w.document;
+  await wait(50);
+  d.getElementById('f_ad').value = 'Əli'; d.getElementById('f_dogum').value = '2021-03-01';
+  d.getElementById('f_diaqnoz').value = 'Autizm spektr pozuntusu'; d.getElementById('f_baslama').value = '2026-10-05';
+  d.getElementById('intakeForm').dispatchEvent(new w.Event('submit', { cancelable: true }));
+  await wait(200);
+  let opened = 0; w.open = () => { opened++; return null; };
+  const cases = [['spec-print', /Klinik psixoloq planı/], ['print', /Reabilitasiya Planı/], ['html', /Reabilitasiya Planı/], ['parent', /Mərkəzə gəliş cədvəli/]];
+  for (const [act, rx] of cases) {
+    d.querySelector('#planSection [data-action="' + act + '"]').click();
+    await wait(80);
+    const fr = d.querySelector('#docViewer iframe');
+    assert.ok(fr, act + ': görüntüləyici açılmadı');
+    assert.match(fr.getAttribute('srcdoc') || fr.srcdoc, rx);
+    assert.ok(d.body.classList.contains('viewing'));
+    d.querySelector('[data-action="doc-close"]').click();
+    assert.strictEqual(d.getElementById('docViewer'), null);
+    assert.ok(!d.body.classList.contains('viewing'));
+  }
+  assert.strictEqual(opened, 0);
+  w.close();
+});
