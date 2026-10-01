@@ -62,7 +62,7 @@
   function ageLabel(m) {
     if (m == null) return '';
     var y = Math.floor(m / 12), r = m % 12;
-    return (y ? y + ' yaş ' : '') + (r || !y ? r + ' ay' : '');
+    return ((y ? y + ' yaş ' : '') + (r || !y ? r + ' ay' : '')).trim();
   }
 
   // ---- diaqnoz ----
