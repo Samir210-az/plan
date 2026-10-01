@@ -262,3 +262,19 @@ test('ixrac başlığı: uşaq, yaş, mərkəz və mütəxəssis adı', () => {
   assert.match(html, /Həsən Həsənov, 8 yaş · Reabilitasiya Planı/);
   assert.match(html, /Kurator mütəxəssis: <b>Axundova Nahidə<\/b>/);
 });
+
+test('mütəxəssis planı: yalnız seçilmiş mütəxəssis və həftə, hər seans ayrıca', () => {
+  const X = require('../js/exports.js');
+  const f = { ad: 'Əli', soyad: 'V', dogum: '2021-03-01', diaqnoz: 'Autizm', baslama: '2026-10-05', kurator: 'Kurator Ad' };
+  const plan = E.generate(f, demo, { catalog: {}, today: '2026-10-02' });
+  const cy = { n: 1, plan, log: {}, results: {} };
+  const wk = X.specialistHtml(f, cy, demo, { spec: 'loqoped', week: 2 });
+  assert.match(wk, /Loqoped planı · həftə 2/);
+  assert.ok(!/Klinik psixoloq · tanışlıq/.test(wk) && !/Ev proqramı/.test(wk));
+  const w2 = plan.sessions.filter(s => s.week === 2 && s.items.loqoped).length;
+  assert.strictEqual((wk.match(/gün \d+, həftə 2/g) || []).length, w2);
+  const all = X.specialistHtml(f, cy, demo, { spec: 'psixoloq', week: 0, perSession: true });
+  assert.strictEqual((all.match(/class="day/g) || []).length, plan.sessions.filter(s => s.items.psixoloq).length);
+  assert.ok((all.match(/newpage/g) || []).length >= 2);
+  assert.match(all, /Qeyd: <span class="line">/);
+});

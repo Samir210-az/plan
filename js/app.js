@@ -290,6 +290,7 @@
     else if (a === 'del-child') { if (window.confirm('Bu uşağın bütün planları və qeydləri silinsin?')) { saveCheck(store.removeChild(key)); if (state.childKey === key) { state.childKey = null; $('planSection').hidden = true; } renderChildren(); } }
     else if (a === 'new-assessment') newAssessment();
     else if (a === 'print') withCur(function (c, b) { printDoc(X.fullHtml(c.form(), c.cycle, b)); });
+    else if (a === 'spec-print') withCur(function (c, b) { printDoc(X.specialistHtml(c.form(), c.cycle, b, { spec: $('specSel').value, week: +$('specPeriod').value || 0, perSession: $('specPerSession').checked })); });
     else if (a === 'approve') approve();
     else if (a === 'unapprove') unapprove();
     else if (a === 'doc') withCur(function (c, b) { download(X.wordHtml(c.form(), c.cycle, b), fname(c, 'plan', 'doc'), 'application/msword'); });
