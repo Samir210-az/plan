@@ -358,6 +358,21 @@
     return rows;
   }
 
+  function retimePlan(plan, minutes) {
+    var out = JSON.parse(JSON.stringify(plan));
+    var sm = SESSION_LENGTHS.indexOf(+minutes) >= 0 ? +minutes : DEFAULT_SESSION_MIN;
+    out.sessionMin = sm;
+    if (out.profile) out.profile.sessionLen = sm;
+    out.sessions.forEach(function (s) {
+      Object.keys(s.items || {}).forEach(function (sp) {
+        var list = s.items[sp].list;
+        if (list.length > 1) { list[0].min = Math.round(sm * 0.6); list[1].min = sm - list[0].min; }
+        else if (list.length === 1) list[0].min = sm;
+      });
+    });
+    return out;
+  }
+
   function sessionMinutes(p) {
     return p.sessionLen || DEFAULT_SESSION_MIN;
   }
@@ -701,7 +716,7 @@
   return {
     monthSessions: monthSessions, SPECS: SPECS, NEED_IDS: NEED_IDS, CYCLE_DAYS: CYCLE_DAYS, VERSION: ENGINE_VERSION, PATTERNS: PATTERNS,
     norm: norm, ageMonths: ageMonths, ageLabel: ageLabel, parseISO: parseISO, toISO: toISO, addDays: addDays, todayISO: todayISO,
-    detectDx: detectDx, deriveProfile: deriveProfile, eligible: eligible, generate: generate, selectTests: selectTests,
+    detectDx: detectDx, deriveProfile: deriveProfile, eligible: eligible, generate: generate, selectTests: selectTests, retimePlan: retimePlan,
     progress: progress, recommendLevel: recommendLevel, nextCycleSeed: nextCycleSeed, compareResults: compareResults,
     validatePlan: validatePlan, usedCounts: usedCounts, levelFor: levelFor, startLevel: startLevel, hashSeed: hashSeed
   };

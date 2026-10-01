@@ -287,3 +287,16 @@ test('seans müddəti: standart 45 dəq, diqqət və yaşdan asılı qısalmır,
   assert.strictEqual(E.generate(Object.assign({ seansdeq: '30' }, base), demo, { catalog: {}, today: '2026-10-02' }).sessionMin, 30);
   assert.strictEqual(E.generate(Object.assign({ seansdeq: '17' }, base), demo, { catalog: {}, today: '2026-10-02' }).sessionMin, 45);
 });
+
+test('retimePlan: köhnə plan 45 dəqiqəyə keçir, məşğələlər dəyişmir', () => {
+  const plan = gen({ seansdeq: '30', seans: '3' }, demo);
+  assert.strictEqual(plan.sessionMin, 30);
+  const out = E.retimePlan(plan, 45);
+  assert.strictEqual(out.sessionMin, 45);
+  assert.strictEqual(plan.sessionMin, 30, 'orijinal dəyişmir');
+  out.sessions.forEach((s, i) => Object.keys(s.items).forEach(sp => {
+    const l = s.items[sp].list, o = plan.sessions[i].items[sp].list;
+    assert.strictEqual(l.reduce((a, x) => a + x.min, 0), 45);
+    assert.deepStrictEqual(l.map(x => x.a), o.map(x => x.a));
+  }));
+});
