@@ -147,6 +147,7 @@ main{padding:36px 0 80px}
 .goal-card ul{margin:0; padding-left:18px; font-size:14px}
 .goal-card li{margin-bottom:6px}
 
+.appr-box{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.appr-box.ok{border-color:#1f7a4d;background:#eaf7f0}.appr-box.wait{border-color:#c0392b;background:#fff6f5}.appr-box input{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;min-width:160px;flex:1}
 .week-nav{display:flex; gap:8px; flex-wrap:wrap; margin:20px 0 8px}
 .week-btn{
   border:1.5px solid var(--line); background:#fff; padding:8px 14px; border-radius:10px; cursor:pointer;
@@ -256,10 +257,11 @@ details.day>summary::-webkit-details-marker{display:none}
 @media print{
   .hero,.no-print,.footer,.submit-bar,.week-nav{display:none !important}
   body{background:#fff}
-  .card,.day-card,.plan-head{box-shadow:none; border:1px solid #ccc; break-inside:avoid}
+  main>*:not(#planSection){display:none !important}
+  .card,.day-card,.plan-head{box-shadow:none; border:1px solid #ccc}
+  .plan-head{break-inside:avoid}
   .day-card,.day-body{display:block !important}
-  details.day>summary{background:#fff}
-  .act{break-inside:avoid}
+  details.day>summary{background:#fff;break-after:avoid}
   .logrow{display:none}
   main{padding:0}
 }
@@ -505,6 +507,7 @@ details.day>summary::-webkit-details-marker{display:none}
         </div>
       </div>
       <div id="warningsBlock"></div>
+      <div id="approvalBlock" class="no-print"></div>
       <div class="export-row no-print">
         <button type="button" class="btn btn-sm" style="background:var(--sky);color:var(--blue)" data-action="goto" data-target="needsBlock">Plan nəyə əsaslanır</button>
         <button type="button" class="btn btn-sm" style="background:var(--sky);color:var(--blue)" data-action="goto" data-target="goalsBlock">Məqsədlər</button>

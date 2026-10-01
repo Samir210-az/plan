@@ -582,15 +582,13 @@
 
     var skippedTests = [];
     var tests = selectTests(p, catalog, cycle, sdates, prior, skippedTests);
-    var planWarnings = p.warnings.slice();
-    if (skippedTests.length) planWarnings.push('Plan həddindən artıq yüklənməsin deyə bu dövrdə növbəti testlər planlaşdırılmayıb: ' + skippedTests.join(', ') + '. Mütəxəssis lazım bilərsə, əlavə edə bilər.');
     var plan = {
       v: ENGINE_VERSION, bankVersion: bank.version || 0, cycle: cycle, childKey: childKey, seed: seed,
       createdAt: opts.now || new Date().toISOString(), start: start, end: toISO(addDays(parseISO(start), CYCLE_DAYS - 1)),
       nextStart: toISO(addDays(parseISO(start), CYCLE_DAYS)),
       profile: p, sessionMin: sm, weeks: weeks, sessions: sessions, home: home,
-      tests: tests,
-      goals: buildGoals(bank, p, form.ad), warnings: planWarnings,
+      tests: tests, testsDeferred: skippedTests,
+      goals: buildGoals(bank, p, form.ad), warnings: p.warnings,
       coverage: pools
     };
     return plan;

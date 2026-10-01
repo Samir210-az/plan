@@ -169,6 +169,7 @@
     paintDays(cur, bank);
     paintReport(cur, bank, pr);
     paintCycleBox(cur, pr);
+    paintApproval(cur.cycle);
   }
 
   function paintTests(cur, p) {
@@ -186,7 +187,7 @@
         '<input class="mini" aria-label="' + esc(t.name) + ' qeyd" data-test="' + esc(t.id) + '" data-phase="' + esc(t.phase) + '" data-f="note" value="' + esc(r.note || '') + '" placeholder="qeyd"></td></tr>';
     }).join('');
     $('testsBody').innerHTML = '<p class="hint">Testlər 1-ci həftədə (başlanğıc), təxminən 15-ci gündə (ara) və ayın sonunda (yekun) planlaşdırılır, yəni hər 10-15 gündən bir. Nəticəni daxil edin: növbəti dövr planı və müqayisə bunlara əsaslanır.' + (cur.cycle.n > 1 ? ' IQ və Vineland kimi testlər hər ay təkrarlanmır.' : '') + '</p>' +
-      '<div class="table-wrap"><table class="tbl"><thead><tr><th>Tarix</th><th>Test</th><th>Mərhələ</th><th>Kim aparır</th><th>Niyə</th><th>Nəticə</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+      '<div class="table-wrap"><table class="tbl"><thead><tr><th>Tarix</th><th>Test</th><th>Mərhələ</th><th>Kim aparır</th><th>Niyə</th><th>Nəticə</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + (X.deferredNote(p) ? '<p class="muted small">' + esc(X.deferredNote(p)) + '</p>' : '');
   }
 
   function paintWeeks(p) {
@@ -288,7 +289,9 @@
     else if (a === 'new-cycle') startNextCycle(key);
     else if (a === 'del-child') { if (window.confirm('Bu uşağın bütün planları və qeydləri silinsin?')) { saveCheck(store.removeChild(key)); if (state.childKey === key) { state.childKey = null; $('planSection').hidden = true; } renderChildren(); } }
     else if (a === 'new-assessment') newAssessment();
-    else if (a === 'print') window.print();
+    else if (a === 'print') withCur(function (c, b) { printDoc(X.fullHtml(c.form(), c.cycle, b)); });
+    else if (a === 'approve') approve();
+    else if (a === 'unapprove') unapprove();
     else if (a === 'doc') withCur(function (c, b) { download(X.wordHtml(c.form(), c.cycle, b), fname(c, 'plan', 'doc'), 'application/msword'); });
     else if (a === 'html') withCur(function (c, b) { download(X.fullHtml(c.form(), c.cycle, b), fname(c, 'plan', 'html'), 'text/html'); });
     else if (a === 'parent') withCur(function (c, b) { download(X.parentHtml(c.form(), c.cycle, b), fname(c, 'valideyn', 'html'), 'text/html'); });
@@ -297,6 +300,50 @@
     else if (a === 'import') $('importFile').click();
     else if (a === 'goto') { var el = $(t.getAttribute('data-target')); if (el) el.scrollIntoView({ behavior: 'smooth' }); }
   }
+  function printDoc(html) {
+    var fr = document.createElement('iframe');
+    fr.setAttribute('aria-hidden', 'true');
+    fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+    document.body.appendChild(fr);
+    var d = fr.contentWindow.document;
+    d.open(); d.write(html); d.close();
+    var done = false;
+    function go() {
+      if (done) return; done = true;
+      try { fr.contentWindow.focus(); fr.contentWindow.print(); } catch (e) { toast('Çap açıla bilmədi. HTML yükləyib brauzerdən çap edin.'); }
+      setTimeout(function () { if (fr.parentNode) fr.parentNode.removeChild(fr); }, 60000);
+    }
+    if (d.readyState === 'complete') setTimeout(go, 50); else fr.onload = go;
+  }
+
+  function paintApproval(cy) {
+    var box = $('approvalBlock');
+    if (!box) return;
+    var a = cy.approval;
+    if (a && a.by) {
+      box.innerHTML = '<div class="appr-box ok"><span><b>Təsdiq edilib.</b> ' + esc(a.by) + (a.role ? ' (' + esc(a.role) + ')' : '') + ' · ' + esc(X.fmtDate(a.at)) + '</span>' +
+        '<button type="button" class="btn btn-ghost btn-sm" data-action="unapprove">Təsdiqi ləğv et</button></div>';
+      return;
+    }
+    var last = ''; try { last = localStorage.getItem('plan_approver') || ''; } catch (e) { /* kənar */ }
+    box.innerHTML = '<div class="appr-box wait"><span><b>Təsdiq gözlənilir.</b> Mərkəz müdiri planı təsdiqləməlidir.</span>' +
+      '<input id="apprName" placeholder="Müdirin adı, soyadı" aria-label="Müdirin adı, soyadı" maxlength="80" value="' + esc(last) + '">' +
+      '<input id="apprRole" placeholder="Vəzifə" aria-label="Vəzifə" maxlength="60" value="Mərkəz müdiri">' +
+      '<button type="button" class="btn btn-primary btn-sm" data-action="approve">Təsdiq et</button></div>';
+  }
+  function approve() {
+    var by = ($('apprName').value || '').trim(), role = ($('apprRole').value || '').trim();
+    if (by.length < 3) { toast('Təsdiq edənin adı və soyadı yazılmalıdır.'); return; }
+    try { localStorage.setItem('plan_approver', by); } catch (e) { /* kənar */ }
+    saveCheck(store.updateCycle(state.childKey, state.cycleN, function (cy) { cy.approval = { by: by, role: role, at: E.todayISO() }; }));
+    renderPlan();
+  }
+  function unapprove() {
+    if (!window.confirm('Təsdiq ləğv edilsin?')) return;
+    saveCheck(store.updateCycle(state.childKey, state.cycleN, function (cy) { delete cy.approval; }));
+    renderPlan();
+  }
+
   function newAssessment() {
     $('intakeForm').reset();
     setChips('behaviorChips', []); setChips('sensoryChips', []);

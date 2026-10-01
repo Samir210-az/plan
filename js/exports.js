@@ -43,18 +43,35 @@
   var CSS = 'body{font-family:Segoe UI,Arial,sans-serif;color:#1b2733;line-height:1.5;font-size:13px;margin:24px}' +
     'h1{font-size:22px;color:#0b2545;margin:0 0 4px}h2{font-size:17px;color:#1e5aa8;border-bottom:2px solid #dbe6f3;padding-bottom:4px;margin-top:26px}' +
     'h3{font-size:14px;background:#eaf3ff;padding:6px 10px;border-radius:6px;margin:16px 0 6px}h4{font-size:13px;margin:10px 0 4px;color:#0b2545}' +
-    '.lv{font-weight:400;color:#5c7089;font-size:11px}.act{border:1px solid #dbe6f3;border-radius:8px;padding:8px 12px;margin:8px 0;page-break-inside:avoid}' +
+    '.lv{font-weight:400;color:#5c7089;font-size:11px}.act{border:1px solid #dbe6f3;border-radius:8px;padding:8px 12px;margin:8px 0}' +
     '.act p{margin:3px 0}.act ol,.act ul{margin:3px 0 3px 18px;padding:0}table{border-collapse:collapse;width:100%;margin:8px 0}' +
     'td,th{border:1px solid #c9d8ea;padding:5px 7px;text-align:left;vertical-align:top;font-size:12px}th{background:#eaf3ff}' +
     '.warn{border:2px solid #c0392b;background:#fdecea;padding:8px 12px;border-radius:8px;margin:8px 0}.muted{color:#5c7089}' +
-    '.day{page-break-inside:avoid;margin-top:14px}footer{margin-top:30px;font-size:11px;color:#5c7089;border-top:1px solid #dbe6f3;padding-top:8px}';
+    '.day{margin-top:14px}h2,h3,h4{page-break-after:avoid}.act p,.act li{orphans:3;widows:3}tr{page-break-inside:avoid}' +
+    '.appr{border:2px solid;border-radius:8px;padding:8px 12px;margin:10px 0;page-break-inside:avoid}.appr.ok{border-color:#1f7a4d;background:#eaf7f0}.appr.wait{border-color:#c0392b;background:#fdecea}.appr .sig{margin-top:14px}' +
+    '@page{margin:14mm}footer{margin-top:30px;font-size:11px;color:#5c7089;border-top:1px solid #dbe6f3;padding-top:8px}';
+
+  function approvalHtml(cycle) {
+    var a = cycle && cycle.approval;
+    if (a && a.by) {
+      return '<div class="appr ok"><b>Təsdiq edilib.</b> ' + esc(a.by) + (a.role ? ' (' + esc(a.role) + ')' : '') + ' · ' + fmtDate(a.at) +
+        '<div class="sig">İmza: ______________________</div></div>';
+    }
+    return '<div class="appr wait"><b>Təsdiq gözlənilir (qaralama).</b> Plan mərkəz rəhbərliyi tərəfindən təsdiqlənənədək tətbiq edilməməlidir.' +
+      '<div class="sig">Mərkəz müdiri: ______________________ &nbsp; İmza: ____________ &nbsp; Tarix: ____________</div></div>';
+  }
 
   function headerHtml(form, cycle) {
     var p = cycle.plan, name = [form.ad, form.soyad].filter(Boolean).join(' ');
     return '<h1>Fərdi Reabilitasiya Planı: ' + esc(name) + '</h1>' +
       '<p class="muted">' + esc(p.profile.ageLabel) + ' · Dövr ' + cycle.n + ' · ' + fmtDate(p.start) + ' – ' + fmtDate(p.end) + ' · həftədə ' + p.profile.sessionsPerWeek + ' seans (ayda ' + p.sessions.length + ')' +
       (form.diaqnoz ? ' · Diaqnoz: ' + esc(form.diaqnoz) : '') + (form.kurator ? ' · Kurator: ' + esc(form.kurator) : '') + '</p>' +
-      '<p class="muted">Növbəti dövr: ' + fmtDate(p.nextStart) + ' tarixindən, yekun testlərdən sonra yeni plan hazırlanır.</p>';
+      '<p class="muted">Növbəti dövr: ' + fmtDate(p.nextStart) + ' tarixindən, yekun testlərdən sonra yeni plan hazırlanır.</p>' + approvalHtml(cycle);
+  }
+
+  function deferredNote(p) {
+    var d = p.testsDeferred || [];
+    return d.length ? 'Yüklənmə çox olmasın deyə bu dövrdə planlaşdırılmayan testlər: ' + d.join(', ') + '. Mütəxəssis lazım bilərsə əlavə edə bilər.' : '';
   }
 
   function warningsHtml(p) {
@@ -74,7 +91,7 @@
       var r = results && results[t.id] && results[t.id][t.phase];
       return '<tr><td>' + fmtDate(t.date) + '<br><span class="muted">' + esc(wdName(t.date)) + ', gün ' + t.day + '</span></td><td><b>' + esc(t.name) + '</b></td><td>' + esc(PHASE[t.phase]) + '</td><td>' + esc(SPEC_LABEL[t.who] || t.who) + (t.licensed ? '<br><span class="muted">lisenziyalı mütəxəssis</span>' : '') + '</td><td>~' + t.min + ' dəq</td><td>' + esc(t.reason) + '</td><td>' + (r ? esc(r.score + (r.note ? ' · ' + r.note : '')) : '') + '</td></tr>';
     }).join('');
-    return '<h2>Test cədvəli</h2><table><tr><th>Tarix</th><th>Test</th><th>Mərhələ</th><th>Kim aparır</th><th>Müddət</th><th>Niyə</th><th>Nəticə</th></tr>' + rows + '</table>';
+    return '<h2>Test cədvəli</h2><table><tr><th>Tarix</th><th>Test</th><th>Mərhələ</th><th>Kim aparır</th><th>Müddət</th><th>Niyə</th><th>Nəticə</th></tr>' + rows + '</table>' + (deferredNote(p) ? '<p class="muted">' + esc(deferredNote(p)) + '</p>' : '');
   }
 
   function needsHtml(p) {
@@ -134,7 +151,7 @@
 
   function fullHtml(form, cycle, bank) {
     var p = cycle.plan;
-    return wrap('Plan ' + form.ad, headerHtml(form, cycle) + warningsHtml(p) + needsHtml(p) + goalsHtml(p) + testsHtml(p, cycle.results) + sessionsHtml(p, bank, cycle.log) + homeHtml(p, bank, false));
+    return wrap('Plan ' + form.ad, headerHtml(form, cycle) + warningsHtml(p) + needsHtml(p) + goalsHtml(p) + testsHtml(p, cycle.results) + sessionsHtml(p, bank, cycle.log) + homeHtml(p, bank, false) + approvalHtml(cycle));
   }
 
   function parentHtml(form, cycle, bank) {
@@ -191,6 +208,6 @@
     return out;
   }
 
-  return { esc: esc, fmtDate: fmtDate, wdName: wdName, fullHtml: fullHtml, parentHtml: parentHtml, wordHtml: wordHtml, csv: csv, activityBlock: activityBlock,
+  return { deferredNote: deferredNote, approvalHtml: approvalHtml, esc: esc, fmtDate: fmtDate, wdName: wdName, fullHtml: fullHtml, parentHtml: parentHtml, wordHtml: wordHtml, csv: csv, activityBlock: activityBlock,
     comparisonHtml: comparisonHtml, flatResults: flat, SPEC_LABEL: SPEC_LABEL, PHASE: PHASE, LV: LV, WD: WD, testsHtml: testsHtml, needsHtml: needsHtml, goalsHtml: goalsHtml, warningsHtml: warningsHtml };
 });
