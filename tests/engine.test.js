@@ -278,3 +278,11 @@ test('mütəxəssis planı: yalnız seçilmiş mütəxəssis və həftə, hər s
   assert.ok((all.match(/newpage/g) || []).length >= 2);
   assert.match(all, /Qeyd: <span class="line">/);
 });
+
+test('seans müddəti: standart 45 dəq, diqqət və yaşdan asılı qısalmır, seçim 30/60 qəbul olunur', () => {
+  const base = { dogum: '2024-06-01', diaqnoz: 'Autizm', diqqet: 'Çox zəif', baslama: '2026-10-05' };
+  assert.strictEqual(E.generate(base, demo, { catalog: {}, today: '2026-10-02' }).sessionMin, 45);
+  assert.strictEqual(E.generate(Object.assign({ seansdeq: '60' }, base), demo, { catalog: {}, today: '2026-10-02' }).sessionMin, 60);
+  assert.strictEqual(E.generate(Object.assign({ seansdeq: '30' }, base), demo, { catalog: {}, today: '2026-10-02' }).sessionMin, 30);
+  assert.strictEqual(E.generate(Object.assign({ seansdeq: '17' }, base), demo, { catalog: {}, today: '2026-10-02' }).sessionMin, 45);
+});
