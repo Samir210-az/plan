@@ -18,7 +18,7 @@ AN Psixoloji Dəstək və Reabilitasiya Mərkəzi üçün 30 günlük fərdi pla
 
 ## Lisenziya
 
-Nümunə rejimində 10 məşğələ işləyir. Tam baza Google hesabına bağlı lisenziya ilə (1, 6 və ya 12 ay) açılır. Quraşdırma: `SETUP.md`.
+Plan yaratmaq və açmaq yalnız aktiv lisenziya ilə mümkündür. Lisenziya Google hesabına bağlıdır (1, 6 və ya 12 ay). Quraşdırma: `SETUP.md`.
 
 ## Tərtibat
 
