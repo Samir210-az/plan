@@ -21,7 +21,7 @@
 
   function activityBlock(bank, item) {
     var a = bank.act[item.a];
-    if (!a) return '';
+    if (!a) return '<div class="act"><p class="muted">Bu məşğələ cari baza ilə açılmır. Tam məzmun üçün aktiv lisenziya lazımdır.</p></div>';
     var lv = a.levels[item.lv] || a.levels[1];
     return '<div class="act">' +
       '<h4>' + esc(a.t) + ' <span class="lv">' + esc(LV[item.lv]) + ' · ' + item.min + ' dəq</span></h4>' +

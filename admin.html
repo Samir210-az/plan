@@ -1,132 +1,191 @@
-<!DOCTYPE html><html lang="az"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SuperAdmin — Qeydiyyatlar</title>
-<meta name="robots" content="noindex, nofollow">
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>İdarə paneli | Plan lisenziyaları</title>
 <style>
-:root{--bordo:#6A0000;--teal:#2A9D8F;--teal-2:#1f7a6f;--gold:#D2A55D;--gold-2:#b9863a;--cream:#F3ECE0;--paper:#FBF7F0;--line:#e7ddd0;--ink-2:#6b5d54;--r:14px;--r-lg:20px;--shadow-sm:0 2px 10px rgba(90,60,30,.06);--shadow-lg:0 20px 60px rgba(90,60,30,.18)}
+:root{--navy:#0b2545;--blue:#1e5aa8;--sky:#eaf3ff;--line:#dbe6f3;--ink:#1b2733;--muted:#5c7089;--warn:#c0392b;--ok:#1c8a5a;--bg:#f5f9fd}
 *{box-sizing:border-box}
-body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--paper);color:#2a1c1c}
-.admin-wrap{max-width:900px;margin:0 auto;padding:60px 24px 60px}
-.pin-box{max-width:340px;margin:120px auto;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 28px;box-shadow:var(--shadow-lg);text-align:center}
-.pin-box input{width:100%;font-size:1.1rem;text-align:center;letter-spacing:.15em;padding:12px;border:1px solid var(--line);border-radius:10px;margin:16px 0;font-family:monospace;box-sizing:border-box}
-.pin-err{color:#b34242;font-size:.85rem;min-height:1.2em}
-.btn{border:none;border-radius:10px;padding:12px;font-size:.95rem;font-weight:700;cursor:pointer}
-.btn-primary{background:var(--bordo);color:#fff;width:100%}
-.admin-table{width:100%;border-collapse:collapse}
-.admin-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:6px}
-.admin-count{background:var(--bordo);color:#fff;border-radius:999px;padding:5px 14px;font-size:.82rem;font-weight:700}
-#adminSearch{max-width:260px;padding:10px 14px;border:1px solid var(--line);border-radius:10px}
-.reg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:20px}
-.reg-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm);position:relative}
-.reg-card .rc-name{font-family:Georgia,serif;font-size:1.1rem;color:var(--bordo);font-weight:700;margin-bottom:10px;padding-left:64px;padding-right:64px}
-.reg-card .rc-row{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--ink-2);margin-top:7px}
-.reg-card .rc-tag{position:absolute;top:18px;right:18px;font-size:.68rem;font-weight:800;padding:4px 10px;border-radius:999px;text-transform:uppercase}
-.reg-card .rc-tag.sms{background:#e3f4f1;color:var(--teal-2)}
-.reg-card .rc-tag.bypass{background:#faf0dd;color:var(--gold-2)}
-.reg-card .rc-status{position:absolute;top:18px;left:18px;font-size:.68rem;font-weight:800;padding:4px 10px;border-radius:999px;text-transform:uppercase}
-.reg-card .rc-status.pending{background:#fdeceb;color:#b34242}
-.reg-card .rc-status.active{background:#e3f4f1;color:var(--teal-2)}
-.reg-card .rc-actions{margin-top:14px;display:flex;gap:8px}
-.rc-btn{flex:1;border:none;border-radius:9px;padding:9px 0;font-size:.82rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;color:#333}
-.rc-btn.approve{background:var(--teal);color:#fff}
-.rc-btn.revoke{background:var(--cream);color:var(--ink-2)}
-.rc-btn.wa{background:#faf0dd;color:var(--gold-2)}
-.empty-note{text-align:center;padding:40px;color:var(--ink-2)}
-h2{margin:0}
+body{margin:0;font-family:"Segoe UI",Tahoma,Verdana,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+header{background:var(--navy);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{margin:0;font-size:18px}
+main{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+.btn{border:1.5px solid var(--line);background:#fff;color:var(--blue);border-radius:10px;padding:8px 14px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.danger{color:var(--warn);border-color:#f1c6c0}
+.btn:disabled{opacity:.5;cursor:default}
+.btn:focus-visible,.tab:focus-visible{outline:3px solid #2f7fe0;outline-offset:2px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tab{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 16px;font:inherit;font-weight:700;color:var(--muted);cursor:pointer}
+.tab[aria-selected=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 0;border-bottom:1px dashed var(--line)}
+.row:last-child{border-bottom:none}
+.row .meta{color:var(--muted);font-size:13px}
+.actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tag{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700}
+.tag.ok{background:#e4f6ee;color:var(--ok)}.tag.bad{background:#fdecea;color:var(--warn)}
+.msg{margin:10px 0;font-size:14px}.msg.err{color:var(--warn)}.msg.ok{color:var(--ok)}
+[hidden]{display:none!important}
 </style>
-</head><body>
-
-<div id="pinScreen" class="pin-box">
-  <h3 style="margin-bottom:4px">SuperAdmin girişi</h3>
-  <p style="font-size:.9rem;color:var(--ink-2)">Qeydiyyatdan keçənlərin siyahısını görmək üçün PIN daxil edin.</p>
-  <input id="pinInput" type="password" placeholder="PIN" autocomplete="off" autocapitalize="characters">
-  <div class="pin-err" id="pinErr"></div>
-  <button class="btn btn-primary" onclick="checkPin()">Daxil ol</button>
-</div>
-
-<main id="adminMain" class="admin-wrap" style="display:none">
-  <div class="admin-top">
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-      <h2 id="pageTitle">Qeydiyyatdan keçənlər</h2>
-      <span class="admin-count" id="regCount">0</span>
-      <span class="admin-count" id="regActiveCount" style="background:var(--teal)">0 aktiv</span>
-      <span class="admin-count" id="regPendingCount" style="background:#b34242">0 gözləyir</span>
-    </div>
-    <input id="adminSearch" type="text" placeholder="Ad, iş yeri və ya nömrə axtar..." oninput="renderTable()">
+</head>
+<body>
+<header>
+  <h1>Plan lisenziya paneli</h1>
+  <div class="actions"><span id="who"></span><button class="btn" id="out" type="button" hidden>Çıxış</button></div>
+</header>
+<main>
+  <div class="card" id="loginCard">
+    <p>İdarə paneli yalnız sahib Google hesabı ilə açılır.</p>
+    <button class="btn primary" id="in" type="button">Google ilə daxil ol</button>
+    <div class="msg err" id="loginMsg" role="alert"></div>
   </div>
-  <div class="reg-grid" id="regBody"></div>
-  <div class="empty-note" id="emptyNote" style="display:none">Hələ heç kim qeydiyyatdan keçməyib.</div>
-</main>
 
+  <div id="panel" hidden>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="req" aria-selected="true">Sorğular</button>
+      <button class="tab" role="tab" data-tab="lic" aria-selected="false">Lisenziyalar</button>
+      <button class="tab" role="tab" data-tab="bank" aria-selected="false">Məşğələ bazası</button>
+    </div>
+    <div class="msg" id="msg" role="status"></div>
+    <div class="card" id="tab-req"></div>
+    <div class="card" id="tab-lic" hidden></div>
+    <div class="card" id="tab-bank" hidden></div>
+  </div>
+</main>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-database-compat.js"></script>
 <script>
-const ADMIN_PIN = "AL2026EA";
-const TOOL_ID = "plan";
-const TOOL_TITLE = "Fərdi Reabilitasiya Planı";
-const FB_CONFIG = {
-  apiKey: "AIzaSyCBhyGNzZRGgQShP_C9kwAzTm_g_0zJlzg",
-  authDomain: "an-psixoloji-33442.firebaseapp.com",
-  databaseURL: "https://an-psixoloji-33442-default-rtdb.firebaseio.com",
-  projectId: "an-psixoloji-33442",
-  storageBucket: "an-psixoloji-33442.firebasestorage.app",
-  messagingSenderId: "528809299356",
-  appId: "1:528809299356:web:59cae89a64e446dc520c59"
-};
-document.getElementById('pageTitle').textContent = TOOL_TITLE + ' — Qeydiyyatlar';
-let allRegs = [];
-
-function checkPin(){
-  const v = document.getElementById('pinInput').value.trim();
-  if(v !== ADMIN_PIN){ document.getElementById('pinErr').textContent = 'Yanlış PIN.'; return; }
-  document.getElementById('pinScreen').style.display='none';
-  document.getElementById('adminMain').style.display='block';
-  loadRegs();
-}
-document.getElementById('pinInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
-
-async function loadRegs(){
-  if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
-  if(!firebase.auth().currentUser){
-    try{ await firebase.auth().signInAnonymously(); }catch(e){ console.error(e); }
-  }
-  firebase.database().ref('registrations/'+TOOL_ID).on('value', snap=>{
-    const val = snap.val() || {};
-    allRegs = Object.entries(val).map(([key,r])=>Object.assign({_key:key}, r)).sort((a,b)=>(b.ts||0)-(a.ts||0));
-    renderTable();
+(function () {
+  'use strict';
+  var ADMIN_EMAIL = 'samir.akhundoff@gmail.com';
+  firebase.initializeApp({
+    apiKey: 'AIzaSyCBhyGNzZRGgQShP_C9kwAzTm_g_0zJlzg', authDomain: 'an-psixoloji-33442.firebaseapp.com',
+    databaseURL: 'https://an-psixoloji-33442-default-rtdb.firebaseio.com', projectId: 'an-psixoloji-33442',
+    storageBucket: 'an-psixoloji-33442.firebasestorage.app', messagingSenderId: '528809299356', appId: '1:528809299356:web:59cae89a64e446dc520c59'
   });
-}
-function renderTable(){
-  const q = (document.getElementById('adminSearch').value||'').toLowerCase();
-  const filtered = allRegs.filter(r =>
-    (r.adSoyad||'').toLowerCase().includes(q) ||
-    (r.isYeri||'').toLowerCase().includes(q) ||
-    (r.phone||'').toLowerCase().includes(q)
-  );
-  const pendingCount = allRegs.filter(r=>!r.approved).length;
-  document.getElementById('regCount').textContent = allRegs.length + ' toplam';
-  document.getElementById('regActiveCount').textContent = (allRegs.length - pendingCount) + ' aktiv';
-  document.getElementById('regPendingCount').textContent = pendingCount + ' gözləyir';
-  document.getElementById('emptyNote').style.display = filtered.length ? 'none' : 'block';
-  document.getElementById('regBody').innerHTML = filtered.map(r => {
-    const d = r.ts ? new Date(r.ts).toLocaleDateString('az-AZ',{year:'numeric',month:'short',day:'numeric'}) : '—';
-    const tag = r.bypass ? '<span class="rc-tag bypass">Daxili</span>' : '<span class="rc-tag sms">İstifadəçi</span>';
-    const status = r.approved ? '<span class="rc-status active">Aktiv</span>' : '<span class="rc-status pending">Gözləyir</span>';
-    const actionBtn = r.approved
-      ? `<button class="rc-btn revoke" onclick="toggleApprove('${r._key}',false)">Deaktiv et</button>`
-      : `<button class="rc-btn approve" onclick="toggleApprove('${r._key}',true)">Aktivləşdir</button>`;
-    const waMsg = encodeURIComponent(`Salam ${r.adSoyad||''}, ${TOOL_TITLE} hesabınız aktivləşdirildi. İstifadə edə bilərsiniz.`);
-    const waBtn = r.approved ? '' : `<a class="rc-btn wa" href="https://wa.me/${(r.phone||'').replace('+','')}?text=${waMsg}" target="_blank" rel="noopener noreferrer">WhatsApp</a>`;
-    return `<div class="reg-card">${status}${tag}<div class="rc-name">${esc(r.adSoyad)}</div>
-      <div class="rc-row">🏢 <span>${esc(r.isYeri)}</span></div>
-      <div class="rc-row">📞 <span>${esc(r.phone)}</span></div>
-      <div class="rc-row">📅 <span>${d}</span></div>
-      <div class="rc-actions">${actionBtn}${waBtn}</div></div>`;
-  }).join('');
-}
-function toggleApprove(key, val){
-  firebase.database().ref('registrations/'+TOOL_ID+'/'+key+'/approved').set(val);
-}
-function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+  var db = firebase.database(), auth = firebase.auth();
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  function fmt(ts) { var d = new Date(ts); return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear(); }
+  function say(t, kind) { var m = $('msg'); m.textContent = t || ''; m.className = 'msg' + (kind ? ' ' + kind : ''); }
+  function addMonths(ts, n) { var d = new Date(ts); d.setMonth(d.getMonth() + n); return d.getTime(); }
+  function button(text, cls, fn) { var b = el('button', 'btn' + (cls ? ' ' + cls : ''), text); b.type = 'button'; b.addEventListener('click', function () { b.disabled = true; Promise.resolve(fn()).catch(function (e) { say('Xəta: ' + (e.code || e.message), 'err'); }).then(function () { b.disabled = false; }); }); return b; }
+
+  $('in').addEventListener('click', function () {
+    var p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' });
+    auth.signInWithPopup(p).catch(function (e) { $('loginMsg').textContent = 'Daxil olmaq mümkün olmadı: ' + (e.code || e.message); });
+  });
+  $('out').addEventListener('click', function () { auth.signOut(); });
+
+  auth.onAuthStateChanged(function (u) {
+    var ok = u && !u.isAnonymous && u.emailVerified && u.email === ADMIN_EMAIL;
+    $('loginCard').hidden = !!ok; $('panel').hidden = !ok; $('out').hidden = !(u && !u.isAnonymous);
+    $('who').textContent = u && !u.isAnonymous ? u.email : '';
+    if (u && !u.isAnonymous && !ok) $('loginMsg').textContent = 'Bu hesabın icazəsi yoxdur.';
+    if (ok) { showTab('req'); }
+  });
+
+  [].forEach.call(document.querySelectorAll('.tab'), function (t) { t.addEventListener('click', function () { showTab(t.getAttribute('data-tab')); }); });
+  function showTab(name) {
+    ['req', 'lic', 'bank'].forEach(function (n) { $('tab-' + n).hidden = n !== name; });
+    [].forEach.call(document.querySelectorAll('.tab'), function (t) { t.setAttribute('aria-selected', t.getAttribute('data-tab') === name ? 'true' : 'false'); });
+    say('');
+    ({ req: loadRequests, lic: loadLicenses, bank: loadBank })[name]();
+  }
+
+  function issue(uid, info, months) {
+    return db.ref('plan_licenses/' + uid).once('value').then(function (s) {
+      var cur = s.val(), now = Date.now();
+      var base = cur && cur.expiresAt > now ? cur.expiresAt : now;
+      var rec = { email: info.email, name: info.name || '', tier: months, issuedAt: now, expiresAt: addMonths(base, months) };
+      return db.ref('plan_licenses/' + uid).set(rec).then(function () { return rec; });
+    });
+  }
+
+  function loadRequests() {
+    var box = $('tab-req'); box.textContent = '';
+    box.appendChild(el('h2', null, 'Lisenziya sorğuları'));
+    db.ref('plan_requests').once('value').then(function (s) {
+      var v = s.val() || {}, keys = Object.keys(v).sort(function (a, b) { return v[b].ts - v[a].ts; });
+      if (!keys.length) { box.appendChild(el('p', 'meta', 'Yeni sorğu yoxdur.')); return; }
+      keys.forEach(function (uid) {
+        var r = v[uid], row = el('div', 'row'), info = el('div');
+        info.appendChild(el('b', null, (r.name || '-') + ' · ' + r.email));
+        info.appendChild(el('div', 'meta', [r.work, r.phone, fmt(r.ts)].filter(Boolean).join(' · ')));
+        var act = el('div', 'actions');
+        [1, 6, 12].forEach(function (m) {
+          act.appendChild(button(m + ' ay ver', 'primary', function () {
+            return issue(uid, r, m).then(function (rec) { return db.ref('plan_requests/' + uid).remove().then(function () { say(r.email + ' üçün lisenziya verildi, bitmə tarixi ' + fmt(rec.expiresAt), 'ok'); loadRequests(); }); });
+          }));
+        });
+        act.appendChild(button('Sil', 'danger', function () { return db.ref('plan_requests/' + uid).remove().then(loadRequests); }));
+        row.appendChild(info); row.appendChild(act); box.appendChild(row);
+      });
+    }).catch(function (e) { say('Oxumaq mümkün olmadı: ' + (e.code || e.message), 'err'); });
+  }
+
+  function loadLicenses() {
+    var box = $('tab-lic'); box.textContent = '';
+    box.appendChild(el('h2', null, 'Lisenziyalar'));
+    db.ref('plan_licenses').once('value').then(function (s) {
+      var v = s.val() || {}, keys = Object.keys(v).sort(function (a, b) { return v[b].expiresAt - v[a].expiresAt; });
+      if (!keys.length) { box.appendChild(el('p', 'meta', 'Lisenziya yoxdur.')); return; }
+      keys.forEach(function (uid) {
+        var r = v[uid], active = r.expiresAt > Date.now(), row = el('div', 'row'), info = el('div');
+        var t = el('b', null, (r.name || '-') + ' · ' + r.email + ' ');
+        t.appendChild(el('span', 'tag ' + (active ? 'ok' : 'bad'), active ? 'aktiv' : 'bitib'));
+        info.appendChild(t);
+        info.appendChild(el('div', 'meta', 'Bitmə: ' + fmt(r.expiresAt) + ' · Verilib: ' + fmt(r.issuedAt)));
+        var act = el('div', 'actions');
+        [1, 6, 12].forEach(function (m) { act.appendChild(button('+' + m + ' ay', '', function () { return issue(uid, r, m).then(function (rec) { say('Yeni bitmə tarixi: ' + fmt(rec.expiresAt), 'ok'); loadLicenses(); }); })); });
+        act.appendChild(button('Ləğv et', 'danger', function () { if (!confirm('Lisenziya ləğv olunsun?')) return Promise.resolve(); return db.ref('plan_licenses/' + uid).remove().then(loadLicenses); }));
+        row.appendChild(info); row.appendChild(act); box.appendChild(row);
+      });
+    }).catch(function (e) { say('Oxumaq mümkün olmadı: ' + (e.code || e.message), 'err'); });
+  }
+
+  function validateBank(b) {
+    if (!b || typeof b !== 'object' || !b.act || typeof b.act !== 'object' || !b.needs) return 'Fayl baza formatında deyil.';
+    var ids = Object.keys(b.act);
+    if (ids.length < 10) return 'Məşğələ sayı çox azdır (' + ids.length + ').';
+    var req = ['id', 'group', 't', 'needs', 'age', 'min', 'why', 'prep', 'how', 'say', 'avoid', 'measure', 'easier', 'harder', 'home', 'levels'];
+    for (var i = 0; i < ids.length; i++) {
+      var a = b.act[ids[i]];
+      for (var j = 0; j < req.length; j++) if (a[req[j]] == null) return ids[i] + ': "' + req[j] + '" sahəsi yoxdur.';
+      for (var l = 1; l <= 3; l++) if (!a.levels[l] || !a.levels[l].g || !a.levels[l].sup || !a.levels[l].ok) return ids[i] + ': səviyyə ' + l + ' natamamdır.';
+    }
+    return '';
+  }
+
+  function loadBank() {
+    var box = $('tab-bank'); box.textContent = '';
+    box.appendChild(el('h2', null, 'Məşğələ bazası'));
+    var info = el('p', 'meta', 'Yüklənir...'); box.appendChild(info);
+    db.ref('plan_bank/meta').once('value').then(function (s) {
+      var m = s.val();
+      info.textContent = m ? 'Cari baza: versiya ' + m.version + ', ' + m.count + ' məşğələ, ' + Math.round(m.size / 1024) + ' KB, yenilənib ' + fmt(m.updatedAt) : 'Baza hələ yüklənməyib.';
+    }).catch(function (e) { info.textContent = 'Oxumaq mümkün olmadı: ' + (e.code || e.message); });
+    var file = el('input'); file.type = 'file'; file.accept = '.json,application/json'; file.setAttribute('aria-label', 'Baza faylı');
+    box.appendChild(file);
+    var go = button('Bazanı yüklə', 'primary', function () {
+      var f = file.files && file.files[0];
+      if (!f) { say('Fayl seçin.', 'err'); return Promise.resolve(); }
+      return f.text().then(function (txt) {
+        var b; try { b = JSON.parse(txt); } catch (e) { say('JSON oxunmadı.', 'err'); return; }
+        var err = validateBank(b); if (err) { say(err, 'err'); return; }
+        if (txt.length > 4 * 1024 * 1024) { say('Fayl çox böyükdür.', 'err'); return; }
+        var data = JSON.stringify(b);
+        return db.ref('plan_bank').update({ data: data, meta: { version: b.version || 0, count: Object.keys(b.act).length, size: data.length, updatedAt: Date.now() } })
+          .then(function () { say('Baza yeniləndi: ' + Object.keys(b.act).length + ' məşğələ.', 'ok'); loadBank(); });
+      });
+    });
+    go.style.marginLeft = '8px'; box.appendChild(go);
+  }
+})();
 </script>
-</body></html>
+</body>
+</html>

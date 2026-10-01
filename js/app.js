@@ -125,9 +125,9 @@
   }
   function renderModeBanner() {
     var el = $('modeBanner');
-    if (state.mode === 'full') { el.hidden = true; return; }
+    if (state.mode === 'full' || !state.bank) { el.hidden = true; return; }
     el.hidden = false;
-    el.innerHTML = '<b>Nümunə rejimi.</b> Plan yalnız ' + Object.keys(state.bank.act).length + ' məşğələdən qurulur. Tam baza (63 məşğələ, 3 səviyyə, ev proqramı) lisenziya ilə açılır.';
+    el.textContent = 'Nümunə rejimi: plan yalnız ' + Object.keys(state.bank.act).length + ' məşğələdən qurulur. Lisenziya ilə tam baza açılır.';
   }
 
   /* ---------- plan göstərişi ---------- */
@@ -370,6 +370,10 @@
     $('yr').textContent = new Date().getFullYear();
     buildChips('behaviorChips', BEHAVIOR_LIST); buildChips('sensoryChips', SENSORY_LIST);
     ensureBlankOptions();
+    [].forEach.call(document.querySelectorAll('.field'), function (f) {
+      var l = f.querySelector('label'), c = f.querySelector('input,select,textarea');
+      if (l && c && c.id && !l.getAttribute('for')) l.setAttribute('for', c.id);
+    });
     if (!$('f_baslama').value) $('f_baslama').value = E.todayISO();
     $('f_dogum').addEventListener('change', calcAge);
     $('f_seans').addEventListener('change', updateSeansInfo);
@@ -391,6 +395,12 @@
     else $('planSection').hidden = true;
   }
 
-  window.PlanApp = { init: init, state: state };
+  function onLicenseChange() {
+    state.bank = null;
+    if (state.childKey && !$('planSection').hidden) renderPlan();
+    renderModeBanner();
+  }
+
+  window.PlanApp = { init: init, state: state, onLicenseChange: onLicenseChange };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
