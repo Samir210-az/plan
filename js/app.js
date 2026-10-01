@@ -285,7 +285,7 @@
     if (!t) return;
     var a = t.getAttribute('data-action'), key = t.getAttribute('data-key');
     if (a === 'week') { state.week = +t.getAttribute('data-w'); renderPlan(); }
-    else if (a === 'open-child') { var c = store.getChild(key); if (!c) return; state.childKey = key; state.cycleN = c.cycles[c.cycles.length - 1].n; state.week = 1; fillForm(c.cycles[c.cycles.length - 1].form || c.form); renderPlan(); $('planSection').hidden = false; $('planSection').scrollIntoView({ behavior: 'smooth' }); }
+    else if (a === 'open-child') openChild(key);
     else if (a === 'new-cycle') startNextCycle(key);
     else if (a === 'del-child') { if (window.confirm('Bu uşağın bütün planları və qeydləri silinsin?')) { saveCheck(store.removeChild(key)); if (state.childKey === key) { state.childKey = null; $('planSection').hidden = true; } renderChildren(); } }
     else if (a === 'new-assessment') newAssessment();
@@ -342,6 +342,17 @@
     if (!window.confirm('Təsdiq ləğv edilsin?')) return;
     saveCheck(store.updateCycle(state.childKey, state.cycleN, function (cy) { delete cy.approval; }));
     renderPlan();
+  }
+
+  function openChild(key) {
+    var c = store.getChild(key);
+    if (!c) return;
+    var last = c.cycles[c.cycles.length - 1];
+    state.childKey = key; state.cycleN = last.n; state.week = 1;
+    fillForm(last.form || c.form);
+    renderPlan();
+    $('planSection').hidden = false;
+    $('planSection').scrollIntoView({ behavior: 'smooth' });
   }
 
   function newAssessment() {
@@ -414,6 +425,8 @@
       if (!res.ok) { toast(res.error || 'Fayl yüklənmədi'); return; }
       toast('Yükləndi: ' + res.added + ' dövr əlavə olundu.');
       renderChildren();
+      var first = store.listChildren()[0];
+      if (first) openChild(first.key);
     };
     r.readAsText(file);
     ev.target.value = '';
