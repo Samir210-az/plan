@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>İdarə paneli | Plan lisenziyaları</title>
 <style>
-:root{--navy:#0b2545;--blue:#1e5aa8;--sky:#eaf3ff;--line:#dbe6f3;--ink:#1b2733;--muted:#5c7089;--warn:#c0392b;--ok:#1c8a5a;--bg:#f5f9fd}
+:root{--navy:#0c2f3d;--blue:#0e6a82;--sky:#e8f3f5;--line:#e1ddd1;--ink:#1d2a30;--muted:#5d6b72;--warn:#c0392b;--ok:#1c8a5a;--bg:#f6f4ee}
 *{box-sizing:border-box}
 body{margin:0;font-family:"Segoe UI",Tahoma,Verdana,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
 header{background:var(--navy);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
@@ -17,7 +17,7 @@ main{max-width:980px;margin:0 auto;padding:20px 16px 60px}
 .btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
 .btn.danger{color:var(--warn);border-color:#f1c6c0}
 .btn:disabled{opacity:.5;cursor:default}
-.btn:focus-visible,.tab:focus-visible{outline:3px solid #2f7fe0;outline-offset:2px}
+.btn:focus-visible,.tab:focus-visible{outline:3px solid #0e6a82;outline-offset:2px}
 .tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
 .tab{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 16px;font:inherit;font-weight:700;color:var(--muted);cursor:pointer}
 .tab[aria-selected=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
@@ -30,10 +30,12 @@ main{max-width:980px;margin:0 auto;padding:20px 16px 60px}
 .msg{margin:10px 0;font-size:14px}.msg.err{color:var(--warn)}.msg.ok{color:var(--ok)}
 [hidden]{display:none!important}
 </style>
+<link rel="icon" id="favicon" href="">
+<script src="js/brand.js"></script>
 </head>
 <body>
 <header>
-  <h1>Plan lisenziya paneli</h1>
+  <h1 style="display:flex;align-items:center;gap:12px"><span id="brandMark" aria-hidden="true"></span>Plan lisenziya paneli</h1>
   <div class="actions"><span id="who"></span><button class="btn" id="out" type="button" hidden>Çıxış</button></div>
 </header>
 <main>
@@ -187,5 +189,6 @@ main{max-width:980px;margin:0 auto;padding:20px 16px 60px}
   }
 })();
 </script>
+<script>(function(){var m=document.getElementById('brandMark');if(m&&window.PlanBrand){m.innerHTML=PlanBrand.logo(36,true);document.getElementById('favicon').href=PlanBrand.favicon();}})();</script>
 </body>
 </html>

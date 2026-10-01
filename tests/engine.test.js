@@ -300,3 +300,26 @@ test('retimePlan: köhnə plan 45 dəqiqəyə keçir, məşğələlər dəyişmi
     assert.deepStrictEqual(l.map(x => x.a), o.map(x => x.a));
   }));
 });
+
+test('loqo: bütün çıxarışların başlığında və hər seans səhifəsində var', () => {
+  const X = require('../js/exports.js');
+  const f = { ad: 'Həsən', soyad: 'H', dogum: '2018-10-18', diaqnoz: 'Autizm', baslama: '2026-11-01' };
+  const plan = E.generate(f, demo, { catalog: {}, today: '2026-10-02' });
+  const cy = { n: 1, plan, log: {}, results: {} };
+  assert.match(X.fullHtml(f, cy, demo), /class="brandrow"><svg/);
+  assert.match(X.parentHtml(f, cy, demo), /class="brandrow"><svg/);
+  const sp = X.specialistHtml(f, cy, demo, { spec: 'psixoloq', week: 0, perSession: true });
+  assert.match(sp, /class="brandrow"><svg/);
+  const mini = (sp.match(/class="minihead"/g) || []).length;
+  const pages = (sp.match(/class="day newpage"/g) || []).length;
+  assert.ok(pages > 5 && mini === pages, 'hər yeni səhifədə kiçik başlıq var');
+});
+
+test('imza: yalnız təhlükəsiz PNG data URL çapa düşür', () => {
+  const X = require('../js/exports.js');
+  const png = 'data:image/png;base64,iVBORw0KGgo=';
+  assert.match(X.approvalHtml({ approval: { by: 'Nahidə A', at: '2026-10-02', sig: png } }), /<img class="sigimg" alt="İmza" src="data:image\/png;base64,iVBORw0KGgo="/);
+  const bad = X.approvalHtml({ approval: { by: 'N A', at: '2026-10-02', sig: 'javascript:alert(1)' } });
+  assert.ok(!/<img/.test(bad) && /______/.test(bad));
+  assert.ok(!/<img/.test(X.approvalHtml({ approval: { by: 'N A', at: '2026-10-02', sig: 'data:image/png;base64,"><script>' } })));
+});

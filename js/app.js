@@ -345,6 +345,7 @@
     else if (a === 'print') withCur(function (c, b) { showDoc(X.fullHtml(c.form(), c.cycle, b), fname(c, 'plan', 'html')); });
     else if (a === 'spec-print') withCur(function (c, b) { showDoc(X.specialistHtml(c.form(), c.cycle, b, { spec: $('specSel').value, week: +$('specPeriod').value || 0, perSession: $('specPerSession').checked }), fname(c, 'mutexessis-' + $('specSel').value, 'html')); });
     else if (a === 'retime') retime();
+    else if (a === 'sig-clear') clearSig();
     else if (a === 'approve') approve();
     else if (a === 'unapprove') unapprove();
     else if (a === 'html') withCur(function (c, b) { showDoc(X.fullHtml(c.form(), c.cycle, b), fname(c, 'plan', 'html')); });
@@ -416,6 +417,7 @@
     var a = cy.approval;
     if (a && a.by) {
       box.innerHTML = '<div class="appr-box ok"><span><b>Təsdiq edilib.</b> ' + esc(a.by) + (a.role ? ' (' + esc(a.role) + ')' : '') + ' · ' + esc(X.fmtDate(a.at)) + '</span>' +
+        (X.safeSig(a.sig) ? '<img class="sig-thumb" alt="İmza" src="' + X.safeSig(a.sig) + '">' : '') +
         '<button type="button" class="btn btn-ghost btn-sm" data-action="unapprove">Təsdiqi ləğv et</button></div>';
       return;
     }
@@ -423,13 +425,42 @@
     box.innerHTML = '<div class="appr-box wait"><span><b>Təsdiq gözlənilir.</b> Mərkəz müdiri planı təsdiqləməlidir.</span>' +
       '<input id="apprName" placeholder="Müdirin adı, soyadı" aria-label="Müdirin adı, soyadı" maxlength="80" value="' + esc(last) + '">' +
       '<input id="apprRole" placeholder="Vəzifə" aria-label="Vəzifə" maxlength="60" value="Mərkəz müdiri">' +
+      '<div class="sig-wrap"><label for="sigPad">İmza (barmaqla və ya qələmlə çəkin, istəyə bağlı)</label>' +
+      '<canvas id="sigPad" width="480" height="160" aria-label="İmza sahəsi"></canvas>' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-action="sig-clear">Təmizlə</button></div>' +
       '<button type="button" class="btn btn-primary btn-sm" data-action="approve">Təsdiq et</button></div>';
+    initSigPad();
+  }
+
+  function initSigPad() {
+    var c = $('sigPad');
+    state.sigDrawn = false;
+    var ctx = c && c.getContext && c.getContext('2d');
+    if (!ctx) { if (c) c.parentNode.hidden = true; return; }
+    ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0c2f3d';
+    var down = false;
+    function pt(e) { var r = c.getBoundingClientRect(); return { x: (e.clientX - r.left) * c.width / r.width, y: (e.clientY - r.top) * c.height / r.height }; }
+    c.addEventListener('pointerdown', function (e) {
+      down = true; var p = pt(e);
+      if (c.setPointerCapture) try { c.setPointerCapture(e.pointerId); } catch (x) { /* kənar */ }
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + 0.1, p.y + 0.1); ctx.stroke(); state.sigDrawn = true;
+      e.preventDefault();
+    });
+    c.addEventListener('pointermove', function (e) { if (!down) return; var p = pt(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { c.addEventListener(n, function () { down = false; }); });
+  }
+  function clearSig() {
+    var c = $('sigPad'), ctx = c && c.getContext && c.getContext('2d');
+    if (ctx) ctx.clearRect(0, 0, c.width, c.height);
+    state.sigDrawn = false;
   }
   function approve() {
     var by = ($('apprName').value || '').trim(), role = ($('apprRole').value || '').trim();
     if (by.length < 3) { toast('Təsdiq edənin adı və soyadı yazılmalıdır.'); return; }
     try { localStorage.setItem('plan_approver', by); } catch (e) { /* kənar */ }
-    saveCheck(store.updateCycle(state.childKey, state.cycleN, function (cy) { cy.approval = { by: by, role: role, at: E.todayISO() }; }));
+    var sig = '';
+    if (state.sigDrawn) { try { sig = X.safeSig($('sigPad').toDataURL('image/png')) || ''; } catch (e) { sig = ''; } }
+    saveCheck(store.updateCycle(state.childKey, state.cycleN, function (cy) { cy.approval = { by: by, role: role, at: E.todayISO(), sig: sig }; }));
     renderPlan();
   }
   function unapprove() {
