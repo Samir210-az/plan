@@ -35,9 +35,9 @@ Bazanı yenilədikdə eyni yolla yeni fayl yükləyin; lisenziyalı istifadəçi
 
 ## 5. Yoxlama (qurduqdan sonra)
 
-1. İkinci bir Google hesabı ilə daxil olun: nümunə rejimi görünməlidir (10 məşğələ).
+1. İkinci bir Google hesabı ilə daxil olun: lisenziya xəbərdarlığı görünməlidir və plan yaranmamalıdır.
 2. Həmin hesab üçün sorğu göndərib admin paneldən lisenziya verin: tam baza açılmalıdır.
-3. Lisenziyanı ləğv edin və ya müddətini keçmişə çəkin: növbəti açılışda yenidən nümunə rejiminə qayıtmalıdır.
+3. Lisenziyanı ləğv edin və ya müddətini keçmişə çəkin: növbəti açılışda plan yenidən bağlanmalıdır.
 
 ## Məhdudiyyətlər
 
