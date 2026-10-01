@@ -7,7 +7,8 @@
   var SPECS = ['psixoloq', 'loqoped', 'ergoterapevt', 'pedaqoq'];
   var CYCLE_DAYS = 30;
   var ENGINE_VERSION = 2;
-  var PATTERNS = { 2: [2, 4], 3: [1, 3, 5], 4: [1, 2, 4, 5], 5: [1, 2, 3, 4, 5], 6: [1, 2, 3, 4, 5, 6] };
+  var PATTERNS = { 3: [1, 3, 5], 4: [1, 2, 4, 5], 5: [1, 2, 3, 4, 5] };
+  var DEFAULT_SPW = 3;
   var NEED_IDS = ['joint', 'play', 'emotion', 'behavior', 'anxiety', 'attention', 'expressive', 'receptive',
     'artic', 'aac', 'oral', 'gross', 'fine', 'sensory', 'selfcare', 'toilet', 'prewrite', 'academic'];
 
@@ -299,7 +300,7 @@
     return {
       ageM: ageM, ageLabel: ageLabel(ageM), dx: dx, needs: needs, reasons: reasons, tags: tags, flags: flags,
       warnings: warnings, unknown: unknown, dxConfirmed: asdConfirmed, concern: concern,
-      sessionsPerWeek: PATTERNS[+f.seans] ? +f.seans : 5,
+      sessionsPerWeek: PATTERNS[+f.seans] ? +f.seans : DEFAULT_SPW,
       homeMin: Math.max(10, Math.min(120, parseInt(f.evdevaxt, 10) || 45))
     };
   }
@@ -369,9 +370,13 @@
     return out;
   }
 
+  function monthSessions(startISO, spw) {
+    return buildSessionDates(parseISO(startISO) ? startISO : todayISO(), spw).length;
+  }
+
   function weekSlots(coreA, coreB, support, nSessions, week, rand) {
     var slots = [], n = nSessions * 2;
-    var c1 = Math.max(1, Math.round(n * 0.3)), c2 = Math.max(coreB ? 1 : 0, Math.round(n * 0.2));
+    var c1 = Math.max(1, Math.floor(n * 0.25)), c2 = Math.max(coreB ? 1 : 0, Math.floor(n * 0.2));
     var i;
     for (i = 0; i < c1; i++) slots.push(coreA);
     for (i = 0; i < c2; i++) slots.push(coreB || coreA);
@@ -452,11 +457,16 @@
     { id: 'y-bocs', who: 'psixoloq', min: 40, when: function (p) { return p.dx.indexOf('ocd') >= 0; }, phases: ['baseline', 'mid', 'retest'], why: 'Obsessiv-kompulsiv əlamətlər: şiddətin aylıq ölçülməsi (uşaqlar üçün CY-BOCS versiyası).' }
   ];
 
+  function retestDays(sdates) {
+    var late = sdates.filter(function (s) { return s.day >= 26; });
+    return late.length ? late.slice(-3) : sdates.slice(-1);
+  }
+
   function selectTests(p, catalog, cycle, sdates, prior) {
     var out = [];
     if (!sdates.length) return out;
-    var first3 = sdates.slice(0, 3);
-    var last3 = sdates.slice(-3);
+    var first3 = sdates.slice(0, 5);
+    var last3 = retestDays(sdates);
     var midDays = sdates.filter(function (s) { return s.day >= 12 && s.day <= 17; });
     if (!midDays.length) midDays = [sdates.reduce(function (b, s) { return Math.abs(s.day - 15) < Math.abs(b.day - 15) ? s : b; }, sdates[0])];
     var load = {};
@@ -470,7 +480,7 @@
         min: rule.min, link: c.link || '', licensed: !!c.lisenziyali, reason: rule.why + (extra ? ' ' + extra : '')
       });
     }
-    TEST_RULES.forEach(function (r) {
+    TEST_RULES.slice().sort(function (a, b) { return b.min - a.min; }).forEach(function (r) {
       if (!catalog[r.id] || !r.when(p)) return;
       var phases = r.phases;
       if (!phases) {
@@ -519,6 +529,8 @@
     var sdates = buildSessionDates(start, p.sessionsPerWeek);
     var sessions = sdates.map(function (s) { return { day: s.day, date: s.date, weekday: s.weekday, week: s.week, items: {} }; });
     var sm = sessionMinutes(p);
+    var retestSet = {};
+    retestDays(sdates).forEach(function (r) { retestSet[r.day] = true; });
     var pools = {};
     SPECS.forEach(function (sp) {
       var r = planSpecialist(bank, sp, p, prior, sdates, rng(seed + hashSeed(sp)));
@@ -526,7 +538,7 @@
       sessions.forEach(function (s, idx) {
         var pair = r.bySession[s.day];
         if (!pair) return;
-        var retest = idx >= sessions.length - 3;
+        var retest = retestSet[s.day] === true;
         var main = pair[0], second = pair[1];
         var items = [{ a: main, lv: levelForAct(bank, main, p, s.week, prior), min: Math.round(sm * 0.6) }];
         if (second && second !== main) items.push({ a: second, lv: levelForAct(bank, second, p, s.week, prior), min: sm - Math.round(sm * 0.6) });
@@ -672,7 +684,7 @@
   }
 
   return {
-    SPECS: SPECS, NEED_IDS: NEED_IDS, CYCLE_DAYS: CYCLE_DAYS, VERSION: ENGINE_VERSION, PATTERNS: PATTERNS,
+    monthSessions: monthSessions, SPECS: SPECS, NEED_IDS: NEED_IDS, CYCLE_DAYS: CYCLE_DAYS, VERSION: ENGINE_VERSION, PATTERNS: PATTERNS,
     norm: norm, ageMonths: ageMonths, ageLabel: ageLabel, parseISO: parseISO, toISO: toISO, addDays: addDays, todayISO: todayISO,
     detectDx: detectDx, deriveProfile: deriveProfile, eligible: eligible, generate: generate, selectTests: selectTests,
     progress: progress, recommendLevel: recommendLevel, nextCycleSeed: nextCycleSeed, compareResults: compareResults,

@@ -1,0 +1,248 @@
+const test = require('node:test');
+const assert = require('node:assert');
+const fs = require('fs');
+const path = require('path');
+const E = require('../js/engine.js');
+
+const root = path.join(__dirname, '..');
+const catalog = JSON.parse(fs.readFileSync(path.join(root, 'data/tests-catalog.json'), 'utf8'));
+const bankPath = path.join(root, 'private/bank.json');
+const hasFull = fs.existsSync(bankPath);
+const full = hasFull ? JSON.parse(fs.readFileSync(bankPath, 'utf8')) : null;
+const demo = JSON.parse(fs.readFileSync(path.join(root, 'data/demo-bank.json'), 'utf8'));
+
+const base = {
+  ad: 'Əli', soyad: 'Test', dogum: '2021-03-01', baslama: '2026-10-05', diaqnoz: 'Autizm spektr pozuntusu',
+  davranislar: ['Aqressiya', 'Keçid çətinliyi'], sensor: ['Auditor həssaslıq', 'Taktil həssaslıq'],
+  nitqsev: 'Tək sözlər', gosterish: '1 addımlı', gozkontakt: 'Qısa müddətli', birgediqqet: 'Qismən', adreaksiya: 'Qismən',
+  oyun: 'Paralel oyun', diqqet: 'Qısa (3-5 dəq)', yaddas: 'Orta', irimotor: 'Orta', xirdamotor: 'Zəif', tarazliq: 'Orta',
+  qelem: 'Formalaşmayıb', tualet: 'Formalaşmayıb', akademik: 'Formalaşmayıb', aac: 'Yoxdur', seans: '5', evdevaxt: '45'
+};
+const gen = (f, bank, o) => E.generate(Object.assign({}, base, f), bank, Object.assign({ catalog: catalog, today: '2026-10-01', now: '2026-10-01T00:00:00.000Z' }, o || {}));
+
+const banks = [['demo', demo]].concat(hasFull ? [['full', full]] : []);
+
+banks.forEach(function (b) {
+  const name = b[0], bank = b[1];
+  test('[' + name + '] plan 30 gündür və təqvim düzgündür', () => {
+    const p = gen({}, bank);
+    assert.strictEqual(p.start, '2026-10-05');
+    assert.strictEqual(p.end, '2026-11-03');
+    assert.strictEqual(p.nextStart, '2026-11-04');
+    assert.strictEqual(p.home.length, 30);
+    assert.ok(p.sessions.every(s => s.day >= 1 && s.day <= 30));
+    assert.deepStrictEqual(E.validatePlan(p), []);
+  });
+
+  test('[' + name + '] həftədə seans sayı fərqli seçimlərdə düzgün işləyir', () => {
+    [3, 4, 5].forEach(n => {
+      const p = gen({ seans: String(n) }, bank);
+      const wk = {};
+      p.sessions.forEach(s => { if (s.day <= 28) wk[s.week] = (wk[s.week] || 0) + 1; });
+      Object.keys(wk).forEach(w => assert.strictEqual(wk[w], n, n + ' seans, həftə ' + w));
+    });
+  });
+
+  test('[' + name + '] eyni giriş eyni plan, fərqli dövr fərqli plan verir', () => {
+    const a = gen({}, bank), b = gen({}, bank);
+    assert.deepStrictEqual(a.sessions, b.sessions);
+    const c = gen({}, bank, { cycle: 2 });
+    assert.notDeepStrictEqual(a.sessions, c.sessions);
+  });
+
+  test('[' + name + '] hər seansda hər mütəxəssis üçün 1-2 fərqli məşğələ var və vaxt cəmi seans vaxtına bərabərdir', () => {
+    const p = gen({}, bank);
+    p.sessions.forEach(s => E.SPECS.forEach(sp => {
+      const it = s.items[sp];
+      if (!it) return;
+      assert.ok(it.list.length >= 1 && it.list.length <= 2);
+      const ids = it.list.map(x => x.a);
+      assert.strictEqual(new Set(ids).size, ids.length);
+      assert.strictEqual(it.list.reduce((t, x) => t + x.min, 0), p.sessionMin);
+      it.list.forEach(x => { assert.ok(bank.act[x.a], 'bankda yoxdur ' + x.a); assert.ok([1, 2, 3].includes(x.lv)); });
+    }));
+  });
+
+  test('[' + name + '] bir həftədə eyni məşğələ 3 dəfədən çox təkrarlanmır və ardıcıl seanslarda əsas məşğələ təkrarlanmır', () => {
+    const p = gen({}, bank);
+    E.SPECS.forEach(sp => {
+      const pool = new Set();
+      p.sessions.forEach(s => { if (s.items[sp]) s.items[sp].list.forEach(x => pool.add(x.a)); });
+      if (pool.size < 4) return;
+      const perWeek = {};
+      let prev = null, consecutive = 0;
+      p.sessions.forEach(s => {
+        const it = s.items[sp];
+        if (!it) return;
+        it.list.forEach(x => { const k = s.week + '|' + x.a; perWeek[k] = (perWeek[k] || 0) + 1; });
+        if (prev && prev === it.list[0].a) consecutive++;
+        prev = it.list[0].a;
+      });
+      Object.keys(perWeek).forEach(k => assert.ok(perWeek[k] <= 4, sp + ' ' + k + ' ' + perWeek[k]));
+      assert.ok(consecutive <= 2, sp + ' ardıcıl təkrar: ' + consecutive);
+    });
+  });
+
+  test('[' + name + '] səviyyə həftə 3-dən başlayaraq artır, heç vaxt 1-3 aralığından çıxmır', () => {
+    const p = gen({}, bank);
+    const byAct = {};
+    p.sessions.forEach(s => E.SPECS.forEach(sp => { if (s.items[sp]) s.items[sp].list.forEach(x => { (byAct[x.a] = byAct[x.a] || {})[s.week] = x.lv; }); }));
+    Object.keys(byAct).forEach(id => {
+      const w = byAct[id];
+      if (w[1] != null && w[3] != null) assert.ok(w[3] >= w[1], id);
+      if (w[1] != null && w[2] != null) assert.strictEqual(w[1], w[2], id);
+    });
+  });
+
+  test('[' + name + '] testlər 10-15 gündən bir yoxlama nöqtəsində: başlanğıc, ara, yekun', () => {
+    [3, 5].forEach(n => {
+      const p = gen({ seans: String(n) }, bank);
+      assert.ok(p.tests.length > 0);
+      const days = [...new Set(p.tests.map(t => t.day))].sort((a, b) => a - b);
+      const phases = new Set(p.tests.map(t => t.phase));
+      ['baseline', 'mid', 'retest'].forEach(ph => assert.ok(phases.has(ph), ph + ' yoxdur'));
+      p.tests.filter(t => t.phase === 'baseline').forEach(t => assert.ok(t.day <= 10, 'baseline gün ' + t.day));
+      p.tests.filter(t => t.phase === 'mid').forEach(t => assert.ok(t.day >= 12 && t.day <= 17, 'mid gün ' + t.day));
+      p.tests.filter(t => t.phase === 'retest').forEach(t => assert.ok(t.day >= 26 && t.day <= 30, 'retest gün ' + t.day));
+      const med = ph => Math.min.apply(null, p.tests.filter(t => t.phase === ph).map(t => t.day));
+      const g1 = med('mid') - med('baseline'), g2 = med('retest') - med('mid');
+      [g1, g2].forEach(g => assert.ok(g >= 10 && g <= 16, 'boşluq ' + g));
+      assert.ok(days.length >= 3);
+    });
+  });
+
+  test('[' + name + '] hər gün testlərin ümumi müddəti 140 dəqiqədən çox deyil', () => {
+    const p = gen({}, bank);
+    const perDay = {};
+    p.tests.forEach(t => { perDay[t.date] = (perDay[t.date] || 0) + t.min; });
+    Object.keys(perDay).forEach(d => assert.ok(perDay[d] <= 200, d + ' ' + perDay[d]));
+  });
+
+  test('[' + name + '] aspirasiya riski ağız-motor və yemək məşqlərini çıxarır', () => {
+    const p = gen({ tibbiqeyd: 'Aspirasiya riski', diaqnoz: 'Serebral iflic' }, bank);
+    const used = Object.keys(E.usedCounts(p));
+    used.forEach(id => assert.ok(!(bank.act[id].risks || []).includes('oral'), id));
+    assert.ok(p.warnings.some(w => /udma|aspirasiya/i.test(w)));
+    const pools = Object.values(p.coverage).flat();
+    pools.forEach(id => assert.ok(!(bank.act[id].risks || []).includes('oral'), id));
+  });
+
+  test('[' + name + '] epilepsiya vestibulyar və parlayan işıq məşqlərini çıxarır', () => {
+    const p = gen({ tibbiqeyd: 'Epilepsiya' }, bank);
+    Object.values(p.coverage).flat().forEach(id => {
+      const r = bank.act[id].risks || [];
+      assert.ok(!r.includes('vestibular') && !r.includes('photic'), id);
+    });
+    assert.ok(p.profile.flags.includes('epilepsy'));
+  });
+
+  test('[' + name + '] yaş filtri: 18 aylıq uşağa məktəb məşğələsi və kiçik hissəli əşyalar verilmir', () => {
+    const p = gen({ dogum: '2025-04-01', baslama: '2026-10-05' }, bank);
+    assert.ok(p.profile.ageM >= 17 && p.profile.ageM <= 18);
+    Object.values(p.coverage).flat().forEach(id => {
+      const a = bank.act[id];
+      assert.ok(p.profile.ageM >= a.age[0] && p.profile.ageM <= a.age[1], id);
+      assert.ok(!(a.risks || []).includes('smallparts'), id);
+    });
+  });
+
+  test('[' + name + '] bütün qiymətləndirmə sahələri plana təsir edir', () => {
+    const baseP = JSON.stringify(gen({}, bank).sessions);
+    const changes = [
+      { nitqsev: 'Yaşa uyğun' }, { gosterish: 'Mürəkkəb' }, { gozkontakt: 'Sabit', birgediqqet: 'Formalaşıb', adreaksiya: 'Bəli, sabit' },
+      { oyun: 'Qarşılıqlı oyun' }, { diqqet: 'Yaxşı (10+ dəq)', yaddas: 'Yaxşı' }, { irimotor: 'Yaxşı', tarazliq: 'Yaxşı' },
+      { xirdamotor: 'Yaxşı' }, { qelem: 'Formalaşıb' }, { tualet: 'Formalaşıb' }, { akademik: 'Formalaşıb' },
+      { davranislar: [] }, { sensor: [] }, { aac: 'PECS istifadə olunur' }
+    ];
+    let changed = 0;
+    changes.forEach(c => { if (JSON.stringify(gen(c, bank).sessions) !== baseP) changed++; });
+    assert.ok(changed >= (name === 'demo' ? 5 : 11), 'plana təsir edən dəyişiklik sayı: ' + changed);
+  });
+
+  test('[' + name + '] bilinməyən sahələr siyahıya düşür, plan yenə yaranır', () => {
+    const p = gen({ gozkontakt: '', diqqet: '', irimotor: '' }, bank);
+    assert.ok(p.profile.unknown.includes('Göz kontaktı') && p.profile.unknown.includes('Diqqət müddəti'));
+  });
+
+  test('[' + name + '] yeni dövr: əvvəlki qiymətləndirmə səviyyəni və təkrarı dəyişir', () => {
+    const p1 = gen({}, bank);
+    const log = {};
+    p1.sessions.forEach(s => E.SPECS.forEach(sp => { if (s.items[sp]) s.items[sp].list.forEach(x => { log[s.day + '|' + sp + '|' + x.a] = { att: 'bəli', r: 4 }; }); }));
+    const seed = E.nextCycleSeed(p1, bank, log);
+    assert.ok(Object.keys(seed.levels).length > 0);
+    Object.values(seed.levels).forEach(l => assert.ok(l >= 1 && l <= 3));
+    const p2 = gen({ baslama: p1.nextStart }, bank, { cycle: 2, prior: seed });
+    assert.strictEqual(p2.start, p1.nextStart);
+    assert.notDeepStrictEqual(p2.sessions.map(s => s.items), p1.sessions.map(s => s.items));
+  });
+
+  test('[' + name + '] tövsiyə olunan səviyyə: iki yüksək qiymət artırır, iki aşağı endirir', () => {
+    const p = gen({}, bank);
+    const s0 = p.sessions.find(s => s.items.psixoloq);
+    const id = s0.items.psixoloq.list[0].a;
+    const days = p.sessions.filter(s => s.items.psixoloq && s.items.psixoloq.list.some(x => x.a === id)).slice(0, 2);
+    assert.strictEqual(days.length, 2);
+    const hi = {}, lo = {};
+    days.forEach(s => { hi[s.day + '|psixoloq|' + id] = { att: 'bəli', r: 4 }; lo[s.day + '|psixoloq|' + id] = { att: 'bəli', r: 1 }; });
+    assert.strictEqual(E.recommendLevel(p, bank, hi, 'psixoloq', id, 2).lv, 3);
+    assert.strictEqual(E.recommendLevel(p, bank, lo, 'psixoloq', id, 2).lv, 1);
+    assert.strictEqual(E.recommendLevel(p, bank, {}, 'psixoloq', id, 2).lv, 2);
+  });
+
+  test('[' + name + '] hədəflər qısa, orta, uzun müddət üzrə var', () => {
+    const p = gen({}, bank);
+    assert.ok(p.goals.short.length >= 3 && p.goals.mid.length >= 2 && p.goals.long.length >= 2);
+    assert.ok(p.goals.short.every(g => g.text && !g.text.includes('{ad}') && g.text.includes('Əli')));
+  });
+});
+
+test('diaqnoz çoxlu etiket: autizm + DEHB eyni anda tanınır, səhv uyğunluq yoxdur', () => {
+  assert.deepStrictEqual(E.detectDx({ diaqnoz: 'Autizm spektr pozuntusu + DEHB' }).sort(), ['adhd', 'asd']);
+  assert.ok(E.detectDx({ diaqnoz: 'Serebral iflic, nitq gecikməsi' }).includes('cp'));
+  assert.ok(E.detectDx({ diaqnoz: 'Serebral iflic, nitq gecikməsi' }).includes('speech'));
+  assert.deepStrictEqual(E.detectDx({ diaqnoz: 'Basdırma' }), []);
+  assert.deepStrictEqual(E.detectDx({ diaqnoz: 'Sindrom X' }), []);
+});
+
+test('yaş hesablaması', () => {
+  assert.strictEqual(E.ageMonths('2021-03-01', '2026-10-05'), 67);
+  assert.strictEqual(E.ageMonths('2021-03-10', '2026-03-09'), 59);
+});
+
+test('testlər: 2 yaşlı M-CHAT, 8 yaşlı IQ, davranış FBA, narahatlıq SCARED', () => {
+  const young = gen({ dogum: '2024-06-01', diaqnoz: 'Nitq gecikməsi', diaqtarix: '' }, demo);
+  assert.ok(young.tests.some(t => t.id === 'm-chat-r'));
+  const school = gen({ dogum: '2018-01-01', diaqnoz: 'Zehni gerilik', akademik: 'Formalaşmayıb' }, demo);
+  assert.ok(school.tests.some(t => t.id === 'wisc-v'));
+  assert.ok(school.tests.some(t => t.id === 'wisc-v' && t.phase === 'baseline'));
+  const anx = gen({ dogum: '2015-01-01', diaqnoz: 'Narahatlıq pozuntusu', davranislar: ['Qorxular'], narahatliq: 'qorxu və narahatlıq' }, demo);
+  assert.ok(anx.tests.some(t => t.id === 'scared'));
+  const beh = gen({ davranislar: ['Aqressiya', 'Özünə zərər'] }, demo);
+  assert.ok(beh.tests.some(t => t.id === 'fba' && t.phase === 'mid'));
+});
+
+test('IQ və Vineland hər dövr təkrarlanmır (məşq effekti, qısa interval)', () => {
+  const f = { dogum: '2018-01-01', diaqnoz: 'Zehni gerilik' };
+  const c2 = gen(f, demo, { cycle: 2 });
+  assert.ok(!c2.tests.some(t => t.id === 'wisc-v' || t.id === 'vineland-3'));
+  const c4 = gen(f, demo, { cycle: 4 });
+  assert.ok(c4.tests.some(t => t.id === 'vineland-3'));
+});
+
+test('hesabat: nəticələrin müqayisəsi', () => {
+  const r = E.compareResults({ a: { score: '10' }, b: { score: 'yüksək' } }, { a: { score: '14' }, b: { score: 'orta' }, c: { score: '3' } });
+  assert.strictEqual(r.find(x => x.id === 'a').delta, 4);
+  assert.strictEqual(r.find(x => x.id === 'a').direction, 'up');
+  assert.strictEqual(r.find(x => x.id === 'b').delta, null);
+  assert.strictEqual(r.find(x => x.id === 'c').prev, null);
+});
+
+test('həftədə seans sayı: minimum 3, ay üzrə cəm avtomatik hesablanır', () => {
+  assert.strictEqual(E.deriveProfile({ seans: '2' }).sessionsPerWeek, 3);
+  assert.strictEqual(E.deriveProfile({ seans: '' }).sessionsPerWeek, 3);
+  assert.strictEqual(E.deriveProfile({ seans: '5' }).sessionsPerWeek, 5);
+  const n3 = E.monthSessions('2026-10-05', 3), n5 = E.monthSessions('2026-10-05', 5);
+  assert.ok(n3 >= 12 && n3 <= 14, 'n3=' + n3);
+  assert.ok(n5 >= 20 && n5 <= 22, 'n5=' + n5);
+  assert.strictEqual(gen({ seans: '3' }, demo).sessions.length, n3);
+});
