@@ -329,3 +329,15 @@ test('imza: yalnız təhlükəsiz PNG data URL çapa düşür', () => {
   assert.ok(!/<img/.test(bad) && /______/.test(bad));
   assert.ok(!/<img/.test(X.approvalHtml({ approval: { by: 'N A', at: '2026-10-02', sig: 'data:image/png;base64,"><script>' } })));
 });
+
+test('gate: ehtiyac formada qeyd olunmayıbsa mütəxəssis məşğələsi planlaşdırılmır, 2-ci dövrdə «tanışlıq» seansı yoxdur', () => {
+  const mk = (id, extra) => Object.assign({ id, group: 'psixoloq', t: id, needs: ['behavior'], age: [24, 216], min: 15, levels: { 1: { g: 'a', sup: 'b', ok: 'c' }, 2: { g: 'a', sup: 'b', ok: 'c' }, 3: { g: 'a', sup: 'b', ok: 'c' } }, steps: [0, 1, 2, 3, 4, 5].map(i => ({ t: 't' + i, do: 'd' + i, ok: 'o' + i })) }, extra);
+  const bank = { act: { a1: mk('a1', { needs: ['joint'] }), a2: mk('a2', { needs: ['joint'] }), a3: mk('a3', { needs: ['joint'] }), a4: mk('a4', { needs: ['joint'] }), a5: mk('a5', { needs: ['joint'] }), g1: mk('g1', { gate: ['behavior'] }) }, needs: {} };
+  const form = { ad: 'T', dogum: '2012-01-01', baslama: '2026-11-02', seans: '3', diaqnoz: 'Autizm' };
+  const p1 = E.generate(form, bank, { cycle: 2, today: '2026-10-02' });
+  assert.ok(!p1.coverage.psixoloq.includes('g1'));
+  assert.strictEqual(p1.sessions[0].items.psixoloq.kind, 'regular');
+  const p2 = E.generate(Object.assign({}, form, { davranislar: ['Aqressiya'] }), bank, { cycle: 1, today: '2026-10-02' });
+  assert.ok(p2.coverage.psixoloq.includes('g1'));
+  assert.strictEqual(p2.sessions[0].items.psixoloq.kind, 'baseline');
+});
