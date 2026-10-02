@@ -70,8 +70,13 @@
     if (!chip) return;
     var st = L.state;
     chip.textContent = '';
-    if (!st.user) { chip.hidden = true; return; }
     chip.hidden = false;
+    if (!st.user) {
+      var inBtn = el('button', { type: 'button', 'class': 'user-name signin-chip' }, 'Google ilə daxil ol');
+      inBtn.addEventListener('click', function () { L.signIn().catch(function (e) { msg = 'Daxil olmaq mümkün olmadı: ' + (e.code || e.message); render(); }); });
+      chip.appendChild(inBtn);
+      return;
+    }
     var name = el('button', { type: 'button', 'class': 'user-name', 'aria-haspopup': 'dialog', title: 'Hesab və lisenziya məlumatı' }, displayName(st.user));
     name.addEventListener('click', openAccount);
     chip.appendChild(name);
