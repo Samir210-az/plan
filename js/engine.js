@@ -536,7 +536,7 @@
     { id: 'denver-ii', pri: 4, who: 'psixoloq', min: 20, when: function (p) { return p.ageM != null && p.ageM <= 72; }, phases: ['baseline', 'mid', 'retest'], why: 'Yaş 6-dan aşağıdır: inkişaf sahələri üzrə skrininq və aylıq irəliləyişə nəzarət.' },
     { id: 'erken-inkishaf', pri: 4, who: 'psixoloq', min: 30, when: function (p) { return p.ageM != null && p.ageM <= 72; }, phases: ['baseline', 'mid', 'retest'], why: 'Erkən inkişaf yaşında sahələr üzrə vəziyyətin ölçülməsi.' },
     { id: 'erken-mudaxile', pri: 4, who: 'psixoloq', min: 20, when: function (p) { return p.ageM != null && p.ageM <= 72; }, phases: ['mid'], why: 'Ay ortasında izləmə: plan işləyirsə davam, işləmirsə düzəliş.' },
-    { id: 'wisc-v', pri: 2, who: 'psixoloq', min: 80, when: function (p) { return p.ageM != null && p.ageM >= 72 && p.ageM <= 203 && (p.dx.some(function (d) { return ['id', 'gdd', 'adhd', 'learning'].indexOf(d) >= 0; }) || p.needs.academic >= 2); }, first: true, everyN: 6, why: 'Koqnitiv profilin dəqiqləşdirilməsi; tez-tez təkrarlanmır (məşq effekti).' },
+    { id: 'wisc-v', pri: 1, who: 'psixoloq', min: 80, when: function (p) { return p.ageM != null && p.ageM >= 72 && p.ageM <= 203 && (p.dx.some(function (d) { return ['id', 'gdd', 'adhd', 'learning'].indexOf(d) >= 0; }) || p.needs.academic >= 2); }, first: true, everyN: 6, why: 'Koqnitiv profilin dəqiqləşdirilməsi; tez-tez təkrarlanmır (məşq effekti).' },
     { id: 'leiter-3', pri: 3, who: 'psixoloq', min: 45, when: function (p) { return p.ageM != null && p.ageM >= 36 && (p.needs.expressive >= 2 || p.dx.indexOf('asd') >= 0) && !(p.ageM >= 72 && p.ageM <= 203 && p.dx.indexOf('id') >= 0); }, first: true, everyN: 6, why: 'Nitq məhdud olduqda qeyri-verbal koqnitiv qiymətləndirmə.' },
     { id: 'vineland-3', pri: 3, who: 'psixoloq', min: 40, when: function () { return true; }, first: true, everyN: 3, why: 'Gündəlik həyat bacarıqlarının ümumi profili; hər 3 ayda bir yenilənir.' },
     { id: 'sensory-profile-2', pri: 3, who: 'ergoterapevt', min: 20, when: function (p) { return p.needs.sensory >= 1; }, first: true, everyN: 3, why: 'Sensor xüsusiyyətlər qeyd olunub: ergoterapiya planının əsası.' },
@@ -549,7 +549,7 @@
     { id: 'y-bocs', pri: 2, who: 'psixoloq', min: 40, when: function (p) { return p.dx.indexOf('ocd') >= 0; }, phases: ['baseline', 'mid', 'retest'], why: 'Obsessiv-kompulsiv əlamətlər: şiddətin aylıq ölçülməsi (uşaqlar üçün CY-BOCS versiyası).' }
   ];
 
-  var TEST_CAP = { baseline: 4, mid: 2, retest: 2 };
+  var TEST_CAP = { baseline: 2, mid: 2, retest: 2 };
 
   function retestDays(sdates) {
     var late = sdates.filter(function (s) { return s.day >= 26; });
@@ -587,15 +587,16 @@
       if (phases.indexOf('mid') >= 0) cand.push({ r: r, phase: 'mid', days: midDays, extra: phases.indexOf('retest') >= 0 ? 'Ara yoxlama: eyni test qısa formada, yalnız dəyişikliyi görmək üçün.' : '' });
       if (phases.indexOf('retest') >= 0) cand.push({ r: r, phase: 'retest', days: last3, extra: r.retestFocus ? 'Yalnız bu dövrdə işlənmiş sahələr üzrə.' : '' });
     });
-    var kept = [], skipped = {};
+    var kept = [], skipped = {}, deferred = {};
     ['baseline', 'mid', 'retest'].forEach(function (ph) {
       var list = cand.filter(function (c) { return c.phase === ph; })
         .sort(function (a, b) { return a.r.pri - b.r.pri || a.r.min - b.r.min; });
       list.forEach(function (c, i) {
         if (i < TEST_CAP[ph]) { kept.push(c); skipped[c.r.id] = false; }
-        else skipped[c.r.id] = (skipped[c.r.id] !== false);
+        else { skipped[c.r.id] = (skipped[c.r.id] !== false); if (ph === 'baseline') deferred[c.r.id] = true; }
       });
     });
+    kept.forEach(function (c) { if (c.phase === 'mid' && deferred[c.r.id]) c.extra = 'İlkin qiymətləndirmə: birinci həftənin yükünü azaltmaq üçün ara mərhələyə keçirilib.'; });
     kept.sort(function (a, b) { return b.r.min - a.r.min; }).forEach(function (c) { place(c.days, c.r, c.phase, c.extra); });
     if (notes) Object.keys(skipped).filter(function (id) { return skipped[id]; }).forEach(function (id) { notes.push((catalog[id] && catalog[id].ad) || id); });
     out.sort(function (a, b) { return a.day - b.day || (a.id < b.id ? -1 : 1); });
