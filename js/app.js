@@ -280,7 +280,7 @@
       html += '<details class="day' + (h.date === today ? ' today' : '') + '"' + (h.date === today ? ' open' : '') + '><summary><b>' + esc(X.fmtDate(h.date)) + '</b> · ' + esc(X.wdName(h.date)) + ' · gün ' + h.day +
         (s ? '' : ' <span class="muted">(mərkəzdə seans yoxdur)</span>') + (tests.length ? ' <span class="badge test">test: ' + esc(tests.map(function (t) { return t.name; }).join(', ')) + '</span>' : '') + '</summary>';
       if (s) E.SPECS.forEach(function (sp) { html += specHtml(s, sp, bank, log, p); });
-      html += '<div class="spec spec-valideyn"><h3>' + esc(X.SPEC_LABEL.valideyn) + '</h3>' + h.items.map(function (it) { return X.activityBlock(bank, it); }).join('') + '</div></details>';
+      html += '<div class="spec spec-valideyn"><h3>' + esc(X.SPEC_LABEL.valideyn) + '</h3>' + h.items.map(function (it) { return X.activityBlock(bank, it, p.profile); }).join('') + '</div></details>';
     });
     $('daysContainer').innerHTML = html;
   }
@@ -288,13 +288,13 @@
   function specHtml(s, sp, bank, log, p) {
     var it = s.items[sp];
     if (!it) return '';
-    var out = '<div class="spec spec-' + sp + '"><h3>' + esc(X.SPEC_LABEL[sp]) + (it.kind === 'baseline' ? ' · tanışlıq seansı' : it.kind === 'retest' ? ' · yekun mərhələ' : '') + ' <span class="muted">' + p.sessionMin + ' dəq</span></h3>';
+    var out = '<div class="spec spec-' + sp + '"><h3>' + esc(X.SPEC_LABEL[sp]) + (it.kind === 'baseline' && p.cycle === 1 ? ' · tanışlıq seansı' : it.kind === 'retest' ? ' · yekun mərhələ' : '') + ' <span class="muted">' + p.sessionMin + ' dəq</span></h3>';
     var rt = X.ritual(bank, sp, p, s); if (rt) out += '<p class="muted small"><b>Başlanğıc:</b> ' + esc(rt.open) + '<br><b>Son:</b> ' + esc(rt.close) + '</p>';
     it.list.forEach(function (item) {
       var k = s.day + '|' + sp + '|' + item.a;
       var e = log[k] || {};
       var rec = e.r ? E.recommendLevel(p, bank, log, sp, item.a, item.lv) : null;
-      out += '<div class="actwrap">' + X.activityBlock(bank, item) +
+      out += '<div class="actwrap">' + X.activityBlock(bank, item, p.profile) +
         '<div class="logrow no-print" data-key="' + esc(k) + '">' +
         '<label><input type="radio" name="att_' + esc(k) + '" data-f="att" value="bəli"' + (e.att === 'bəli' ? ' checked' : '') + '> iştirak etdi</label> ' +
         '<label><input type="radio" name="att_' + esc(k) + '" data-f="att" value="xeyr"' + (e.att === 'xeyr' ? ' checked' : '') + '> gəlmədi</label> ' +

@@ -341,3 +341,45 @@ test('gate: ehtiyac formada qeyd olunmayıbsa mütəxəssis məşğələsi planl
   assert.ok(p2.coverage.psixoloq.includes('g1'));
   assert.strictEqual(p2.sessions[0].items.psixoloq.kind, 'baseline');
 });
+
+test('view: yaş zolağı baza sahələrini əvəz edir, uyğunlaşdırma diaqnoza görə seçilir', () => {
+  const bank = { act: { x: {
+    id: 'x', prep: 'baza', how: ['b'],
+    bands: [
+      { range: [24, 71], label: 'Kiçik', prep: 'oyuncaq dəsti' },
+      { range: [132, 216], label: 'Yeniyetmə', prep: 'telefon qeydi' }
+    ],
+    adapt: { asd: 'Vizual cədvəl istifadə edin, şifahi təlimatı azaldın.', adhd: 'Mərhələləri qısa bloklara bölün.', epilepsy: 'Yanıb-sönən işıqdan qaçın, qərar həkimindir.' }
+  } } };
+  const small = E.view(bank, 'x', { ageM: 40, dx: ['asd'], tags: [], flags: [] });
+  assert.strictEqual(small.prep, 'oyuncaq dəsti');
+  assert.strictEqual(small.band, 'Kiçik');
+  assert.strictEqual(small.bands, undefined);
+  assert.deepStrictEqual(small.adaptList.map(a => a.k), ['asd']);
+
+  const teen = E.view(bank, 'x', { ageM: 180, dx: ['asd', 'adhd'], tags: [], flags: ['epilepsy'] });
+  assert.strictEqual(teen.prep, 'telefon qeydi');
+  assert.deepStrictEqual(teen.adaptList.map(a => a.k).sort(), ['adhd', 'asd', 'epilepsy']);
+
+  const gap = E.view(bank, 'x', { ageM: 100, dx: [], tags: [], flags: [] });
+  assert.strictEqual(gap.prep, 'baza');
+  assert.strictEqual(gap.adaptList.length, 0);
+  assert.strictEqual(E.view(bank, 'yoxdur', {}), null);
+});
+
+if (hasFull) test('[full] hər zolaq yaş aralığını boşluqsuz örtür, adapt mətni kifayət qədər konkretdir', () => {
+  Object.keys(full.act).forEach(function (id) {
+    const a = full.act[id];
+    assert.ok(a.adapt && Object.keys(a.adapt).length >= 3, id + ': adapt');
+    if (a.age[1] - a.age[0] <= 48 && !a.bands) return;
+    assert.ok(a.bands, id + ': bands');
+    let prev = null;
+    a.bands.forEach(function (b) {
+      if (prev !== null) assert.strictEqual(b.range[0], prev + 1, id + ': zolaq boşluğu');
+      prev = b.range[1];
+    });
+    assert.strictEqual(a.bands[0].range[0], a.age[0], id + ': başlanğıc');
+    assert.strictEqual(prev, a.age[1], id + ': son');
+    Object.keys(a.adapt).forEach(k => assert.ok(a.adapt[k].length >= 40, id + '.' + k));
+  });
+});

@@ -27,8 +27,8 @@
     return list[(s && s.day ? s.day : 0) % list.length];
   }
 
-  function activityBlock(bank, item) {
-    var a = bank.act[item.a];
+  function activityBlock(bank, item, profile) {
+    var a = E.view(bank, item.a, profile || {});
     if (!a) return '<div class="act"><p class="muted">Bu məşğələ cari baza ilə açılmır. Tam məzmun üçün aktiv lisenziya lazımdır.</p></div>';
     var lv = a.levels[item.lv] || a.levels[1];
     var st = item.st != null && a.steps ? a.steps[item.st] : null;
@@ -39,6 +39,7 @@
       '<p><b>Uğur meyarı:</b> ' + esc(st ? st.ok : lv.ok) + '</p>' +
       '<p><b>Niyə vacibdir:</b> ' + esc(a.why) + '</p>' +
       '<p><b>Material:</b> ' + esc(a.prep) + '</p>' +
+      (a.adaptList && a.adaptList.length ? '<p><b>Bu uşaq üçün uyğunlaşdırma:</b></p><ul>' + a.adaptList.map(function (x) { return '<li><i>' + esc(x.label) + ':</i> ' + esc(x.text) + '</li>'; }).join('') + '</ul>' : '') +
       '<p><b>Necə aparılır:</b></p>' + list(a.how, true) +
       '<p><b>Nə demək olar:</b> ' + (a.say || []).map(function (x) { return '<i>' + esc(x) + '</i>'; }).join(' · ') + '</p>' +
       '<p><b>Nədən çəkinmək lazımdır:</b> ' + esc(a.avoid) + '</p>' +
@@ -130,12 +131,12 @@
     sess.forEach(function (s, i) {
       var it = s.items[sp];
       out += '<div class="day' + (opts.perSession && i > 0 ? ' newpage' : '') + '">' + (opts.perSession && i > 0 ? miniHead(name, SPEC_LABEL[sp]) : '') + '<h3>' + fmtDate(s.date) + ', ' + esc(WD[s.weekday]) + ' (gün ' + s.day + ', həftə ' + s.week + ')' +
-        (it.kind === 'baseline' ? ' · tanışlıq seansı' : it.kind === 'retest' ? ' · yekun mərhələ' : '') + '</h3>';
+        (it.kind === 'baseline' && p.cycle === 1 ? ' · tanışlıq seansı' : it.kind === 'retest' ? ' · yekun mərhələ' : '') + '</h3>';
       var dt = p.tests.filter(function (t) { return t.day === s.day && t.who === sp; });
       if (dt.length) out += '<p><b>Bu gün test:</b> ' + dt.map(function (t) { return esc(t.name + ' (' + PHASE[t.phase] + ', ~' + t.min + ' dəq)'); }).join(', ') + '</p>';
       var rt = ritual(bank, sp, p, s); if (rt) out += '<p class="muted"><b>Başlanğıc:</b> ' + esc(rt.open) + ' <b>Son:</b> ' + esc(rt.close) + '</p>';
       it.list.forEach(function (item) {
-        out += activityBlock(bank, item) + sessionRecordBox(log[s.day + '|' + sp + '|' + item.a]);
+        out += activityBlock(bank, item, p.profile) + sessionRecordBox(log[s.day + '|' + sp + '|' + item.a]);
       });
       out += '</div>';
     });
@@ -187,11 +188,11 @@
         E.SPECS.forEach(function (sp) {
           var it = s.items[sp];
           if (!it) return;
-          out += '<h3>' + esc(SPEC_LABEL[sp]) + (it.kind === 'baseline' ? ' · tanışlıq seansı' : it.kind === 'retest' ? ' · yekun mərhələ' : '') + '</h3>';
+          out += '<h3>' + esc(SPEC_LABEL[sp]) + (it.kind === 'baseline' && p.cycle === 1 ? ' · tanışlıq seansı' : it.kind === 'retest' ? ' · yekun mərhələ' : '') + '</h3>';
           var rt = ritual(bank, sp, p, s); if (rt) out += '<p class="muted"><b>Başlanğıc:</b> ' + esc(rt.open) + ' <b>Son:</b> ' + esc(rt.close) + '</p>';
           it.list.forEach(function (item) {
             var e = log && log[s.day + '|' + sp + '|' + item.a];
-            out += activityBlock(bank, item);
+            out += activityBlock(bank, item, p.profile);
             if (e) out += '<p class="muted">Qeyd: ' + (e.att === 'xeyr' ? 'iştirak etmədi' : 'iştirak etdi, qiymət ' + esc(e.r || '-')) + (e.note ? ' · ' + esc(e.note) : '') + '</p>';
           });
         });
@@ -206,7 +207,7 @@
     p.home.forEach(function (d) {
       if (onlyFirst && d.day > 7) return;
       out += '<div class="day"><h4>' + fmtDate(d.date) + ', ' + esc(wdName(d.date)) + ' (gün ' + d.day + ')</h4>';
-      d.items.forEach(function (item) { out += activityBlock(bank, item); });
+      d.items.forEach(function (item) { out += activityBlock(bank, item, p.profile); });
       out += '</div>';
     });
     return out;
