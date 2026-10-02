@@ -23,11 +23,12 @@
     var a = bank.act[item.a];
     if (!a) return '<div class="act"><p class="muted">Bu məşğələ cari baza ilə açılmır. Tam məzmun üçün aktiv lisenziya lazımdır.</p></div>';
     var lv = a.levels[item.lv] || a.levels[1];
+    var st = item.st != null && a.steps ? a.steps[item.st] : null;
     return '<div class="act">' +
-      '<h4>' + esc(a.t) + ' <span class="lv">' + esc(LV[item.lv]) + ' · ' + item.min + ' dəq</span></h4>' +
-      '<p><b>Bu seansın məqsədi:</b> ' + esc(lv.g) + '</p>' +
+      '<h4>' + esc(a.t) + (st ? ' — ' + esc(st.t) : '') + ' <span class="lv">' + esc(LV[item.lv]) + ' · ' + item.min + ' dəq</span></h4>' +
+      (st ? '<p><b>Bu seansın tapşırığı:</b> ' + esc(st.do) + '</p>' : '<p><b>Bu seansın məqsədi:</b> ' + esc(lv.g) + '</p>') +
       '<p><b>Dəstək səviyyəsi:</b> ' + esc(lv.sup) + '</p>' +
-      '<p><b>Uğur meyarı:</b> ' + esc(lv.ok) + '</p>' +
+      '<p><b>Uğur meyarı:</b> ' + esc(st ? st.ok : lv.ok) + '</p>' +
       '<p><b>Niyə vacibdir:</b> ' + esc(a.why) + '</p>' +
       '<p><b>Material:</b> ' + esc(a.prep) + '</p>' +
       '<p><b>Necə aparılır:</b></p>' + list(a.how, true) +
