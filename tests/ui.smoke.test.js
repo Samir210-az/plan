@@ -295,3 +295,31 @@ test('UI: test nəticəsini və bütün nəticələri silmək', { skip: !JSDOM &
   assert.strictEqual(d.querySelector('[data-action="del-all-tests"]'), null);
   w.close();
 });
+
+test('UI: başlıqda istifadəçi adı, klikdə lisenziya pəncərəsi, kurator avtomatik dolur', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {
+  const w = boot('full', { uid: 'u1', email: 'm@ex.az', name: 'Samir Axundov' });
+  const d = w.document;
+  const exp = Date.now() + 365 * 86400000;
+  Object.assign(w.PlanBank, { state: { user: { uid: 'u1', email: 'm@ex.az', name: 'Samir Axundov' }, mode: 'full', license: { expiresAt: exp } }, daysLeft: () => 365, waLink: () => '#', signOut: () => { w.__out = true; return Promise.resolve(); }, onChange() {} });
+  w.eval(fs.readFileSync(path.join(root, 'js', 'license-ui.js'), 'utf8'));
+  await wait(50);
+  const chip = d.getElementById('userChip');
+  assert.strictEqual(chip.hidden, false);
+  assert.strictEqual(chip.querySelector('.user-name').textContent, 'Samir Axundov');
+  assert.strictEqual(d.getElementById('licenseBar').hidden, true, 'aktiv lisenziyada ayrıca zolaq gizlənir');
+  assert.ok(!d.getElementById('accOverlay'));
+  chip.querySelector('.user-name').click();
+  const dlg = d.getElementById('accOverlay');
+  assert.ok(dlg, 'pəncərə açılır');
+  assert.match(dlg.textContent, /m@ex\.az/);
+  assert.match(dlg.textContent, /365 gün/);
+  assert.match(dlg.textContent, /Aktivdir/);
+  d.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape' }));
+  assert.ok(!d.getElementById('accOverlay'), 'Escape bağlayır');
+  chip.querySelector('.btn').click();
+  assert.strictEqual(w.__out, true, 'çıxış düyməsi işləyir');
+  w.PlanApp.onLicenseChange();
+  await wait(50);
+  assert.strictEqual(d.getElementById('f_kurator').value, 'Samir Axundov');
+  w.close();
+});
