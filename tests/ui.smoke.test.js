@@ -323,3 +323,16 @@ test('UI: başlıqda istifadəçi adı, klikdə lisenziya pəncərəsi, kurator 
   assert.strictEqual(d.getElementById('f_kurator').value, 'Samir Axundov');
   w.close();
 });
+
+test('UI: daxil olmayanda başlıqda «Google ilə daxil ol» düyməsi görünür', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {
+  const w = boot('demo', null);
+  const d = w.document;
+  Object.assign(w.PlanBank, { state: { user: null, mode: 'demo', license: null }, daysLeft: () => 0, waLink: () => '#', signIn: () => { w.__in = true; return Promise.resolve(); }, onChange() {} });
+  w.eval(fs.readFileSync(path.join(root, 'js', 'license-ui.js'), 'utf8'));
+  await wait(50);
+  const b = d.querySelector('#userChip .signin-chip');
+  assert.ok(b && !d.getElementById('userChip').hidden);
+  b.click();
+  assert.strictEqual(w.__in, true);
+  w.close();
+});
