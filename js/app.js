@@ -289,7 +289,7 @@
     var it = s.items[sp];
     if (!it) return '';
     var out = '<div class="spec spec-' + sp + '"><h3>' + esc(X.SPEC_LABEL[sp]) + (it.kind === 'baseline' ? ' · tanışlıq seansı' : it.kind === 'retest' ? ' · yekun mərhələ' : '') + ' <span class="muted">' + p.sessionMin + ' dəq</span></h3>';
-    if (bank.rituals && bank.rituals[sp]) out += '<p class="muted small"><b>Başlanğıc:</b> ' + esc(bank.rituals[sp].open) + '<br><b>Son:</b> ' + esc(bank.rituals[sp].close) + '</p>';
+    var rt = X.ritual(bank, sp, p, s); if (rt) out += '<p class="muted small"><b>Başlanğıc:</b> ' + esc(rt.open) + '<br><b>Son:</b> ' + esc(rt.close) + '</p>';
     it.list.forEach(function (item) {
       var k = s.day + '|' + sp + '|' + item.a;
       var e = log[k] || {};

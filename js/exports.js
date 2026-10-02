@@ -19,6 +19,14 @@
     return '<' + tag + '>' + (items || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</' + tag + '>';
   }
 
+  function ritual(bank, sp, plan, s) {
+    var r = bank.rituals && bank.rituals[sp];
+    if (!r) return null;
+    var teen = plan && plan.profile && plan.profile.ageM != null && plan.profile.ageM >= 144;
+    var list = (teen ? r.teen : r.kid) || [r];
+    return list[(s && s.day ? s.day : 0) % list.length];
+  }
+
   function activityBlock(bank, item) {
     var a = bank.act[item.a];
     if (!a) return '<div class="act"><p class="muted">Bu məşğələ cari baza ilə açılmır. Tam məzmun üçün aktiv lisenziya lazımdır.</p></div>';
@@ -125,7 +133,7 @@
         (it.kind === 'baseline' ? ' · tanışlıq seansı' : it.kind === 'retest' ? ' · yekun mərhələ' : '') + '</h3>';
       var dt = p.tests.filter(function (t) { return t.day === s.day && t.who === sp; });
       if (dt.length) out += '<p><b>Bu gün test:</b> ' + dt.map(function (t) { return esc(t.name + ' (' + PHASE[t.phase] + ', ~' + t.min + ' dəq)'); }).join(', ') + '</p>';
-      if (bank.rituals && bank.rituals[sp]) out += '<p class="muted"><b>Başlanğıc:</b> ' + esc(bank.rituals[sp].open) + ' <b>Son:</b> ' + esc(bank.rituals[sp].close) + '</p>';
+      var rt = ritual(bank, sp, p, s); if (rt) out += '<p class="muted"><b>Başlanğıc:</b> ' + esc(rt.open) + ' <b>Son:</b> ' + esc(rt.close) + '</p>';
       it.list.forEach(function (item) {
         out += activityBlock(bank, item) + sessionRecordBox(log[s.day + '|' + sp + '|' + item.a]);
       });
@@ -180,7 +188,7 @@
           var it = s.items[sp];
           if (!it) return;
           out += '<h3>' + esc(SPEC_LABEL[sp]) + (it.kind === 'baseline' ? ' · tanışlıq seansı' : it.kind === 'retest' ? ' · yekun mərhələ' : '') + '</h3>';
-          if (bank.rituals && bank.rituals[sp]) out += '<p class="muted"><b>Başlanğıc:</b> ' + esc(bank.rituals[sp].open) + ' <b>Son:</b> ' + esc(bank.rituals[sp].close) + '</p>';
+          var rt = ritual(bank, sp, p, s); if (rt) out += '<p class="muted"><b>Başlanğıc:</b> ' + esc(rt.open) + ' <b>Son:</b> ' + esc(rt.close) + '</p>';
           it.list.forEach(function (item) {
             var e = log && log[s.day + '|' + sp + '|' + item.a];
             out += activityBlock(bank, item);
@@ -239,6 +247,6 @@
     return out;
   }
 
-  return { safeSig: safeSig, specialistHtml: specialistHtml, deferredNote: deferredNote, approvalHtml: approvalHtml, esc: esc, fmtDate: fmtDate, wdName: wdName, fullHtml: fullHtml, parentHtml: parentHtml, activityBlock: activityBlock,
+  return { ritual: ritual, safeSig: safeSig, specialistHtml: specialistHtml, deferredNote: deferredNote, approvalHtml: approvalHtml, esc: esc, fmtDate: fmtDate, wdName: wdName, fullHtml: fullHtml, parentHtml: parentHtml, activityBlock: activityBlock,
     comparisonHtml: comparisonHtml, flatResults: flat, SPEC_LABEL: SPEC_LABEL, PHASE: PHASE, LV: LV, WD: WD, testsHtml: testsHtml, needsHtml: needsHtml, goalsHtml: goalsHtml, warningsHtml: warningsHtml };
 });

@@ -277,6 +277,8 @@
     set('academic', acad, []);
     mark('akademik', 'Akademik hazırlıq');
 
+    var known = {};
+    NEED_IDS.forEach(function (id) { if (needs[id] != null) known[id] = true; });
     NEED_IDS.forEach(function (id) {
       if (needs[id] == null) {
         needs[id] = 1;
@@ -284,7 +286,7 @@
       }
     });
     NEED_IDS.forEach(function (id) {
-      if (KW[id] && has(concern, KW[id]) && needs[id] < 3 && id !== 'sensory') { needs[id] += 1; reasons[id].push('valideynin narahatlığında qeyd olunub'); }
+      if (KW[id] && has(concern, KW[id]) && needs[id] < 3 && id !== 'sensory') { needs[id] += 1; known[id] = true; reasons[id].push('valideynin narahatlığında qeyd olunub'); }
     });
     Object.keys(needs).forEach(function (k) { needs[k] = Math.min(3, needs[k]); });
 
@@ -307,7 +309,7 @@
 
     var asdConfirmed = !!(norm(f.diaqtarix) || norm(f.diaqtesdiq) === 'beli');
     return {
-      ageM: ageM, ageLabel: ageLabel(ageM), dx: dx, needs: needs, reasons: reasons, tags: tags, flags: flags,
+      ageM: ageM, ageLabel: ageLabel(ageM), dx: dx, needs: needs, known: known, reasons: reasons, tags: tags, flags: flags,
       warnings: warnings, unknown: unknown, dxConfirmed: asdConfirmed, concern: concern,
       sessionsPerWeek: PATTERNS[+f.seans] ? +f.seans : DEFAULT_SPW,
       sessionLen: SESSION_LENGTHS.indexOf(+f.seansdeq) >= 0 ? +f.seansdeq : DEFAULT_SESSION_MIN,
@@ -324,6 +326,7 @@
     if (risks.indexOf('smallparts') >= 0 && p.flags.indexOf('smallparts') >= 0) return false;
     if (risks.indexOf('photic') >= 0 && p.flags.indexOf('epilepsy') >= 0) return false;
     if (risks.indexOf('vestibular') >= 0 && p.flags.indexOf('epilepsy') >= 0) return false;
+    if (act.gate && !act.gate.some(function (n) { return p.known && p.known[n] && p.needs[n] >= 1; })) return false;
     if (act.onlyDx && !act.onlyDx.some(function (d) { return p.dx.indexOf(d) >= 0; })) return false;
     if (act.notDx && act.notDx.some(function (d) { return p.dx.indexOf(d) >= 0; })) return false;
     return true;
@@ -605,7 +608,7 @@
         var items = [{ a: main, lv: levelForAct(bank, main, p, s.week, prior), min: Math.round(sm * 0.6) }];
         if (second && second !== main) items.push({ a: second, lv: levelForAct(bank, second, p, s.week, prior), min: sm - Math.round(sm * 0.6) });
         else items[0].min = sm;
-        s.items[sp] = { list: items, kind: idx === 0 ? 'baseline' : retest ? 'retest' : 'regular' };
+        s.items[sp] = { list: items, kind: idx === 0 && cycle === 1 ? 'baseline' : retest ? 'retest' : 'regular' };
       });
     });
 
@@ -635,7 +638,7 @@
     applySteps(bank, p, prior, homeSeq);
 
     var weeks = [1, 2, 3, 4].map(function (w) {
-      var themes = ['Tanışlıq, ilkin qiymətləndirmə və təməl bacarıqlar', 'Bacarıqların möhkəmləndirilməsi', 'Çətinləşmə və ümumiləşdirmə', 'Möhkəmlətmə, yekun qiymətləndirmə və növbəti dövrün hazırlığı'];
+      var themes = [cycle > 1 ? 'Əvvəlki dövrün nəticələrinə əsasən davam və bacarıqların yenilənməsi' : 'Tanışlıq, ilkin qiymətləndirmə və təməl bacarıqlar', 'Bacarıqların möhkəmləndirilməsi', 'Çətinləşmə və ümumiləşdirmə', 'Möhkəmlətmə, yekun qiymətləndirmə və növbəti dövrün hazırlığı'];
       var from = (w - 1) * 7 + 1, to = w === 4 ? CYCLE_DAYS : w * 7;
       return { n: w, theme: themes[w - 1], from: from, to: to, fromDate: toISO(addDays(parseISO(start), from - 1)), toDate: toISO(addDays(parseISO(start), to - 1)) };
     });
