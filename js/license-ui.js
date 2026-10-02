@@ -21,11 +21,71 @@
 
   var sent = false, busy = false, msg = '';
 
+  function displayName(u) {
+    return (u.name || '').trim() || String(u.email || '').split('@')[0];
+  }
+
+  function closeAccount() {
+    var o = document.getElementById('accOverlay');
+    if (o) o.remove();
+    document.removeEventListener('keydown', onAccKey);
+    var c = document.querySelector('#userChip .user-name');
+    if (c) c.focus();
+  }
+  function onAccKey(ev) { if (ev.key === 'Escape') closeAccount(); }
+
+  function openAccount() {
+    var st = L.state;
+    if (!st.user || document.getElementById('accOverlay')) return;
+    var full = st.mode === 'full' && st.license;
+    var o = el('div', { 'class': 'acc-overlay', id: 'accOverlay' });
+    var card = el('div', { 'class': 'acc-card', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'accTitle' });
+    card.appendChild(el('h2', { id: 'accTitle' }, 'Hesab və lisenziya'));
+    var dl = el('dl');
+    function row(k, v) { dl.appendChild(el('dt', {}, k)); dl.appendChild(el('dd', {}, v)); }
+    row('Ad', displayName(st.user));
+    row('E-poçt', st.user.email || '');
+    if (full) {
+      row('Lisenziya', 'Aktivdir');
+      row('Bitmə tarixi', fmt(st.license.expiresAt));
+      row('Qalan müddət', L.daysLeft() + ' gün');
+    } else {
+      row('Lisenziya', st.mode === 'expired' ? 'Müddəti bitib' : 'Aktiv lisenziya yoxdur');
+    }
+    card.appendChild(dl);
+    var actions = el('div', { 'class': 'acc-actions' });
+    actions.appendChild(btn('Bağla', 'btn-ghost', closeAccount));
+    actions.appendChild(btn('Çıxış', 'btn-outline', function () { closeAccount(); sent = false; L.signOut(); }));
+    card.appendChild(actions);
+    o.appendChild(card);
+    o.addEventListener('click', function (ev) { if (ev.target === o) closeAccount(); });
+    document.body.appendChild(o);
+    document.addEventListener('keydown', onAccKey);
+    var first = card.querySelector('button');
+    if (first) first.focus();
+  }
+
+  function renderChip() {
+    var chip = document.getElementById('userChip');
+    if (!chip) return;
+    var st = L.state;
+    chip.textContent = '';
+    if (!st.user) { chip.hidden = true; return; }
+    chip.hidden = false;
+    var name = el('button', { type: 'button', 'class': 'user-name', 'aria-haspopup': 'dialog', title: 'Hesab və lisenziya məlumatı' }, displayName(st.user));
+    name.addEventListener('click', openAccount);
+    chip.appendChild(name);
+    chip.appendChild(btn('Çıxış', 'btn-ghost', function () { sent = false; L.signOut(); }));
+  }
+
   function render() {
     var host = document.getElementById('licenseBar');
     if (!host) return;
     var st = L.state;
+    renderChip();
     host.textContent = '';
+    var quiet = st.mode === 'full' && L.daysLeft() > 7 && st.error !== 'offline';
+    host.hidden = quiet;
     host.className = 'banner' + (st.mode === 'full' ? '' : ' demo');
     var row = el('div', { 'class': 'lic-row' });
     var text = el('div', { 'class': 'lic-text' });
@@ -34,10 +94,9 @@
     if (st.mode === 'full') {
       var d = L.daysLeft();
       text.appendChild(el('b', {}, 'Lisenziya aktivdir. '));
-      text.appendChild(document.createTextNode((st.user ? st.user.email + ' · ' : '') + 'bitmə tarixi ' + fmt(st.license.expiresAt) + ' (' + d + ' gün qalıb).'));
+      text.appendChild(document.createTextNode('Bitmə tarixi ' + fmt(st.license.expiresAt) + ' (' + d + ' gün qalıb).'));
       if (d <= 7) { host.className = 'banner demo'; text.appendChild(document.createTextNode(' Fasiləsiz işləmək üçün müddəti uzadın.')); actions.appendChild(el('a', { 'class': 'btn btn-outline btn-sm', href: L.waLink(), target: '_blank', rel: 'noopener' }, 'Uzat (WhatsApp)')); }
       if (st.error === 'offline') text.appendChild(document.createTextNode(' Offline rejim: yadda saxlanmış baza istifadə olunur.'));
-      actions.appendChild(btn('Çıxış', 'btn-outline', function () { L.signOut(); }));
     } else if (!st.user) {
       text.appendChild(el('b', {}, 'Nümunə rejimi. '));
       text.appendChild(document.createTextNode('Tam məşğələ bazası, 3 səviyyə və ev proqramı lisenziya ilə açılır. Lisenziyanız varsa Google hesabınızla daxil olun.'));
@@ -60,7 +119,6 @@
         text.appendChild(f);
       }
       actions.appendChild(el('a', { 'class': 'btn btn-outline btn-sm', href: L.waLink(), target: '_blank', rel: 'noopener' }, 'WhatsApp'));
-      actions.appendChild(btn('Çıxış', 'btn-outline', function () { sent = false; L.signOut(); }));
     }
     if (msg) text.appendChild(el('div', { 'class': 'lic-msg', role: 'alert' }, msg));
     row.appendChild(text); row.appendChild(actions); host.appendChild(row);

@@ -512,6 +512,7 @@
     setChips('behaviorChips', []); setChips('sensoryChips', []);
     state.pending = null; $('cycleBanner').hidden = true;
     $('f_baslama').value = E.todayISO();
+    prefillKurator();
     updateSeansInfo();
     $('intakeForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -617,8 +618,15 @@
     document.addEventListener('visibilitychange', function () { if (!document.hidden && Date.now() - cloud.at > 60000) cloudSync(); });
   }
 
+  function prefillKurator() {
+    var u = window.PlanBank && window.PlanBank.state && window.PlanBank.state.user;
+    var f = $('f_kurator');
+    if (u && f && !f.value.trim()) f.value = (u.name || '').trim();
+  }
+
   function syncOwner() {
     var me = owner();
+    prefillKurator();
     if (me) store.adoptLegacy(me);
     renderChildren();
     var cur = state.childKey && store.getChild(state.childKey, me);

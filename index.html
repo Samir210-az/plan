@@ -44,6 +44,17 @@ a{color:var(--blue2)}
 @keyframes floaty{0%,100%{transform:translateY(0px)} 50%{transform:translateY(26px)}}
 .hero-inner{position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:28px; flex-wrap:wrap}
 .brand{display:flex; gap:16px; align-items:center}
+.hero-top{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; width:100%; flex-wrap:wrap}
+.user-chip{display:flex; gap:8px; align-items:center; margin-left:auto}
+.user-name{background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.4); color:#fff; border-radius:999px; padding:7px 14px; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.user-name:hover{background:rgba(255,255,255,.24)}
+.acc-overlay{position:fixed; inset:0; background:rgba(12,47,61,.55); display:flex; align-items:center; justify-content:center; padding:16px; z-index:1000}
+.acc-card{background:#fff; color:var(--ink); border-radius:16px; padding:22px; max-width:380px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.acc-card h2{margin:0 0 14px; font-size:18px; color:var(--navy)}
+.acc-card dl{margin:0 0 16px; display:grid; grid-template-columns:auto 1fr; gap:8px 14px; font-size:14px}
+.acc-card dt{color:var(--muted)} .acc-card dd{margin:0; font-weight:600; word-break:break-all}
+.acc-card .acc-actions{display:flex; gap:8px; justify-content:flex-end}
+.acc-card .btn-ghost{background:#fff; color:var(--blue); border:1.5px solid var(--line)}
 .brand-badge{
   height:62px;min-width:62px;padding:8px 10px;border-radius:16px;flex:none;background:#fff;color:var(--navy);
   display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;
@@ -270,6 +281,7 @@ details.day>summary::-webkit-details-marker{display:none}
 .dv-frame{display:block;width:100%;border:0}
 body.viewing{overflow:hidden}
 @media print{
+  .user-chip,.acc-overlay{display:none!important}
   body.viewing>*:not(#docViewer){display:none !important}
   #docViewer{position:static;overflow:visible}
   body.viewing{overflow:visible}
@@ -306,12 +318,15 @@ body.viewing{overflow:hidden}
 
 <header class="hero">
   <div class="wrap hero-inner">
-    <div class="brand">
-      <div class="brand-badge" id="anpLogoTap">AN</div>
-      <div>
-        <h1>AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</h1>
-        <p>Elmi Rəhbər: Nahidə Axundova</p>
+    <div class="hero-top">
+      <div class="brand">
+        <div class="brand-badge" id="anpLogoTap">AN</div>
+        <div>
+          <h1>AN Psixoloji Dəstək və Reabilitasiya Mərkəzi</h1>
+          <p>Elmi Rəhbər: Nahidə Axundova</p>
+        </div>
       </div>
+      <div class="user-chip no-print" id="userChip" hidden></div>
     </div>
     <div class="no-print" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <button type="button" id="savedBtn" class="btn btn-outline" data-action="toggle-children" aria-controls="childrenCard" aria-expanded="false">📁 Yaddaşdan uşaq seç</button>
