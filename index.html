@@ -26,7 +26,7 @@ a{color:var(--blue2)}
 
 /* HERO */
 .hero{
-  position:relative; overflow:hidden; color:#fff; padding:64px 0 84px;
+  position:relative; overflow:hidden; color:#fff; padding:22px 0 84px;
   background:linear-gradient(120deg,#0c2f3d,#0e5a73 55%,#14829a 120%);
   background-size:220% 220%;
   animation:gradientShift 14s ease infinite;
@@ -45,7 +45,8 @@ a{color:var(--blue2)}
 .hero-inner{position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:28px; flex-wrap:wrap}
 .brand{display:flex; gap:16px; align-items:center}
 .hero-top{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; width:100%; flex-wrap:wrap}
-.user-chip{display:flex; gap:8px; align-items:center; margin-left:auto}
+.user-chip{display:flex; gap:8px; align-items:center; justify-content:flex-end; width:100%; margin:0 0 -14px}
+.user-chip[hidden]+.hero-top{margin-top:30px}
 .user-name{background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.4); color:#fff; border-radius:999px; padding:7px 14px; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .user-name:hover{background:rgba(255,255,255,.24)}
 .acc-overlay{position:fixed; inset:0; background:rgba(12,47,61,.55); display:flex; align-items:center; justify-content:center; padding:16px; z-index:1000}
@@ -318,6 +319,7 @@ body.viewing{overflow:hidden}
 
 <header class="hero">
   <div class="wrap hero-inner">
+    <div class="user-chip no-print" id="userChip" hidden></div>
     <div class="hero-top">
       <div class="brand">
         <div class="brand-badge" id="anpLogoTap">AN</div>
@@ -326,7 +328,6 @@ body.viewing{overflow:hidden}
           <p>Elmi Rəhbər: Nahidə Axundova</p>
         </div>
       </div>
-      <div class="user-chip no-print" id="userChip" hidden></div>
     </div>
     <div class="no-print" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <button type="button" id="savedBtn" class="btn btn-outline" data-action="toggle-children" aria-controls="childrenCard" aria-expanded="false">📁 Yaddaşdan uşaq seç</button>
