@@ -464,12 +464,52 @@
     if (prior && prior.levels && pn && prior.levels[pn]) start = prior.levels[pn];
     return start;
   }
+  var ADAPT_LABEL = {
+    asd: 'Autizm', adhd: 'DEHB', cp: 'Serebral iflic', down: 'Daun sindromu', gdd: 'Ümumi inkişaf gecikməsi', speech: 'Nitq pozuntusu',
+    id: 'Zehni gerilik', anxiety: 'Narahatlıq', ocd: 'OKP', learning: 'Öyrənmə çətinliyi', epilepsy: 'Epilepsiya',
+    aggression: 'Aqressiya', selfinjury: 'Özünə zərər', elopement: 'Qaçma', transition: 'Keçidlərdə çətinlik', stereotypy: 'Stereotipiya', sleep: 'Yuxu problemi',
+    stutter: 'Kəkələmə', social: 'Sosial çətinlik', executive: 'İcra funksiyaları', reading: 'Oxu çətinliyi', math: 'Hesab çətinliyi', handwriting: 'Yazı çətinliyi',
+    aspiration: 'Udma riski', allergy: 'Allergiya', medication: 'Dərman qəbulu', smallparts: 'Kiçik hissə riski'
+  };
+  var ADAPT_ORDER = ['epilepsy', 'aspiration', 'allergy', 'selfinjury', 'elopement', 'aggression', 'cp', 'down', 'asd', 'adhd', 'id', 'gdd', 'speech', 'learning', 'anxiety', 'ocd',
+    'stutter', 'transition', 'stereotypy', 'sleep', 'social', 'executive', 'reading', 'math', 'handwriting', 'medication', 'smallparts'];
+
+  // yaş zolağı və uşağa xas uyğunlaşdırmalarla birləşdirilmiş məşğələ görünüşü
+  function view(bank, id, p) {
+    var a = bank && bank.act && bank.act[id];
+    if (!a) return null;
+    var out = a;
+    var age = p && p.ageM != null ? p.ageM : null;
+    if (a.bands && age != null) {
+      for (var i = 0; i < a.bands.length; i++) {
+        var b = a.bands[i];
+        if (age >= b.range[0] && age <= b.range[1]) {
+          out = Object.assign({}, a, b);
+          delete out.range; delete out.label; delete out.bands; delete out.adapt;
+          out.band = b.label || '';
+          break;
+        }
+      }
+    }
+    if (out === a) out = Object.assign({}, a);
+    var adapt = [];
+    if (a.adapt && p) {
+      var have = {};
+      (p.dx || []).forEach(function (d) { have[d] = true; });
+      (p.tags || []).forEach(function (t) { have[t] = true; });
+      (p.flags || []).forEach(function (f) { have[f] = true; });
+      ADAPT_ORDER.forEach(function (k) { if (have[k] && a.adapt[k]) adapt.push({ k: k, label: ADAPT_LABEL[k] || k, text: a.adapt[k] }); });
+    }
+    out.adaptList = adapt.slice(0, 5);
+    return out;
+  }
+
   function levelForAct(bank, id, p, week, prior) {
     return levelFor(week, startLevelForAct(bank, id, p, prior));
   }
   // k-cı təkrar üçün pillə: başlanğıc səviyyədən yuxarıya doğru, ay boyu artan
   function stepFor(bank, id, p, prior, k, n) {
-    var a = bank.act[id];
+    var a = view(bank, id, p);
     if (!a || !a.steps || !a.steps.length) return null;
     var top = a.steps.length - 1;
     var base = Math.min(top, (startLevelForAct(bank, id, p, prior) - 1) * 2);
@@ -763,7 +803,7 @@
   return {
     monthSessions: monthSessions, SPECS: SPECS, NEED_IDS: NEED_IDS, CYCLE_DAYS: CYCLE_DAYS, VERSION: ENGINE_VERSION, PATTERNS: PATTERNS,
     norm: norm, ageMonths: ageMonths, ageLabel: ageLabel, parseISO: parseISO, toISO: toISO, addDays: addDays, todayISO: todayISO,
-    detectDx: detectDx, deriveProfile: deriveProfile, eligible: eligible, generate: generate, selectTests: selectTests, retimePlan: retimePlan,
+    detectDx: detectDx, deriveProfile: deriveProfile, eligible: eligible, view: view, generate: generate, selectTests: selectTests, retimePlan: retimePlan,
     progress: progress, recommendLevel: recommendLevel, nextCycleSeed: nextCycleSeed, compareResults: compareResults,
     validatePlan: validatePlan, usedCounts: usedCounts, levelFor: levelFor, startLevel: startLevel, hashSeed: hashSeed
   };
