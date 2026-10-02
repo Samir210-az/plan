@@ -6,7 +6,7 @@
 
   var SPECS = ['psixoloq', 'loqoped', 'ergoterapevt', 'pedaqoq'];
   var CYCLE_DAYS = 30;
-  var ENGINE_VERSION = 2;
+  var ENGINE_VERSION = 3;
   var PATTERNS = { 3: [1, 3, 5], 4: [1, 2, 4, 5], 5: [1, 2, 3, 4, 5] };
   var DEFAULT_SPW = 3;
   var NEED_IDS = ['joint', 'play', 'emotion', 'behavior', 'anxiety', 'attention', 'expressive', 'receptive',
@@ -297,6 +297,12 @@
     if (tags.indexOf('selfinjury') >= 0) { flags.push('selfinjury'); warnings.push('Özünə zərər davranışı qeydə alınıb: məşğələ otağında sərt və təhlükəli əşyalar olmamalıdır, hər seansın davranış qeydi aparılmalı, kurator və ailə dərhal məlumatlandırılmalıdır.'); }
     if (tags.indexOf('elopement') >= 0) { flags.push('elopement'); warnings.push('Qaçma davranışı qeydə alınıb: qapılar və pəncərələr nəzarətdə olmalı, uşaq heç vaxt otaqda tək buraxılmamalıdır.'); }
     if (ageM != null && ageM < 36) { flags.push('smallparts'); }
+    if (/keke|axicilig/.test(concern)) tags.push('stutter');
+    if (/oxu|hece|herf|disleksiya/.test(concern) || dx.indexOf('learning') >= 0) tags.push('reading');
+    if (/hesab|riyaziyyat|say\b|sayma|diskalkuliya|toplama|cixma/.test(concern)) tags.push('math');
+    if (/yazi|yazmaq|el yazisi|disqrafiya|xett/.test(concern)) tags.push('handwriting');
+    if (/dost|yasid|yoldas|sosial|unsiyyet|ünsiyyet/.test(concern) || (dx.indexOf('asd') >= 0 && ageM != null && ageM >= 96)) tags.push('social');
+    if (/planla|tapsiriq|dagin|unudur|vaxt|icra/.test(concern) || dx.indexOf('adhd') >= 0) tags.push('executive');
     if (tags.indexOf('aggression') >= 0) tags.push('safety');
 
     var asdConfirmed = !!(norm(f.diaqtarix) || norm(f.diaqtesdiq) === 'beli');
@@ -330,8 +336,8 @@
       sum += s;
     });
     var boost = 0;
-    (act.boost || []).forEach(function (t) { if (p.tags.indexOf(t) >= 0) boost += 2; });
-    if (act.dx) act.dx.forEach(function (d) { if (p.dx.indexOf(d) >= 0) boost += 1.5; });
+    (act.boost || []).forEach(function (t) { if (p.tags.indexOf(t) >= 0) boost += 4; });
+    if (act.dx) act.dx.forEach(function (d) { if (p.dx.indexOf(d) >= 0) boost += 4; });
     return best * 10 + sum + boost;
   }
   function primaryNeed(act, p) {
@@ -345,6 +351,8 @@
     return Math.max(1, Math.min(3, l));
   }
 
+  var MIN_POOL = 5;
+  var MAX_REP = 6;
   function rankPool(bank, group, p, prior) {
     var ids = Object.keys(bank.act).filter(function (id) { return bank.act[id].group === group; });
     var rows = ids.map(function (id) {
@@ -352,10 +360,13 @@
       if (!eligible(a, p)) return null;
       var sc = activityScore(a, p);
       if (prior && prior.used && prior.used[id]) sc -= Math.min(4, prior.used[id] * 0.5);
-      return { id: id, score: sc, need: primaryNeed(a, p) };
+      var pn = primaryNeed(a, p);
+      var boosted = (a.boost || []).some(function (t) { return p.tags.indexOf(t) >= 0; }) || (a.dx || []).some(function (d) { return p.dx.indexOf(d) >= 0; });
+      return { id: id, score: sc, need: pn, best: pn == null ? 0 : p.needs[pn], boosted: boosted };
     }).filter(Boolean);
     rows.sort(function (x, y) { return y.score - x.score || (x.id < y.id ? -1 : 1); });
-    return rows;
+    var need = rows.filter(function (r) { return r.best >= 1 || r.boosted; });
+    return need.length >= MIN_POOL ? need : rows.slice(0, Math.max(need.length, MIN_POOL));
   }
 
   function retimePlan(plan, minutes) {
@@ -390,9 +401,9 @@
     return buildSessionDates(parseISO(startISO) ? startISO : todayISO(), spw).length;
   }
 
-  function weekSlots(coreA, coreB, support, nSessions, week, rand) {
-    var slots = [], n = nSessions * 2;
-    var c1 = Math.max(1, Math.floor(n * 0.25)), c2 = Math.max(coreB ? 1 : 0, Math.floor(n * 0.2));
+  function weekSlots(coreA, coreB, support, nSessions, week, rand, per) {
+    var slots = [], n = nSessions * per;
+    var c1 = Math.max(1, Math.floor(n * 0.15)), c2 = Math.max(coreB ? 1 : 0, Math.floor(n * 0.1));
     var i;
     for (i = 0; i < c1; i++) slots.push(coreA);
     for (i = 0; i < c2; i++) slots.push(coreB || coreA);
@@ -403,18 +414,18 @@
     return shuffle(slots, rand).slice(0, n);
   }
 
-  function arrange(slots, nSessions, rand, prevMain) {
+  function arrange(slots, nSessions, rand, prevMain, per) {
     var best = null, bestPen = 1e9, tries = 60;
     for (var t = 0; t < tries; t++) {
       var s = t === 0 ? slots.slice() : shuffle(slots, rand);
       var sessions = [], pen = 0;
       for (var i = 0; i < nSessions; i++) {
-        var a = s[i * 2], b = s[i * 2 + 1];
-        if (a === b) pen += 5;
+        var a = s[i * per], b = per === 2 ? s[i * per + 1] : undefined;
+        if (b != null && a === b) pen += 5;
         var pm = i === 0 ? prevMain : sessions[i - 1][0];
         if (a === pm) pen += 3;
-        if (i > 0 && (b === sessions[i - 1][1])) pen += 1;
-        sessions.push([a, b]);
+        if (i > 0 && b != null && (b === sessions[i - 1][1])) pen += 1;
+        sessions.push(per === 2 ? [a, b] : [a]);
       }
       if (pen < bestPen) { bestPen = pen; best = sessions; }
       if (pen === 0) break;
@@ -431,23 +442,46 @@
     var byWeek = {};
     sdates.forEach(function (s) { (byWeek[s.week] = byWeek[s.week] || []).push(s); });
     var prevMain = null;
+    var per = pool.length * MAX_REP >= sdates.length * 2 ? 2 : 1;
     Object.keys(byWeek).sort().forEach(function (w) {
       var list = byWeek[w];
-      var slots = weekSlots(core[0], core[1], support, list.length, +w, rand);
-      var arr = arrange(slots, list.length, rand, prevMain);
+      var slots = weekSlots(core[0], core[1], support, list.length, +w, rand, per);
+      var arr = arrange(slots, list.length, rand, prevMain, per);
       list.forEach(function (s, i) { out[s.day] = arr[i]; });
       prevMain = arr[arr.length - 1][0];
     });
     return { pool: pool, bySession: out, core: core };
   }
 
-  function levelForAct(bank, id, p, week, prior) {
+  function startLevelForAct(bank, id, p, prior) {
     var a = bank.act[id];
     var pn = primaryNeed(a, p);
     var score = pn == null ? 1 : p.needs[pn];
     var start = startLevel(score);
     if (prior && prior.levels && pn && prior.levels[pn]) start = prior.levels[pn];
-    return levelFor(week, start);
+    return start;
+  }
+  function levelForAct(bank, id, p, week, prior) {
+    return levelFor(week, startLevelForAct(bank, id, p, prior));
+  }
+  // k-cı təkrar üçün pillə: başlanğıc səviyyədən yuxarıya doğru, ay boyu artan
+  function stepFor(bank, id, p, prior, k, n) {
+    var a = bank.act[id];
+    if (!a || !a.steps || !a.steps.length) return null;
+    var top = a.steps.length - 1;
+    var base = Math.min(top, (startLevelForAct(bank, id, p, prior) - 1) * 2);
+    var idx = n <= 1 ? base : base + Math.floor(k * (top - base) / (n - 1) + 0.5);
+    return Math.max(0, Math.min(top, idx));
+  }
+  function stepLevel(idx) { return Math.min(3, 1 + Math.floor(idx / 2)); }
+  function applySteps(bank, p, prior, entries) {
+    var total = {}, seen = {};
+    entries.forEach(function (it) { total[it.a] = (total[it.a] || 0) + 1; });
+    entries.forEach(function (it) {
+      var k = seen[it.a] || 0; seen[it.a] = k + 1;
+      var st = stepFor(bank, it.a, p, prior, k, total[it.a]);
+      if (st != null) { it.st = st; it.lv = stepLevel(st); }
+    });
   }
 
   // ---- testlər ----
@@ -575,6 +609,12 @@
       });
     });
 
+    SPECS.forEach(function (sp) {
+      var seq = [];
+      sessions.forEach(function (s) { if (s.items[sp]) s.items[sp].list.forEach(function (it) { seq.push(it); }); });
+      applySteps(bank, p, prior, seq);
+    });
+
     var homeIds = rankPool(bank, 'valideyn', p, prior).map(function (r) { return r.id; });
     var perDay = Math.max(1, Math.min(3, Math.round(p.homeMin / 20)));
     var home = [];
@@ -589,6 +629,10 @@
       }
       home.push({ day: d, date: toISO(addDays(parseISO(start), d - 1)), items: items });
     }
+
+    var homeSeq = [];
+    home.forEach(function (h) { h.items.forEach(function (it) { homeSeq.push(it); }); });
+    applySteps(bank, p, prior, homeSeq);
 
     var weeks = [1, 2, 3, 4].map(function (w) {
       var themes = ['Tanışlıq, ilkin qiymətləndirmə və təməl bacarıqlar', 'Bacarıqların möhkəmləndirilməsi', 'Çətinləşmə və ümumiləşdirmə', 'Möhkəmlətmə, yekun qiymətləndirmə və növbəti dövrün hazırlığı'];

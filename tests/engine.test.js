@@ -83,14 +83,20 @@ banks.forEach(function (b) {
     });
   });
 
-  test('[' + name + '] səviyyə həftə 3-dən başlayaraq artır, heç vaxt 1-3 aralığından çıxmır', () => {
+  test('[' + name + '] təkrarlarda pillə azalmır, səviyyə 1-3 aralığındadır, pillə təkrarı yoxdur', () => {
     const p = gen({}, bank);
-    const byAct = {};
-    p.sessions.forEach(s => E.SPECS.forEach(sp => { if (s.items[sp]) s.items[sp].list.forEach(x => { (byAct[x.a] = byAct[x.a] || {})[s.week] = x.lv; }); }));
-    Object.keys(byAct).forEach(id => {
-      const w = byAct[id];
-      if (w[1] != null && w[3] != null) assert.ok(w[3] >= w[1], id);
-      if (w[1] != null && w[2] != null) assert.strictEqual(w[1], w[2], id);
+    const seq = {};
+    p.sessions.forEach(s => E.SPECS.forEach(sp => { if (s.items[sp]) s.items[sp].list.forEach(x => { (seq[sp + '|' + x.a] = seq[sp + '|' + x.a] || []).push(x); }); }));
+    Object.keys(seq).forEach(k => {
+      const list = seq[k];
+      list.forEach((x, i) => {
+        assert.ok(x.lv >= 1 && x.lv <= 3, k);
+        if (i > 0) { assert.ok(x.lv >= list[i - 1].lv, k + ' səviyyə düşdü'); if (x.st != null) assert.ok(x.st >= list[i - 1].st, k + ' pillə düşdü'); }
+      });
+      if (list[0].st != null && list.length >= 2 && list.length <= 6) {
+        const steps = list.map(x => x.st);
+        assert.ok(new Set(steps).size >= Math.min(list.length, 2), k + ' bütün təkrarlar eyni pillə');
+      }
     });
   });
 
