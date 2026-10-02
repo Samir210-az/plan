@@ -99,8 +99,7 @@
       if (st.error === 'offline') text.appendChild(document.createTextNode(' Offline rejim: yadda saxlanmış baza istifadə olunur.'));
     } else if (!st.user) {
       text.appendChild(el('b', {}, 'Nümunə rejimi. '));
-      text.appendChild(document.createTextNode('Tam məşğələ bazası, 3 səviyyə və ev proqramı lisenziya ilə açılır. Lisenziyanız varsa Google hesabınızla daxil olun.'));
-      actions.appendChild(btn('Google ilə daxil ol', 'btn-primary', function () { L.signIn().catch(function (e) { msg = 'Daxil olmaq mümkün olmadı: ' + (e.code || e.message); render(); }); }));
+      text.appendChild(document.createTextNode('Tam məşğələ bazası, 3 səviyyə və ev proqramı lisenziya ilə açılır. Lisenziyanız varsa yuxarıdakı düymə ilə Google hesabınızla daxil olun.'));
     } else {
       text.appendChild(el('b', {}, st.mode === 'expired' ? 'Lisenziyanın müddəti bitib. ' : 'Bu hesab üçün aktiv lisenziya yoxdur. '));
       text.appendChild(document.createTextNode(st.user.email + ' hesabı ilə daxil olmusunuz. ' + (sent ? 'Sorğunuz göndərildi, WhatsApp ilə də yazın ki, tez aktivləşdirək.' : 'Aşağıdakı sorğunu göndərin və ya birbaşa WhatsApp-da yazın.')));
