@@ -131,7 +131,7 @@
   }
   function waLink() {
     var u = current.user;
-    var msg = 'Salam. Fərdi Reabilitasiya Planı Generatoru üçün lisenziya almaq istəyirəm.' + (u ? '\nGoogle hesabı: ' + u.email : '');
+    var msg = 'Salam. Fərdi Reabilitasiya Planı Generatorunda hesabımın aktiv edilməsini xahiş edirəm.' + (u ? '\nGoogle hesabı: ' + u.email : '');
     return 'https://wa.me/' + WA + '?text=' + encodeURIComponent(msg);
   }
   function onChange(fn) { listeners.push(fn); }
