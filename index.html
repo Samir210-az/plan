@@ -136,9 +136,12 @@ main{padding:36px 0 80px}
 .section-toggle.open .arrow{transform:rotate(90deg)}
 
 .submit-bar{
-  position:sticky; bottom:16px; display:flex; justify-content:center; margin-top:10px; z-index:20;
+  position:sticky; bottom:16px; display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:12px; margin-top:10px; z-index:20;
 }
-.submit-bar .btn{padding:16px 40px; font-size:16px; box-shadow:0 14px 30px rgba(14,106,130,.35)}
+.btn-wa{background:#1f8a4c; color:#fff; box-shadow:0 14px 30px rgba(31,138,76,.3); text-align:center; text-decoration:none}
+.btn-wa:hover{background:#19753f; transform:translateY(-1px)}
+.btn-wa[hidden]{display:none}
+.submit-bar .btn{padding:16px 32px; font-size:16px; box-shadow:0 14px 30px rgba(14,106,130,.35)}
 
 /* PLAN VIEW */
 #planSection[hidden]{display:none}
@@ -521,6 +524,7 @@ body.viewing{overflow:hidden}
 
     <div class="submit-bar">
       <button type="submit" class="btn btn-primary">✨ PLANI HAZIRLA</button>
+      <a class="btn btn-wa" id="waActivate" href="#" target="_blank" rel="noopener" hidden>Aktiv edilmək üçün WhatsApp ilə əlaqə saxlayın</a>
     </div>
   </form>
 

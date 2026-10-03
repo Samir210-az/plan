@@ -17,7 +17,7 @@ function boot(mode, user) {
   w.confirm = () => true;
   w.URL.createObjectURL = () => 'blob:x'; w.URL.revokeObjectURL = () => {};
   const demoBank = JSON.parse(fs.readFileSync(path.join(root, 'data/demo-bank.json'), 'utf8'));
-  w.PlanBank = { state: { user: user === undefined ? { uid: 'u1' } : user }, get: () => Promise.resolve({ bank: demoBank, mode: mode || 'full' }) };
+  w.PlanBank = { state: { user: user === undefined ? { uid: 'u1' } : user, mode: mode || 'full' }, waLink: () => 'https://wa.me/x', signIn: () => { w.__signIn = true; return Promise.resolve(); }, get: () => Promise.resolve({ bank: demoBank, mode: mode || 'full' }) };
   ['brand', 'engine', 'storage', 'exports', 'app'].forEach(n => w.eval(fs.readFileSync(path.join(root, 'js', n + '.js'), 'utf8')));
   return w;
 }
@@ -125,6 +125,25 @@ test('UI: lisenziyasız rejimdə plan yaranmır', { skip: !JSDOM && 'jsdom yoxdu
   assert.strictEqual(d.getElementById('planSection').hidden, true);
   assert.strictEqual(JSON.parse(w.localStorage.getItem('an_rehab_v2') || '{"children":{}}').children && Object.keys(JSON.parse(w.localStorage.getItem('an_rehab_v2') || '{"children":{}}').children).length, 0);
   assert.match(d.getElementById('modeBanner').textContent, /lisenziya/i);
+  const wa = d.getElementById('waActivate');
+  assert.strictEqual(wa.hidden, false, 'daxil olub aktiv olmayana WhatsApp düyməsi görünür');
+  assert.match(wa.textContent, /WhatsApp/);
+  assert.ok(!/0552107111|552107111/.test(d.getElementById('intakeForm').parentElement.textContent), 'nömrə mətn kimi görünmür');
+  w.close();
+});
+
+test('UI: daxil olmayanda «Planı hazırla» Google girişini açır, plan yaranmır', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {
+  const w = boot('demo', null);
+  const d = w.document;
+  await wait(50);
+  d.getElementById('f_ad').value = 'Əli'; d.getElementById('f_dogum').value = '2021-03-01';
+  d.getElementById('f_diaqnoz').value = 'Autizm spektr pozuntusu';
+  assert.strictEqual(d.getElementById('waActivate').hidden, true, 'daxil olmayanda WhatsApp düyməsi yoxdur');
+  d.getElementById('intakeForm').dispatchEvent(new w.Event('submit', { cancelable: true }));
+  await wait(100);
+  assert.strictEqual(w.__signIn, true);
+  assert.strictEqual(d.getElementById('planSection').hidden, true);
+  w.close();
 });
 
 test('UI: təsdiq gözlənilir, müdir təsdiqləyir, ixrac sənədində əks olunur', { skip: !JSDOM && 'jsdom yoxdur' }, async () => {

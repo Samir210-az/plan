@@ -141,6 +141,13 @@
   /* ---------- plan yaratma ---------- */
   function onSubmit(ev) {
     ev.preventDefault();
+    var B = window.PlanBank;
+    if (B && B.state && !B.state.user) {
+      toast('Plan hazırlamaq üçün əvvəlcə Google hesabı ilə daxil olun.');
+      B.signIn().catch(function () { toast('Daxil olmaq mümkün olmadı. Yenidən cəhd edin.'); });
+      return;
+    }
+    if (B && B.state && B.state.mode !== 'full') { loadBank().then(askLicense); return; }
     var f = collectForm();
     if (!f.ad || !f.diaqnoz || (!f.dogum && !f.yas)) { toast('Ad, doğum tarixi və əsas diaqnoz mütləq doldurulmalıdır.'); return; }
     if (!f.baslama) { f.baslama = E.todayISO(); $('f_baslama').value = f.baslama; }
@@ -176,7 +183,15 @@
     var p = window.PlanBank && window.PlanBank.get ? window.PlanBank.get() : fetch('data/demo-bank.json').then(function (r) { return r.json(); }).then(function (b) { return { bank: b, mode: 'demo' }; });
     return p.then(function (r) { state.bank = r.bank; state.mode = r.mode; renderModeBanner(); return r; });
   }
+  function renderActivate() {
+    var B = window.PlanBank, a = $('waActivate');
+    if (!a || !B || !B.state) return;
+    var need = !!B.state.user && B.state.mode !== 'full';
+    a.hidden = !need;
+    if (need) a.href = B.waLink();
+  }
   function renderModeBanner() {
+    renderActivate();
     var el = $('modeBanner');
     if (state.mode === 'full' || !state.bank) { el.hidden = true; return; }
     el.hidden = false;
@@ -200,7 +215,8 @@
     });
   }
   function askLicense() {
-    toast('Plan yaratmaq və açmaq üçün aktiv lisenziya lazımdır. Yuxarıdan Google ilə daxil olub sorğu göndərin.');
+    toast('Hesabınız hələ aktiv edilməyib. Aktivləşdirmək üçün «PLANI HAZIRLA» düyməsinin yanındakı WhatsApp düyməsi ilə yazın.');
+    renderActivate();
     var bar = $('licenseBar');
     if (bar && bar.scrollIntoView) bar.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
