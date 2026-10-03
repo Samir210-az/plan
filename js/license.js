@@ -12,6 +12,7 @@
   };
   var SDK = '10.13.1';
   var WA = '994552107111';
+  var SITE = 'https://ferdi-plan.vercel.app/';
   var CACHE_KEY = 'plan_bank_cache_v2';
   var DAY = 86400000;
 
@@ -131,7 +132,7 @@
   }
   function waLink() {
     var u = current.user;
-    var msg = 'Salam. Fərdi Reabilitasiya Planı Generatorunda hesabımın aktiv edilməsini xahiş edirəm.' + (u ? '\nGoogle hesabı: ' + u.email : '');
+    var msg = 'Salam. Fərdi Reabilitasiya Planı Generatorunda hesabımın aktiv edilməsini xahiş edirəm.' + (u ? '\nGoogle hesabı: ' + u.email : '') + '\nSayt: ' + SITE;
     return 'https://wa.me/' + WA + '?text=' + encodeURIComponent(msg);
   }
   function onChange(fn) { listeners.push(fn); }
