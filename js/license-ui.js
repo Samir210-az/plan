@@ -21,6 +21,33 @@
 
   var sent = false, busy = false, msg = '';
 
+  var draft = { name: '', work: '', phone: '' };
+
+  function requestForm(defaultName, label, submit) {
+    if (!draft.name && defaultName) draft.name = defaultName;
+    var f = el('div', { 'class': 'lic-form no-print' });
+    function field(key, placeholder, extra) {
+      var attrs = { 'class': 'mini', placeholder: placeholder, 'aria-label': placeholder, value: draft[key] };
+      Object.keys(extra || {}).forEach(function (k) { attrs[k] = extra[k]; });
+      var i = el('input', attrs);
+      i.addEventListener('input', function () { draft[key] = i.value; });
+      f.appendChild(i);
+    }
+    field('name', 'Ad Soyad');
+    field('work', 'İş yeri');
+    field('phone', 'Telefon', { inputmode: 'tel' });
+    f.appendChild(btn(label, 'btn-primary', function () {
+      if (busy) return;
+      if (!draft.name.trim() || !draft.phone.trim()) { msg = 'Ad və telefon mütləqdir.'; render(); return; }
+      busy = true;
+      submit({ name: draft.name.trim(), work: draft.work.trim(), phone: draft.phone.trim() }).catch(function (e) {
+        var code = e && e.code || '';
+        msg = code.indexOf('auth/') === 0 ? 'Daxil olmaq mümkün olmadı: ' + code : 'Sorğu göndərilmədi. WhatsApp ilə yazın.';
+      }).then(function () { busy = false; render(); });
+    }));
+    return f;
+  }
+
   function displayName(u) {
     return (u.name || '').trim() || String(u.email || '').split('@')[0];
   }
@@ -104,23 +131,17 @@
       if (st.error === 'offline') text.appendChild(document.createTextNode(' Offline rejim: yadda saxlanmış baza istifadə olunur.'));
     } else if (!st.user) {
       text.appendChild(el('b', {}, 'Nümunə rejimi. '));
-      text.appendChild(document.createTextNode('Tam məşğələ bazası, 3 səviyyə və ev proqramı lisenziya ilə açılır. Lisenziyanız varsa yuxarıdakı düymə ilə Google hesabınızla daxil olun.'));
+      text.appendChild(document.createTextNode('Tam məşğələ bazası, 3 səviyyə və ev proqramı lisenziya ilə açılır. Lisenziyanız varsa yuxarıdakı düymə ilə Google hesabınızla daxil olun. Yoxdursa, məlumatlarınızı yazıb aşağıdakı düyməni basın: Google hesabı seçiləcək və sorğu eyni anda göndəriləcək.'));
+      text.appendChild(requestForm('', 'Google ilə daxil ol və sorğu göndər', function (info) {
+        return L.signInAndRequest(info).then(function (r) { if (r.requested) sent = true; msg = ''; });
+      }));
     } else {
       text.appendChild(el('b', {}, st.mode === 'expired' ? 'Lisenziyanın müddəti bitib. ' : 'Bu hesab üçün aktiv lisenziya yoxdur. '));
       text.appendChild(document.createTextNode(st.user.email + ' hesabı ilə daxil olmusunuz. ' + (sent ? 'Sorğunuz göndərildi, WhatsApp ilə də yazın ki, tez aktivləşdirək.' : 'Aşağıdakı sorğunu göndərin və ya birbaşa WhatsApp-da yazın.')));
       if (!sent) {
-        var f = el('div', { 'class': 'lic-form no-print' });
-        var n = el('input', { 'class': 'mini', placeholder: 'Ad Soyad', 'aria-label': 'Ad Soyad', value: st.user.name || '' });
-        var w = el('input', { 'class': 'mini', placeholder: 'İş yeri', 'aria-label': 'İş yeri' });
-        var p = el('input', { 'class': 'mini', placeholder: 'Telefon', 'aria-label': 'Telefon', inputmode: 'tel' });
-        f.appendChild(n); f.appendChild(w); f.appendChild(p);
-        f.appendChild(btn('Sorğu göndər', 'btn-primary', function () {
-          if (busy) return;
-          if (!n.value.trim() || !p.value.trim()) { msg = 'Ad və telefon mütləqdir.'; render(); return; }
-          busy = true;
-          L.sendRequest({ name: n.value.trim(), work: w.value.trim(), phone: p.value.trim() }).then(function () { sent = true; msg = ''; }).catch(function () { msg = 'Sorğu göndərilmədi. WhatsApp ilə yazın.'; }).then(function () { busy = false; render(); });
+        text.appendChild(requestForm(st.user.name, 'Sorğu göndər', function (info) {
+          return L.sendRequest(info).then(function () { sent = true; msg = ''; });
         }));
-        text.appendChild(f);
       }
       actions.appendChild(el('a', { 'class': 'btn btn-outline btn-sm', href: L.waLink(), target: '_blank', rel: 'noopener' }, 'WhatsApp'));
     }

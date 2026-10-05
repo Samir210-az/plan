@@ -124,11 +124,27 @@
   function signOut() {
     return firebaseReady().then(function (fb) { clearCache(); return fb.auth().signOut(); });
   }
+  function requestRecord(u, info) {
+    return { email: u.email, name: String(info.name || u.name || u.displayName || '').slice(0, 120), work: String(info.work || '').slice(0, 160), phone: String(info.phone || '').slice(0, 30), ts: Date.now() };
+  }
   function sendRequest(info) {
     if (!current.user) return Promise.reject(new Error('Əvvəlcə daxil olun'));
     var u = current.user;
-    var rec = { email: u.email, name: String(info.name || u.name || '').slice(0, 120), work: String(info.work || '').slice(0, 160), phone: String(info.phone || '').slice(0, 30), ts: Date.now() };
-    return firebaseReady().then(function (fb) { return fb.database().ref('plan_requests/' + u.uid).set(rec); });
+    return firebaseReady().then(function (fb) { return fb.database().ref('plan_requests/' + u.uid).set(requestRecord(u, info)); });
+  }
+  function signInAndRequest(info) {
+    return firebaseReady().then(function (fb) {
+      var prov = new fb.auth.GoogleAuthProvider();
+      prov.setCustomParameters({ prompt: 'select_account' });
+      return fb.auth().signInWithPopup(prov).then(function (cred) {
+        var u = cred.user;
+        return fb.database().ref('plan_licenses/' + u.uid).once('value').then(function (snap) {
+          var lic = snap.val();
+          if (lic && lic.expiresAt > Date.now()) return { requested: false };
+          return fb.database().ref('plan_requests/' + u.uid).set(requestRecord(u, info)).then(function () { return { requested: true }; });
+        });
+      });
+    });
   }
   function waLink() {
     var u = current.user;
@@ -138,5 +154,5 @@
   function onChange(fn) { listeners.push(fn); }
   function daysLeft() { return current.license && current.license.expiresAt ? Math.ceil((current.license.expiresAt - Date.now()) / DAY) : 0; }
 
-  window.PlanBank = { get: get, signIn: signIn, signOut: signOut, sendRequest: sendRequest, waLink: waLink, onChange: onChange, state: current, daysLeft: daysLeft, firebaseReady: firebaseReady };
+  window.PlanBank = { get: get, signIn: signIn, signOut: signOut, sendRequest: sendRequest, signInAndRequest: signInAndRequest, waLink: waLink, onChange: onChange, state: current, daysLeft: daysLeft, firebaseReady: firebaseReady };
 })();
